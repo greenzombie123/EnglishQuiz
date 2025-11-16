@@ -1,0 +1,19 @@
+html *{
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+body{
+    display: flex;
+    flex-direction: column;
+
+    .mainContainer{
+        flex: 1;
+    }
+
+    footer{
+
+    }
+}
+

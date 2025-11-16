@@ -44,7 +44,7 @@ If not signed up
         2. Retreive the values for username, password and type.
         3. Check if username already exists
             1. If not, create teacher row and add it to teacher's table.
-                1. Redirect them to `/signupcompleted`.
+                1. Redirect them to `/signup/completed`.
                 2. Send signupcompleted page
                 3. Click on button to them to lessons page. //=> lessons page
             2. If so, redirect them to `/signup/error/taken` or `/signup/error/badinput`
@@ -134,7 +134,45 @@ router.get("/lesson/jackson22/1")
 ---------------------------------------------------------------------------------------------------------------------
 
 
+```sql
 
+CREATE TABLE teachers (
+    id uuid PRIMARY KEY DEFAULT uuidv7(),
+    username varchar(20) NOT NULL,
+    password varchar(12) NOT NULL,   
+    type text CHECK (text = 'student' OR text = 'teacher'),
+    students uuid[],
+    lessons uuid[] 
+)
+
+CREATE TABLE students (
+    id uuid PRIMARY KEY DEFAULT uuidv7(),
+    username varchar(20) NOT NULL,
+    password varchar(12) NOT NULL,   
+    type text CHECK (text = 'student' OR text = 'teacher'),
+    completedLessons integer[]
+)
+
+CREATE TYPE slide AS (
+    type text CHECK type = 'question' OR text = 'vocab'
+    targetWord text CHECK (type = 'vocab'),
+    definition text CHECK (type = 'vocab'),
+    question text CHECK (type = 'question'),
+    correctAnswer text CHECK (type = 'question'),
+    wrongAnswer1 text CHECK (type = 'question'),
+    wrongAnswer2 text CHECK (type = 'question'),
+    wrongAnswer3 text CHECK (type = 'question'),
+)
+
+CREATE TABLE lessons (
+    id uuid PRIMARY KEY,
+    teacherId uuid,
+    name text,
+    slides jsonb
+)
+
+
+```
 
  
 

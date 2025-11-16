@@ -1,44 +1,25 @@
 ```ts 
 
+    // PostgreSQL 
+
     type User = Student | Teacher
 
     type Student = {
-        id:string, //uuid
-        name:string,
+        username:string,
+        password:string,
         type:"student",
-        teacherId:string
-        lessons:LessonInfo[] 
-    }
-
-     type LessonInfo = {
-        teacherId:string,
-        name:string,
-        lessonId:number,
-        isCompleted:boolean
-    }
-
-    type TeacherLessonInfo = {
-        teacherId:string,
-        name:string,
-        lessonId:number,
+        teacherId:string //uuid
+        completedLessons:string[] //lessonId[]
     }
 
     type Teacher = {
         id:string, // uuid
-        name:string,
+        username:string,
+        password:string,
         type:"teacher",
-        lessons:TeacherLessonInfo[],
-        students:string[] //studentId
-    }
-
-    // PostgreSQL 
-
-    type Teacher = {
-        id:string, // uuid
-        name:string,
-        type:"teacher",
-        lessonInfo:TeacherLessonInfo[],
-        lessons:Lesson[]
+        students:string[] //studentId[]
+        lessons:string[], //lessonId[]
+        //  lessonInfo:TeacherLessonInfo[],
     }
 
    
@@ -218,23 +199,6 @@
         changeSlides(){}
     }
 
-```
-
-```sql
-CREATE TYPE slide AS (
-    id integer
-    type text CHECK type = 'question' OR text = 'vocab'
-    targetWord text CHECK type = 'vocab'
-    definition text CHECK type = 'vocab'
-    question text CHECK type = 'question'
-    correctAnswer text
-    wrongAnswer1 text
-    wrongAnswer2 text
-    wrongAnswer3 text
-)
-
-# INSERT 
-# UPDATE 
 ```
 
 Student Lessons Page -> Lesson Page
