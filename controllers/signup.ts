@@ -31,6 +31,10 @@ export const authenticateUser = async (req:TypedRequestBody, res:Response, next:
         handleAddNewTeacher(username, password)
     }
 
+    else{
+        handleAddNewStudent(username, password)
+    }
+        
     res.end()
 } 
 
@@ -49,6 +53,12 @@ const handleDoesUserExist = async (username:string, password:string)=>{
 const handleAddNewTeacher = async (username:string, password:string)=>{
     const id = createId()
     await pool.query("INSERT INTO teachers (username, password, id) VALUES($1,$2,$3)", [username, password, id])
+}
+
+// Add new student to the database
+const handleAddNewStudent = async (username:string, password:string)=>{
+    const id = createId()
+    await pool.query("INSERT INTO students (username, password, id) VALUES($1,$2,$3)", [username, password, id])
 }
 
 // Call this when user is trying to register. Checks if all fields are filled or not and sanitize the values
