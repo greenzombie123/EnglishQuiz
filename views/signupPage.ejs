@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="./signupPage.css">
+</head>
+<body>
+    <div class="mainContainer">
+        <form action="/signup" method="post">
+            <p><label for="username">Username</label><input type="text" name="username" id="username"></p>
+            <p><label for="password">Password</label><input type="text" name="password" id="password"></p>
+            <fieldset>
+                <legend>Are you a student or teacher</legend>
+                <input type="checkbox" name="student" id="student"><label for="student">Student</label>
+                <input type="checkbox" name="teacher" id="teacher"><label for="teacher">Teacher</label>
+            </fieldset>
+            <button type="submit">Ok</button>
+        </form>
+    </div>
+    <footer>Konnnyaku English</footer>
+</body>
+</html>

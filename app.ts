@@ -3,6 +3,7 @@ import type { Request, Response, NextFunction } from "express";
 import views from "./dirNames.ts";
 import { body, matchedData, validationResult } from "express-validator";
 import indexRouter from "./routes/index.ts";
+import signupRouter from "./routes/signup.ts";
 
 // Create a server
 const server = express();
@@ -18,8 +19,13 @@ server.use(express.json());
 // Serve static files from views directory
 server.use(express.static(views[0] as string));
 
-server.use(indexRouter)
+// Routers
 
+server.use("/signup", signupRouter)
+server.use("/", indexRouter)
+
+// server.use("/signup",signupRouter)
+// server.use("/", indexRouter)
 
 server.listen(3000, (error) => {
   if (error) throw error;
