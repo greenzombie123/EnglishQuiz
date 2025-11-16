@@ -1,17 +1,38 @@
 import type { Request, Response, NextFunction } from "express";
-import { body, validationResult,matchedData } from "express-validator";
+import { body, validationResult } from "express-validator";
+import { pool } from "../pool.ts";
 
 export const getSignUpPage = (req: Request, res: Response) => {
-    req.body
   res.render("signupPage");
 };
 
-interface TypedRequestBody<T> extends Request{
-    body:T
+// Allows you to define the types 
+interface TypedRequestBody extends Request{
+    body:{
+        username:string,
+        password:string,
+        userType:string
+    }
 }
 
-export const handleDoesUserExist = (req:TypedRequestBody<{username:string, password:string, userType:string}>, res:Response, next:NextFunction)=>{
+// Authenticates user
+export const authenticateUser = async (req:TypedRequestBody, res:Response, next:NextFunction)=>{
     const {username, password, userType} = req.body
+
+    const result = await handleDoesUserExist(username, password)
+
+    res.send(result)
+} 
+
+// Check if the user has already registered or not
+export const handleDoesUserExist = async (username:string, password:string)=>{
+
+    const teachers = await pool.query("SELECT * FROM teachers WHERE username = $1", [username])
+    const students = await pool.query("SELECT * FROM students WHERE username = $1", [password])
+
+    if(teachers.rowCount === null || students.rowCount === null) return false
+    else if(teachers.rowCount + students.rowCount === 0) return false
+    return true
 }
 
 // Call this when user is trying to register. Checks if all fields are filled or not and sanitize the values

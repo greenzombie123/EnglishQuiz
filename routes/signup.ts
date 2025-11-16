@@ -1,9 +1,9 @@
 import { Router } from "express";
-import { checkSignUpForm, getSignUpPage, validateSignUpForm } from "../controllers/signup.ts";
+import { authenticateUser, checkSignUpForm, getSignUpPage, handleDoesUserExist, validateSignUpForm } from "../controllers/signup.ts";
 
 const signupRouter = Router();
 
 signupRouter.get("/", getSignUpPage)
-signupRouter.post("/", checkSignUpForm(), validateSignUpForm)
+signupRouter.post("/", checkSignUpForm(), validateSignUpForm, authenticateUser)
 
 export default signupRouter
