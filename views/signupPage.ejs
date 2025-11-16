@@ -8,13 +8,13 @@
 </head>
 <body>
     <div class="mainContainer">
-        <form action="/signup" method="post">
+        <form action="/signup" method="POST">
             <p><label for="username">Username</label><input type="text" name="username" id="username"></p>
             <p><label for="password">Password</label><input type="text" name="password" id="password"></p>
             <fieldset>
                 <legend>Are you a student or teacher</legend>
-                <input type="checkbox" name="student" id="student"><label for="student">Student</label>
-                <input type="checkbox" name="teacher" id="teacher"><label for="teacher">Teacher</label>
+                <input type="radio" name="userType" value="student" id="student" checked><label for="student">Student</label>
+                <input type="radio" name="userType" value="teacher" id="teacher"><label for="teacher">Teacher</label>
             </fieldset>
             <button type="submit">Ok</button>
         </form>
