@@ -33,10 +33,15 @@ export const authenticateUser = async (req:TypedRequestBody, res:Response, next:
 
     else{
         handleAddNewStudent(username, password)
+        res.redirect("/signupComplete")
     }
         
     res.end()
 } 
+
+export const getSignUpCompletePage = (req:Request, res:Response, next:NextFunction)=>{
+
+}
 
 // Check if the user has already registered or not
 const handleDoesUserExist = async (username:string, password:string)=>{

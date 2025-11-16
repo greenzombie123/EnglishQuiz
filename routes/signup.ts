@@ -3,6 +3,7 @@ import { authenticateUser, checkSignUpForm, getSignUpPage, validateSignUpForm } 
 
 const signupRouter = Router();
 
+signupRouter.get("/completed", getSignUpCompletePage)
 signupRouter.get("/", getSignUpPage)
 signupRouter.post("/", checkSignUpForm(), validateSignUpForm, authenticateUser)
 

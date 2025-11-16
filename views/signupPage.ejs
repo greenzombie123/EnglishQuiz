@@ -9,14 +9,14 @@
 <body>
     <div class="mainContainer">
         <form action="/signup" method="POST">
-            <p><label for="username">Username</label><input type="text" name="username" id="username"></p>
-            <p><label for="password">Password</label><input type="text" name="password" id="password"></p>
+            <p><label for="username">Username</label><input type="text" name="username" id="username" autocomplete="username"></p>
+            <p><label for="password">Password</label><input type="password" name="password" id="password" autocomplete="current-password"></p>
             <fieldset>
                 <legend>Are you a student or teacher</legend>
-                <input type="radio" name="userType" value="student" id="student" checked><label for="student">Student</label>
+                <input type="radio" name="userType" value="student" id="student"><label for="student">Student</label>
                 <input type="radio" name="userType" value="teacher" id="teacher"><label for="teacher">Teacher</label>
             </fieldset>
-            <button type="submit">Ok</button>
+            <button type="submit">Sign Up</button>
         </form>
     </div>
     <footer>Konnnyaku English</footer>
