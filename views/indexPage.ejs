@@ -7,8 +7,11 @@
     <link rel="stylesheet" href="./indexPage.css">
 </head>
 <body>
+    <% if (locals.user) { %>
+     <h1>Hello, <%= locals.user.username %></h1>
+    <% } %>
     <div class="mainContainer">
-        <form action="/" method="get" id="login">
+        <form action="/login" method="get" id="login">
             <button type="submit">Log In</button>
         </form>
         <form action="/signup" method="get" id="signup">

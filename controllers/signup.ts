@@ -3,6 +3,10 @@ import { body, validationResult } from "express-validator";
 import { pool } from "../pool.ts";
 import { v7 as createId } from "uuid";
 
+export const getSignUpCompletePage = (req:Request, res:Response, next:NextFunction)=>{
+    res.render('signupComplete')
+}
+
 export const getSignUpPage = (req: Request, res: Response) => {
   res.render("signupPage");
 };
@@ -28,20 +32,18 @@ export const authenticateUser = async (req:TypedRequestBody, res:Response, next:
     }
 
     if(userType === "teacher"){
-        handleAddNewTeacher(username, password)
+        await handleAddNewTeacher(username, password)
+        res.redirect("/signup/completed")
     }
 
     else{
-        handleAddNewStudent(username, password)
-        res.redirect("/signupComplete")
+        console.log("efefe")
+        await handleAddNewStudent(username, password)
+        res.redirect("/signup/completed")
     }
         
     res.end()
 } 
-
-export const getSignUpCompletePage = (req:Request, res:Response, next:NextFunction)=>{
-
-}
 
 // Check if the user has already registered or not
 const handleDoesUserExist = async (username:string, password:string)=>{

@@ -6,8 +6,9 @@
     <title>Document</title>
 </head>
 <body>
-    <form action="/lessons" method="get" id="signUpComplete" ></form>
-    <h1>You are all set!</h1>
-    <button type="submit" form="signUpComplete">Go To Lessons Page</button>
+    <form action="/lessons" method="get" id="signUpComplete" >
+        <h1>You are all set, <%= user.username %>!</h1>
+        <button type="submit">Go To Lessons Page</button>
+    </form>
 </body>
 </html>
