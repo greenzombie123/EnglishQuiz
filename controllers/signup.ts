@@ -21,7 +21,7 @@ interface TypedRequestBody extends Request{
 }
 
 // Authenticates user
-export const authenticateUser = async (req:TypedRequestBody, res:Response, next:NextFunction)=>{
+export const handleAddUser = async (req:TypedRequestBody, res:Response, next:NextFunction)=>{
     const {username, password, userType} = req.body
 
     const result = await handleDoesUserExist(username, password)
