@@ -8,6 +8,7 @@ import passport from "passport";
 import session from "express-session";
 import { Strategy } from "passport-local";
 import logInRouter from "./routes/login.ts";
+import lessonsRouter from "./routes/lessons.ts";
 
 // Set up Pool to query Postgres through node
 export const pool = new Pool({
@@ -103,8 +104,7 @@ const strategy = new Strategy(async function verify(username, password, done) {
 passport.serializeUser(function (user, done) {
   return done(null, {
     username: user.username,
-    userType: user.userType,
-    id:user.id
+    userType: user.userType
   });
 });
 
@@ -116,6 +116,7 @@ passport.use(strategy);
 
 // Routers
 
+server.use("/lessons", lessonsRouter)
 server.use("/login", logInRouter);
 server.use("/signup", signupRouter);
 server.use("/", indexRouter);

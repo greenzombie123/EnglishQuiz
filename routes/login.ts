@@ -1,23 +1,17 @@
 import type { NextFunction, Request, Response } from "express";
 import { Router } from "express";
 import passport from "passport";
+import { getLessonsPage } from "../controllers/lessons.ts";
+import { getLogInPage, logInUser } from "../controllers/login.ts";
 
 const logInRouter = Router();
 
-logInRouter.get("/", (req: Request, res: Response, next: NextFunction) => {
-  res.render("login");
-});
+logInRouter.get("/", getLogInPage);
 
 logInRouter.post(
   "/",
-  passport.authenticate("local", {
-    failureRedirect: "/login",
-    failureMessage: true,
-  }),
-  (req:Request, res:Response, next:NextFunction)=>{
-    console.log(req.user)
-    res.end()
-  }
+  logInUser(),
+  getLessonsPage
 );
 
 export default logInRouter

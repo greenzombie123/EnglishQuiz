@@ -1,3 +1,4 @@
+import type {Request, Response, NextFunction } from "express";
 import { Router } from "express";
 import { checkSignUpForm, getSignUpCompletePage, getSignUpPage, handleAddUser, validateSignUpForm } from "../controllers/signup.ts";
 
