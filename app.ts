@@ -9,6 +9,7 @@ import session from "express-session";
 import { Strategy } from "passport-local";
 import logInRouter from "./routes/login.ts";
 import lessonsRouter from "./routes/lessons.ts";
+import findTeacherRouter from "./routes/findTeacher.ts";
 
 // Set up Pool to query Postgres through node
 export const pool = new Pool({
@@ -50,7 +51,6 @@ server.use(passport.session());
 
 // Type for Students and Teachers
 export type User = {
-  id: string;
   username: string;
   password: string;
 };
@@ -116,6 +116,7 @@ passport.use(strategy);
 
 // Routers
 
+server.use("/findTeacher", findTeacherRouter)
 server.use("/lessons", lessonsRouter)
 server.use("/login", logInRouter);
 server.use("/signup", signupRouter);

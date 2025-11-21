@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+        <% if (!isTeacherFound) { %>
+            <form action="/findTeacher" method="post">
+                <label for="username">Enter your teacher's username</label>
+                <input type="text" id="username" name="username">
+                <% if (username) { %>
+                <p>Couldn't find <%= username %></p>
+                <%}%>
+                <button>Find Teacher</button>
+            </form>
+        <% }  else { %>
+            <form action="/findTeacher/finished" method="post">
+                <h3>Is this your teacher?</h3>
+                <p><%= username %> </p>
+                <input type="hidden" name="teacher" value=<%= username %>>
+                <button>Yes</button>
+                <button formaction="/findTeacher" formmethod="get">No</button>
+            </form>
+        <% } %>
+    
+</body>
+</html>
