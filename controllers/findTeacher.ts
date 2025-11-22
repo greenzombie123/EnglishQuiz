@@ -8,8 +8,17 @@ type FindTeacherLocalsType = {
     isTeacherFound:boolean
 }
 
-export const addStudentToTeacher = (req:Request, res:Response, next:NextFunction)=>{
-    console.log(1231231231232321331)
+export const addStudentToTeacher = async (req:Request<{}, {}, {teacher:string}>, res:Response, next:NextFunction)=>{
+    if(!req.user)return res.redirect("/")
+    try {
+        const {username:student} = req.user
+        const teacher = req.body.teacher
+        await pool.query("INSERT INTO teachers_students (teacherUserName, studentUserName) VALUES($1, $2)", [teacher, student])
+        res.redirect("/signup/completed")
+    } catch (error) {
+        res.send(error)
+    }
+   
 }
 
 export const getFindTeacherPage = (req:Request, res:Response<unknown, FindTeacherLocalsType>, next:NextFunction)=>{
@@ -18,6 +27,8 @@ export const getFindTeacherPage = (req:Request, res:Response<unknown, FindTeache
 }
 
  const createUserNameValidator = ()=> body("username").notEmpty().escape() 
+
+ export const createTeacherValidator = ()=> body("teacher").notEmpty().escape() 
 
  const validateUserName = (req:Request, res:Response, next:NextFunction)=>{
     const results = validationResult(req)

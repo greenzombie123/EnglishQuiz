@@ -8,7 +8,7 @@ import {
 
 const findTeacherRouter = Router();
 
-findTeacherRouter.post("/finished", addStudentToTeacher)
+findTeacherRouter.post("/finished", addStudentToTeacher);
 
 findTeacherRouter.get("/", getFindTeacherPage);
 

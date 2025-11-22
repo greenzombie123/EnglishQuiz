@@ -53,7 +53,7 @@ export const handleAddUser = async (
     const user = { username, userType };
     req.logIn(user, (err) => {
       if (err) return next(err);
-      return res.redirect("/signup/completed");
+      return res.redirect("/findTeacher");
     });
   }
 
