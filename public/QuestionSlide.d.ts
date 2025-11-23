@@ -6,5 +6,6 @@ export type QuestionSlideType = {
     wrongAnswer1: string;
     wrongAnswer2: string;
     wrongAnswer3: string;
+    sliderOrder: number;
 };
 //# sourceMappingURL=QuestionSlide.d.ts.map

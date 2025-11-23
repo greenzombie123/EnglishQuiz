@@ -1,11 +1,22 @@
 import "./IntroSlide.ts";
 import "./QuestionSlide.ts"
+import type { Slide } from "./SlideState.ts";
 
 export interface HTMLLessonSlider extends HTMLElement{
 
 }
 
-class Lesson extends HTMLElement{
+export type Lesson = {
+    id:number,
+    name:string,
+    slides:Slide[]
+} 
+
+export type LessonData = {
+
+}
+
+class LessonSlider extends HTMLElement{
     constructor(){
         super()
     }
@@ -23,7 +34,7 @@ class Lesson extends HTMLElement{
     }
 }
 
-customElements.define("lesson-slider", Lesson)
+customElements.define("lesson-slider", LessonSlider)
 
 
 

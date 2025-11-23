@@ -1,6 +1,6 @@
 import "./IntroSlide.js";
 import "./QuestionSlide.js";
-class Lesson extends HTMLElement {
+class LessonSlider extends HTMLElement {
     constructor() {
         super();
     }
@@ -14,5 +14,5 @@ class Lesson extends HTMLElement {
     disconnectedCallback() {
     }
 }
-customElements.define("lesson-slider", Lesson);
+customElements.define("lesson-slider", LessonSlider);
 //# sourceMappingURL=Lesson.js.map

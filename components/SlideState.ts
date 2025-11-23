@@ -1,7 +1,7 @@
 import type { IntroSlideType  } from "./IntroSlide.ts";
 import type { QuestionSlideType } from "./QuestionSlide.ts";
 
-type Slide = IntroSlideType | QuestionSlideType;
+export type Slide = IntroSlideType | QuestionSlideType;
 
 export const slideState = () => {
   const slides: Slide[] = [];

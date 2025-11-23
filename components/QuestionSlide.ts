@@ -6,6 +6,7 @@ export type QuestionSlideType = {
   wrongAnswer1: string;
   wrongAnswer2: string;
   wrongAnswer3: string;
+  sliderOrder:number
 };
 
 class QuestionSlide extends HTMLElement{
