@@ -1,8 +1,12 @@
 import "./IntroSlide.js";
 import "./QuestionSlide.js";
-class LessonSlider extends HTMLElement {
+import { slideState } from "./SlideState.js";
+export class LessonSlider extends HTMLElement {
     constructor() {
         super();
+        this.currentSlide = null;
+        this.slideState = slideState();
+        this.currentSlide;
     }
     connectedCallback() {
         const template = document.getElementById("lesson-slider");
@@ -11,7 +15,9 @@ class LessonSlider extends HTMLElement {
         const shadowRoot = this.attachShadow({ mode: "closed" });
         shadowRoot.appendChild(clonedContent);
     }
-    disconnectedCallback() {
+    disconnectedCallback() { }
+    setSlides(slides) {
+        this.slideState.setSlides(slides);
     }
 }
 customElements.define("lesson-slider", LessonSlider);

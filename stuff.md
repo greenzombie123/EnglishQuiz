@@ -77,7 +77,7 @@
     }() 
 
 
-    class Lesson extends HTMLElement{
+    class LessonSlider extends HTMLElement{
 
         currentSlide:HTMLSlideElement
 

@@ -3,17 +3,35 @@ import type { QuestionSlideType } from "./QuestionSlide.ts";
 
 export type Slide = IntroSlideType | QuestionSlideType;
 
-export const slideState = () => {
-  const slides: Slide[] = [];
-  const currentSlideIndex: number | "Finished" = 0;
+export type SlideState = {
+  changeSlide(nextIndex: number):void
+  setSlides(slides: Slide[]):void
+  getCurrentSlide():void
+  isLastSlide():boolean
+}
 
-  const changeSlide = (nextIndex: number) => {};
-  const setSlides = (slides: Slide[]) => {};
-  const getCurrentSlide = () => {};
+export const slideState = ():SlideState => {
+  let slides: Slide[];
+  let currentSlideIndex: number = 0;
+
+  const isLastSlide = ()=> slides.length + 1 === currentSlideIndex
+
+  const changeSlide = (nextIndex: number) => {
+    currentSlideIndex =+ nextIndex
+  };
+
+  const setSlides = (newSlides: Slide[]) => {
+    slides = newSlides
+    console.log(slides)
+  };
+  const getCurrentSlide = () => {
+    return slides[currentSlideIndex] 
+  };
 
   return {
     changeSlide,
     setSlides,
     getCurrentSlide,
+    isLastSlide
   };
 };

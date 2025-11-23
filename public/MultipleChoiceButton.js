@@ -1,12 +1,8 @@
-export interface MultiChoiceButtonBase{
-  
-};
-
-class MultiChoiceButton extends HTMLElement implements MultiChoiceButtonBase{
-      constructor(){
-        super()
+;
+class MultiChoiceButton extends HTMLElement {
+    constructor() {
+        super();
     }
-
     connectedCallback() {
         // const template = document.getElementById("lesson-slider") as HTMLTemplateElement
         // const templateContent = template.content
@@ -14,10 +10,9 @@ class MultiChoiceButton extends HTMLElement implements MultiChoiceButtonBase{
         // const shadowRoot = this.attachShadow({mode:"closed"})
         // shadowRoot.appendChild(clonedContent)
     }
-
     disconnectedCallback() {
-
     }
 }
-
-customElements.define("multichoice-button", MultiChoiceButton)
+customElements.define("multichoice-button", MultiChoiceButton);
+export {};
+//# sourceMappingURL=MultipleChoiceButton.js.map

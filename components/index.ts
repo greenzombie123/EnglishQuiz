@@ -1,20 +1,23 @@
 import type { IntroSlideType } from "./IntroSlide.ts";
 import "./Lesson.ts";
-import type { HTMLLessonSlider, Lesson } from "./Lesson.ts";
+import type { HTMLLessonSlider, Lesson, LessonSlider } from "./Lesson.ts";
 import type { Slide } from "./SlideState.ts";
 
 const startLesson = async () => {
   // get reference for lesson component
   const lessonSlider = getLessonSlider();
-  const lesson = await getLesson(1);
-    console.log(lesson)
+
   // call getLesson to get slides
+  const lesson = await getLesson(1);
+  const {slides} = lesson
+  
   // pass slides to component
+  lessonSlider.setSlides(slides)
   // render slides
 };
 
 const getLessonSlider = () =>
-  document.getElementById("lesson-slider") as HTMLLessonSlider;
+  document.querySelector("lesson-slider") as LessonSlider//HTMLLessonSlider;
 
 const mockIntroSlides: Lesson = {
   id: 13,
@@ -39,5 +42,10 @@ const mockIntroSlides: Lesson = {
 
 const getLesson = async (lessonId: number): Promise<Lesson> =>
   await mockIntroSlides;
+
+// const g = document.createElement("lesson-slider") as LessonSlider;
+// g.g();
+// const a = document.querySelector("lesson-slider") as LessonSlider;
+// a.g();
 
 startLesson();

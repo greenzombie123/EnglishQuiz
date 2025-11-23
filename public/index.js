@@ -2,13 +2,14 @@ import "./Lesson.js";
 const startLesson = async () => {
     // get reference for lesson component
     const lessonSlider = getLessonSlider();
-    const lesson = await getLesson(1);
-    console.log(lesson);
     // call getLesson to get slides
+    const lesson = await getLesson(1);
+    const { slides } = lesson;
     // pass slides to component
+    lessonSlider.setSlides(slides);
     // render slides
 };
-const getLessonSlider = () => document.getElementById("lesson-slider");
+const getLessonSlider = () => document.querySelector("lesson-slider"); //HTMLLessonSlider;
 const mockIntroSlides = {
     id: 13,
     name: "Mock",
@@ -30,5 +31,9 @@ const mockIntroSlides = {
     ],
 };
 const getLesson = async (lessonId) => await mockIntroSlides;
+// const g = document.createElement("lesson-slider") as LessonSlider;
+// g.g();
+// const a = document.querySelector("lesson-slider") as LessonSlider;
+// a.g();
 startLesson();
 //# sourceMappingURL=index.js.map
