@@ -1,8 +1,9 @@
 import "./IntroSlide.ts";
 import "./QuestionSlide.ts"
 
+export interface HTMLLessonSlider extends HTMLElement{
 
-
+}
 
 class Lesson extends HTMLElement{
     constructor(){

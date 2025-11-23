@@ -1,10 +1,13 @@
 import "./Lesson.js";
-export const startLesson = () => {
+const startLesson = () => {
     // get reference for lesson component
+    const lessonSlider = getLessonSlider();
+    console.log(lessonSlider);
     // call getLesson to get slides
     // pass slides to component
     // render slides
 };
-const getLessonComponent = () => document.getElementById("lesson-slider");
+const getLessonSlider = () => document.getElementById("lesson-slider");
 const getLesson = () => { };
+startLesson();
 //# sourceMappingURL=index.js.map
