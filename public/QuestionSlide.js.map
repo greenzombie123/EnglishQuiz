@@ -1,0 +1,1 @@
+{"version":3,"file":"QuestionSlide.js","sourceRoot":"","sources":["../components/QuestionSlide.ts"],"names":[],"mappings":"AAUA,MAAM,aAAc,SAAQ,WAAW;IACjC;QACE,KAAK,EAAE,CAAA;IACX,CAAC;IAED,iBAAiB;QACb,mFAAmF;QACnF,2CAA2C;QAC3C,wDAAwD;QACxD,wDAAwD;QACxD,wCAAwC;IAC5C,CAAC;IAED,oBAAoB;IAEpB,CAAC;CACJ;AAED,cAAc,CAAC,MAAM,CAAC,gBAAgB,EAAE,aAAa,CAAC,CAAA"}

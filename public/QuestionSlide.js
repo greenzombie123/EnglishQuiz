@@ -1,15 +1,7 @@
-export type IntroSlideType = {
-  id: number;
-  type: "intro";
-  targetWord: string;
-  definition: string;
-};
-
-class IntroSlide extends HTMLElement{
-      constructor(){
-        super()
+class QuestionSlide extends HTMLElement {
+    constructor() {
+        super();
     }
-
     connectedCallback() {
         // const template = document.getElementById("lesson-slider") as HTMLTemplateElement
         // const templateContent = template.content
@@ -17,10 +9,9 @@ class IntroSlide extends HTMLElement{
         // const shadowRoot = this.attachShadow({mode:"closed"})
         // shadowRoot.appendChild(clonedContent)
     }
-
     disconnectedCallback() {
-
     }
 }
-
-customElements.define("intro-slide", IntroSlide)
+customElements.define("question-slide", QuestionSlide);
+export {};
+//# sourceMappingURL=QuestionSlide.js.map
