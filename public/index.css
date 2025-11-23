@@ -1,5 +1,6 @@
 lesson-slider{
-    display: block;
-    height: 50px;
-    background-color: blue;
+
+    div{
+        background-color: blue;
+    }
 }
