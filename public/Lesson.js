@@ -1,15 +1,5 @@
-const slideState = () => {
-    const slides = [];
-    const currentSlideIndex = 0;
-    const changeSlide = (nextIndex) => { };
-    const setSlides = (slides) => { };
-    const getCurrentSlide = () => { };
-    return {
-        changeSlide,
-        setSlides,
-        getCurrentSlide,
-    };
-};
+import "./IntroSlide.js";
+import "./QuestionSlide.js";
 class Lesson extends HTMLElement {
     constructor() {
         super();
@@ -25,5 +15,4 @@ class Lesson extends HTMLElement {
     }
 }
 customElements.define("lesson-slider", Lesson);
-export {};
 //# sourceMappingURL=Lesson.js.map
