@@ -57,7 +57,7 @@ export class LessonSlider extends HTMLElement {
     });
 
     this.addEventListener("backButtonClicked", () => {
-      console.log(23213123);
+
     });
 
     this.root.appendChild(clonedContent);
@@ -84,8 +84,8 @@ export class LessonSlider extends HTMLElement {
 
   createIntroSlide = (introSlideData: IntroSlideData) => {
     const slide = document.createElement(`intro-slide`) as IntroSlide;
-    console.log(slide);
-    slide.setData(introSlideData);
+    const isFirstSlide = this.slideState.getCurrentSlideIndex() === 0
+    slide.setData(introSlideData, isFirstSlide);
     return slide;
   };
   createQuestionSlide = (questionSlideData: QuestionSlideData) => {

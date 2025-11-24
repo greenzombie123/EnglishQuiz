@@ -27,14 +27,14 @@ const mockIntroSlides: Lesson = {
   slides: [
     {
       id: 1,
-      sliderOrder: 1,
+      sliderOrder: 0,
       type: "intro",
       targetWord: "Apple",
       definition: "リンゴ",
     },
     {
       id: 245,
-      sliderOrder: 2,
+      sliderOrder: 1,
       type: "intro",
       targetWord: "Orange",
       definition: "オレンジ",

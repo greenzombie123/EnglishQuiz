@@ -8,6 +8,7 @@ export type SlideState = {
   setSlides(slides: Slide[]): void;
   getCurrentSlide(): Slide | null;
   isLastSlide(): boolean;
+  getCurrentSlideIndex():number
 };
 
 export const slideState = (): SlideState => {
@@ -26,10 +27,13 @@ export const slideState = (): SlideState => {
 
   const getCurrentSlide = () => slides[currentSlideIndex] || null;
 
+  const getCurrentSlideIndex = ()=>currentSlideIndex
+
   return {
     changeSlide,
     setSlides,
     getCurrentSlide,
     isLastSlide,
+    getCurrentSlideIndex
   };
 };

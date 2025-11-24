@@ -19,8 +19,8 @@ export class LessonSlider extends HTMLElement {
         };
         this.createIntroSlide = (introSlideData) => {
             const slide = document.createElement(`intro-slide`);
-            console.log(slide);
-            slide.setData(introSlideData);
+            const isFirstSlide = this.slideState.getCurrentSlideIndex() === 0;
+            slide.setData(introSlideData, isFirstSlide);
             return slide;
         };
         this.createQuestionSlide = (questionSlideData) => {
@@ -50,7 +50,6 @@ export class LessonSlider extends HTMLElement {
             this.render();
         });
         this.addEventListener("backButtonClicked", () => {
-            console.log(23213123);
         });
         this.root.appendChild(clonedContent);
     }

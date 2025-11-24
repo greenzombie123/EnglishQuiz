@@ -3,10 +3,12 @@ export class IntroSlide extends HTMLElement {
         super();
         this.targetWord = "";
         this.definition = "";
+        this.isFirstSlide = false;
         this.root = null;
-        this.setData = (introSlideData) => {
+        this.setData = (introSlideData, isFirstSlide) => {
             this.targetWord = introSlideData.targetWord;
             this.definition = introSlideData.definition;
+            this.isFirstSlide = isFirstSlide;
         };
     }
     connectedCallback() {
@@ -24,16 +26,19 @@ export class IntroSlide extends HTMLElement {
         const backButton = clonedContent.querySelector(".back");
         const backButtonClicked = new CustomEvent("backButtonClicked", {
             bubbles: true,
-            composed: true
+            composed: true,
         });
         backButton.addEventListener("click", () => {
             this.dispatchEvent(backButtonClicked);
         });
+        // Only display back button if the slide is not the first slide of the lesson
+        if (this.isFirstSlide)
+            backButton.style.display = "none";
         const nextButton = clonedContent.querySelector(".next");
         // Need to pass an object to allow the event to not only bubble up and but also leave out of shadow root
         const nextButtonClicked = new CustomEvent("nextButtonClicked", {
             bubbles: true,
-            composed: true
+            composed: true,
         });
         nextButton.addEventListener("click", () => {
             this.dispatchEvent(nextButtonClicked);

@@ -9,11 +9,13 @@ export const slideState = () => {
         slides = newSlides;
     };
     const getCurrentSlide = () => slides[currentSlideIndex] || null;
+    const getCurrentSlideIndex = () => currentSlideIndex;
     return {
         changeSlide,
         setSlides,
         getCurrentSlide,
         isLastSlide,
+        getCurrentSlideIndex
     };
 };
 //# sourceMappingURL=SlideState.js.map

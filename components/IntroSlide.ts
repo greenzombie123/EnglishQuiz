@@ -9,6 +9,7 @@ export type IntroSlideData = {
 export class IntroSlide extends HTMLElement {
   targetWord = "";
   definition = "";
+  isFirstSlide = false;
   root: ShadowRoot | null = null;
 
   constructor() {
@@ -45,13 +46,16 @@ export class IntroSlide extends HTMLElement {
     ) as HTMLButtonElement;
 
     const backButtonClicked = new CustomEvent("backButtonClicked", {
-        bubbles:true,
-        composed:true
+      bubbles: true,
+      composed: true,
     });
 
     backButton.addEventListener("click", () => {
       this.dispatchEvent(backButtonClicked);
     });
+
+     // Only display back button if the slide is not the first slide of the lesson
+     if(this.isFirstSlide) backButton.style.display = "none"
 
     const nextButton = clonedContent.querySelector(
       ".next"
@@ -59,8 +63,8 @@ export class IntroSlide extends HTMLElement {
 
     // Need to pass an object to allow the event to not only bubble up and but also leave out of shadow root
     const nextButtonClicked = new CustomEvent("nextButtonClicked", {
-        bubbles:true,
-        composed:true
+      bubbles: true,
+      composed: true,
     });
 
     nextButton.addEventListener("click", () => {
@@ -72,9 +76,10 @@ export class IntroSlide extends HTMLElement {
 
   disconnectedCallback() {}
 
-  setData = (introSlideData: IntroSlideData) => {
+  setData = (introSlideData: IntroSlideData, isFirstSlide: boolean) => {
     this.targetWord = introSlideData.targetWord;
     this.definition = introSlideData.definition;
+    this.isFirstSlide = isFirstSlide;
   };
 }
 

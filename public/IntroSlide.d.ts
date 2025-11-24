@@ -8,10 +8,11 @@ export type IntroSlideData = {
 export declare class IntroSlide extends HTMLElement {
     targetWord: string;
     definition: string;
+    isFirstSlide: boolean;
     root: ShadowRoot | null;
     constructor();
     connectedCallback(): void;
     disconnectedCallback(): void;
-    setData: (introSlideData: IntroSlideData) => void;
+    setData: (introSlideData: IntroSlideData, isFirstSlide: boolean) => void;
 }
 //# sourceMappingURL=IntroSlide.d.ts.map
