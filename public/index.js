@@ -32,9 +32,5 @@ const mockIntroSlides = {
     ],
 };
 const getLesson = async (lessonId) => await mockIntroSlides;
-// const g = document.createElement("lesson-slider") as LessonSlider;
-// g.g();
-// const a = document.querySelector("lesson-slider") as LessonSlider;
-// a.g();
 startLesson();
 //# sourceMappingURL=index.js.map

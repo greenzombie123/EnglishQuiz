@@ -36,6 +36,12 @@ export class LessonSlider extends HTMLElement {
         const templateContent = template.content;
         const clonedContent = templateContent.cloneNode(true);
         this.root = this.attachShadow({ mode: "closed" });
+        this.addEventListener("nextButtonClicked", () => {
+            console.log(23213123);
+        });
+        this.addEventListener("backButtonClicked", () => {
+            console.log(23213123);
+        });
         this.root.appendChild(clonedContent);
     }
     disconnectedCallback() { }

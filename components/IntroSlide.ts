@@ -9,8 +9,7 @@ export type IntroSlideData = {
 export class IntroSlide extends HTMLElement {
   targetWord = "";
   definition = "";
-  root:ShadowRoot| null = null
-
+  root: ShadowRoot | null = null;
 
   constructor() {
     super();
@@ -21,32 +20,61 @@ export class IntroSlide extends HTMLElement {
       "intro-slide"
     ) as HTMLTemplateElement;
 
+    // Ref the template, clone content and attach to root
     const templateContent = template.content;
 
-    const clonedContent = templateContent.cloneNode(true) as DocumentFragment
+    const clonedContent = templateContent.cloneNode(true) as DocumentFragment;
 
     this.root = this.attachShadow({ mode: "closed" });
 
-    const targetWord = clonedContent.querySelector(".targetWord") as HTMLElement
-    const definition = clonedContent.querySelector(".definition") as HTMLElement
-    const backtButton = clonedContent.querySelector(".next") as HTMLButtonElement
-    const nextButton = clonedContent.querySelector(".back") as HTMLButtonElement
+    // Add text toe targetword and definition spans
+    const targetWord = clonedContent.querySelector(
+      ".targetWord"
+    ) as HTMLElement;
+    const definition = clonedContent.querySelector(
+      ".definition"
+    ) as HTMLElement;
 
-    targetWord.textContent = this.targetWord
-    definition.textContent = this.definition
+    targetWord.textContent = this.targetWord;
+    definition.textContent = this.definition;
 
+    // Ref buttons and create event for slider navigation
+
+    const backButton = clonedContent.querySelector(
+      ".back"
+    ) as HTMLButtonElement;
+
+    const backButtonClicked = new CustomEvent("backButtonClicked", {
+        bubbles:true,
+        composed:true
+    });
+
+    backButton.addEventListener("click", () => {
+      this.dispatchEvent(backButtonClicked);
+    });
+
+    const nextButton = clonedContent.querySelector(
+      ".next"
+    ) as HTMLButtonElement;
+
+    const nextButtonClicked = new CustomEvent("nextButtonClicked", {
+        bubbles:true,
+        composed:true
+    });
+
+    nextButton.addEventListener("click", () => {
+      this.dispatchEvent(nextButtonClicked);
+    });
 
     this.root.appendChild(clonedContent);
   }
 
   disconnectedCallback() {}
 
-  setData= (introSlideData:IntroSlideData) => {
-    this.targetWord = introSlideData.targetWord
-    this.definition = introSlideData.definition
+  setData = (introSlideData: IntroSlideData) => {
+    this.targetWord = introSlideData.targetWord;
+    this.definition = introSlideData.definition;
   };
 }
 
 customElements.define("intro-slide", IntroSlide);
-
-const g = document.createElement("intro-slide") as IntroSlide;
