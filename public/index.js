@@ -8,6 +8,7 @@ const startLesson = async () => {
     // pass slides to component
     lessonSlider.setSlides(slides);
     // render slides
+    lessonSlider.render();
 };
 const getLessonSlider = () => document.querySelector("lesson-slider"); //HTMLLessonSlider;
 const mockIntroSlides = {

@@ -1,6 +1,6 @@
-import type { IntroSlideType } from "./IntroSlide.ts";
+import type { IntroSlideData } from "./IntroSlide.ts";
 import "./Lesson.ts";
-import type { HTMLLessonSlider, Lesson, LessonSlider } from "./Lesson.ts";
+import type { Lesson, LessonSlider } from "./Lesson.ts";
 import type { Slide } from "./SlideState.ts";
 
 const startLesson = async () => {
@@ -13,7 +13,9 @@ const startLesson = async () => {
   
   // pass slides to component
   lessonSlider.setSlides(slides)
+
   // render slides
+  lessonSlider.render()
 };
 
 const getLessonSlider = () =>

@@ -2,7 +2,7 @@ export interface MultiChoiceButtonBase{
   
 };
 
-class MultiChoiceButton extends HTMLElement implements MultiChoiceButtonBase{
+export class MultiChoiceButton extends HTMLElement implements MultiChoiceButtonBase{
       constructor(){
         super()
     }

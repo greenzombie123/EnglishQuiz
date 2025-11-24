@@ -1,5 +1,5 @@
 ;
-class MultiChoiceButton extends HTMLElement {
+export class MultiChoiceButton extends HTMLElement {
     constructor() {
         super();
     }
@@ -14,5 +14,4 @@ class MultiChoiceButton extends HTMLElement {
     }
 }
 customElements.define("multichoice-button", MultiChoiceButton);
-export {};
 //# sourceMappingURL=MultipleChoiceButton.js.map

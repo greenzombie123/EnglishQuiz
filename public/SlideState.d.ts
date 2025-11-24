@@ -1,10 +1,10 @@
-import type { IntroSlideType } from "./IntroSlide.ts";
-import type { QuestionSlideType } from "./QuestionSlide.ts";
-export type Slide = IntroSlideType | QuestionSlideType;
+import type { IntroSlideData } from "./IntroSlide.ts";
+import type { QuestionSlideData } from "./QuestionSlide.ts";
+export type Slide = IntroSlideData | QuestionSlideData;
 export type SlideState = {
     changeSlide(nextIndex: number): void;
     setSlides(slides: Slide[]): void;
-    getCurrentSlide(): void;
+    getCurrentSlide(): Slide | null;
     isLastSlide(): boolean;
 };
 export declare const slideState: () => SlideState;
