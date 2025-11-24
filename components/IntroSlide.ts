@@ -57,6 +57,7 @@ export class IntroSlide extends HTMLElement {
       ".next"
     ) as HTMLButtonElement;
 
+    // Need to pass an object to allow the event to not only bubble up and but also leave out of shadow root
     const nextButtonClicked = new CustomEvent("nextButtonClicked", {
         bubbles:true,
         composed:true

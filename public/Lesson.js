@@ -28,6 +28,10 @@ export class LessonSlider extends HTMLElement {
             slide.setData(questionSlideData);
             return slide;
         };
+        this.removeCurrentSlide = () => {
+            if (this.currentSlide && this.root)
+                this.root.removeChild(this.currentSlide);
+        };
         this.slideState = slideState();
         this.currentSlide = null;
     }
@@ -37,7 +41,13 @@ export class LessonSlider extends HTMLElement {
         const clonedContent = templateContent.cloneNode(true);
         this.root = this.attachShadow({ mode: "closed" });
         this.addEventListener("nextButtonClicked", () => {
-            console.log(23213123);
+            const isLastSlide = this.slideState.isLastSlide();
+            if (isLastSlide)
+                return;
+            this.slideState.changeSlide(1);
+            this.removeCurrentSlide();
+            this.createSlide();
+            this.render();
         });
         this.addEventListener("backButtonClicked", () => {
             console.log(23213123);

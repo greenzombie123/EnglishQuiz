@@ -21,6 +21,7 @@ export declare class LessonSlider extends HTMLElement {
     createSlide: () => void;
     createIntroSlide: (introSlideData: IntroSlideData) => IntroSlide;
     createQuestionSlide: (questionSlideData: QuestionSlideData) => QuestionSlide;
+    removeCurrentSlide: () => void;
     render(): void;
 }
 //# sourceMappingURL=Lesson.d.ts.map

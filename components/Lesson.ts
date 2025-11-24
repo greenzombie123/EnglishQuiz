@@ -46,15 +46,21 @@ export class LessonSlider extends HTMLElement {
     const clonedContent = templateContent.cloneNode(true);
     this.root = this.attachShadow({ mode: "closed" });
 
-    this.addEventListener("nextButtonClicked", ()=>{
-        console.log(23213123)
-    })
+    this.addEventListener("nextButtonClicked", () => {
+      const isLastSlide = this.slideState.isLastSlide();
+      if (isLastSlide) return;
 
-    this.addEventListener("backButtonClicked", ()=>{
-        console.log(23213123)
-    })
+      this.slideState.changeSlide(1);
+      this.removeCurrentSlide()
+      this.createSlide();
+      this.render();
+    });
 
-     this.root.appendChild(clonedContent);
+    this.addEventListener("backButtonClicked", () => {
+      console.log(23213123);
+    });
+
+    this.root.appendChild(clonedContent);
   }
 
   disconnectedCallback() {}
@@ -78,7 +84,7 @@ export class LessonSlider extends HTMLElement {
 
   createIntroSlide = (introSlideData: IntroSlideData) => {
     const slide = document.createElement(`intro-slide`) as IntroSlide;
-    console.log(slide)
+    console.log(slide);
     slide.setData(introSlideData);
     return slide;
   };
@@ -88,8 +94,13 @@ export class LessonSlider extends HTMLElement {
     return slide;
   };
 
+  removeCurrentSlide = () => {
+    if (this.currentSlide && this.root) this.root.removeChild(this.currentSlide);
+  };
+
   render() {
-    if (this.currentSlide && this.root) this.root.appendChild(this.currentSlide);
+    if (this.currentSlide && this.root)
+      this.root.appendChild(this.currentSlide);
   }
 }
 
