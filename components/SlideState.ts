@@ -15,7 +15,7 @@ export const slideState = (): SlideState => {
   let slides: Slide[];
   let currentSlideIndex: number = 0;
 
-  const isLastSlide = () => slides.length + 1 === currentSlideIndex;
+  const isLastSlide = () => slides.length - 1 === currentSlideIndex;
 
   const changeSlide = (nextIndex: number) => {
     currentSlideIndex += nextIndex;
