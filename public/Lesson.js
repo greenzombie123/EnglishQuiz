@@ -50,6 +50,10 @@ export class LessonSlider extends HTMLElement {
             this.render();
         });
         this.addEventListener("backButtonClicked", () => {
+            this.slideState.changeSlide(-1);
+            this.removeCurrentSlide();
+            this.createSlide();
+            this.render();
         });
         this.root.appendChild(clonedContent);
     }

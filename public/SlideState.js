@@ -3,7 +3,7 @@ export const slideState = () => {
     let currentSlideIndex = 0;
     const isLastSlide = () => slides.length + 1 === currentSlideIndex;
     const changeSlide = (nextIndex) => {
-        currentSlideIndex = +nextIndex;
+        currentSlideIndex += nextIndex;
     };
     const setSlides = (newSlides) => {
         slides = newSlides;
