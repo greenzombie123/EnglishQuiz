@@ -19,7 +19,7 @@ export class LessonSlider extends HTMLElement {
         };
         this.createIntroSlide = (introSlideData) => {
             const slide = document.createElement(`intro-slide`);
-            const isFirstSlide = this.slideState.getCurrentSlideIndex() === 0;
+            const isFirstSlide = this.slideState.isFirstSlide();
             slide.setData(introSlideData, isFirstSlide);
             return slide;
         };

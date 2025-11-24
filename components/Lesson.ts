@@ -87,7 +87,7 @@ export class LessonSlider extends HTMLElement {
 
   createIntroSlide = (introSlideData: IntroSlideData) => {
     const slide = document.createElement(`intro-slide`) as IntroSlide;
-    const isFirstSlide = this.slideState.getCurrentSlideIndex() === 0
+    const isFirstSlide = this.slideState.isFirstSlide()
     slide.setData(introSlideData, isFirstSlide);
     return slide;
   };

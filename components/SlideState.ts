@@ -9,11 +9,14 @@ export type SlideState = {
   getCurrentSlide(): Slide | null;
   isLastSlide(): boolean;
   getCurrentSlideIndex():number
+  isFirstSlide():boolean
 };
 
 export const slideState = (): SlideState => {
   let slides: Slide[];
   let currentSlideIndex: number = 0;
+
+  const isFirstSlide = ()=> currentSlideIndex === 0
 
   const isLastSlide = () => slides.length - 1 === currentSlideIndex;
 
@@ -34,6 +37,7 @@ export const slideState = (): SlideState => {
     setSlides,
     getCurrentSlide,
     isLastSlide,
-    getCurrentSlideIndex
+    getCurrentSlideIndex,
+    isFirstSlide
   };
 };

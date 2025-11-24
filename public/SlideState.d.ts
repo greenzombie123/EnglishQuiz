@@ -7,6 +7,7 @@ export type SlideState = {
     getCurrentSlide(): Slide | null;
     isLastSlide(): boolean;
     getCurrentSlideIndex(): number;
+    isFirstSlide(): boolean;
 };
 export declare const slideState: () => SlideState;
 //# sourceMappingURL=SlideState.d.ts.map

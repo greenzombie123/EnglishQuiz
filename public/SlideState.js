@@ -1,6 +1,7 @@
 export const slideState = () => {
     let slides;
     let currentSlideIndex = 0;
+    const isFirstSlide = () => currentSlideIndex === 0;
     const isLastSlide = () => slides.length - 1 === currentSlideIndex;
     const changeSlide = (nextIndex) => {
         currentSlideIndex += nextIndex;
@@ -15,7 +16,8 @@ export const slideState = () => {
         setSlides,
         getCurrentSlide,
         isLastSlide,
-        getCurrentSlideIndex
+        getCurrentSlideIndex,
+        isFirstSlide
     };
 };
 //# sourceMappingURL=SlideState.js.map
