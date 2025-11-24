@@ -29,6 +29,26 @@ const mockIntroSlides = {
             targetWord: "Orange",
             definition: "オレンジ",
         },
+        {
+            id: 442,
+            sliderOrder: 2,
+            type: "question",
+            question: "What is an apple?",
+            correctAnswer: "A fruit",
+            wrongAnswer1: "Yo mama!",
+            wrongAnswer2: "Yo dead cat!",
+            wrongAnswer3: "Yo...um...yo?",
+        },
+        {
+            id: 432,
+            sliderOrder: 3,
+            type: "question",
+            question: "What is an orange?",
+            correctAnswer: "An orange fruit",
+            wrongAnswer1: "Yo mama!",
+            wrongAnswer2: "Yo dead cat!",
+            wrongAnswer3: "Yo...um...yo?",
+        },
     ],
 };
 const getLesson = async (lessonId) => await mockIntroSlides;

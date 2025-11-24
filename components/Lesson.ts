@@ -29,13 +29,12 @@ export type LessonData = {};
 
 export class LessonSlider extends HTMLElement {
   slideState: SlideState;
-  currentSlide: IntroSlide | QuestionSlide | null;
   root: ShadowRoot | null = null;
+  slider: Node | null = null;
 
   constructor() {
     super();
     this.slideState = slideState();
-    this.currentSlide = null;
   }
 
   connectedCallback() {
@@ -49,17 +48,14 @@ export class LessonSlider extends HTMLElement {
     this.addEventListener("nextButtonClicked", () => {
       const isLastSlide = this.slideState.isLastSlide();
       if (isLastSlide) return;
-
       this.slideState.changeSlide(1);
-      this.removeCurrentSlide()
-      this.createSlide();
+      this.removeCurrentSlide();
       this.render();
     });
 
     this.addEventListener("backButtonClicked", () => {
       this.slideState.changeSlide(-1);
-      this.removeCurrentSlide()
-      this.createSlide();
+      this.removeCurrentSlide();
       this.render();
     });
 
@@ -78,19 +74,20 @@ export class LessonSlider extends HTMLElement {
     if (currentSlide) {
       const { type } = currentSlide;
       if (type === "intro") {
-        this.currentSlide = this.createIntroSlide(currentSlide);
+        return this.createIntroSlide(currentSlide);
       } else if (type === "question") {
-        this.currentSlide = this.createQuestionSlide(currentSlide);
+        return this.createQuestionSlide(currentSlide);
       }
     }
   };
 
   createIntroSlide = (introSlideData: IntroSlideData) => {
     const slide = document.createElement(`intro-slide`) as IntroSlide;
-    const isFirstSlide = this.slideState.isFirstSlide()
+    const isFirstSlide = this.slideState.isFirstSlide();
     slide.setData(introSlideData, isFirstSlide);
     return slide;
   };
+
   createQuestionSlide = (questionSlideData: QuestionSlideData) => {
     const slide = document.createElement(`question-slide`) as QuestionSlide;
     slide.setData(questionSlideData);
@@ -98,12 +95,18 @@ export class LessonSlider extends HTMLElement {
   };
 
   removeCurrentSlide = () => {
-    if (this.currentSlide && this.root) this.root.removeChild(this.currentSlide);
+    if (this.root) {
+      const lessonSlider = this.root.querySelector(".lesson-slider");
+      if (lessonSlider) lessonSlider.textContent = null;
+    }
   };
 
   render() {
-    if (this.currentSlide && this.root)
-      this.root.appendChild(this.currentSlide);
+    const slide = this.createSlide();
+    if (this.root && slide) {
+      const slider = this.root.querySelector(".lesson-slider");
+      if (slider) slider.appendChild(slide);
+    }
   }
 }
 

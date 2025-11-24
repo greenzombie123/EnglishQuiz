@@ -12,13 +12,13 @@ export type Lesson = {
 export type LessonData = {};
 export declare class LessonSlider extends HTMLElement {
     slideState: SlideState;
-    currentSlide: IntroSlide | QuestionSlide | null;
     root: ShadowRoot | null;
+    slider: Node | null;
     constructor();
     connectedCallback(): void;
     disconnectedCallback(): void;
     setSlides(slides: Slide[]): void;
-    createSlide: () => void;
+    createSlide: () => IntroSlide | QuestionSlide | undefined;
     createIntroSlide: (introSlideData: IntroSlideData) => IntroSlide;
     createQuestionSlide: (questionSlideData: QuestionSlideData) => QuestionSlide;
     removeCurrentSlide: () => void;
