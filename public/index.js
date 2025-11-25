@@ -16,6 +16,16 @@ const mockIntroSlides = {
     name: "Mock",
     slides: [
         {
+            id: 432,
+            sliderOrder: 3,
+            type: "question",
+            question: "What is an orange?",
+            correctAnswer: "An orange fruit",
+            wrongAnswer1: "Yo mama!",
+            wrongAnswer2: "Yo dead cat!",
+            wrongAnswer3: "Yo...um...yo?",
+        },
+        {
             id: 1,
             sliderOrder: 0,
             type: "intro",
@@ -35,16 +45,6 @@ const mockIntroSlides = {
             type: "question",
             question: "What is an apple?",
             correctAnswer: "A fruit",
-            wrongAnswer1: "Yo mama!",
-            wrongAnswer2: "Yo dead cat!",
-            wrongAnswer3: "Yo...um...yo?",
-        },
-        {
-            id: 432,
-            sliderOrder: 3,
-            type: "question",
-            question: "What is an orange?",
-            correctAnswer: "An orange fruit",
             wrongAnswer1: "Yo mama!",
             wrongAnswer2: "Yo dead cat!",
             wrongAnswer3: "Yo...um...yo?",

@@ -1,3 +1,5 @@
+import { check } from "express-validator";
+
 export type QuestionSlideData = {
   id: number;
   type: "question";
@@ -103,7 +105,9 @@ export class QuestionSlide extends HTMLElement {
   onButtonClick = (e: Event) => {
     const button = e.currentTarget as HTMLButtonElement
     const answer = button.textContent
-    console.log(answer)
+    const isCorrect = this.checkAnswer(answer)
+    console.log(isCorrect)
+
   };
 
   checkAnswer = (answer: string) => this.correctAnswer === answer;
