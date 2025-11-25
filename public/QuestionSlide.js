@@ -22,6 +22,9 @@ export class QuestionSlide extends HTMLElement {
             this.dispatchEvent(new CustomEvent("correctAnswer", { bubbles: true, composed: true }));
         };
         this.onButtonClick = (e) => {
+            const button = e.currentTarget;
+            const answer = button.textContent;
+            console.log(answer);
         };
         this.checkAnswer = (answer) => this.correctAnswer === answer;
         this.shuffle = (array) => array.sort(() => Math.random() - 0.5);
@@ -32,7 +35,7 @@ export class QuestionSlide extends HTMLElement {
         const templateContent = template.content;
         const clonedContent = templateContent.cloneNode(true);
         this.root = this.attachShadow({ mode: "closed" });
-        // Get question and button elements
+        // Get and set question and button elements
         const question = clonedContent.querySelector(".question");
         question.textContent = this.question;
         const buttons = Array.from(clonedContent.querySelectorAll("button"));
@@ -49,7 +52,8 @@ export class QuestionSlide extends HTMLElement {
         buttons[2].textContent = randomizedAnswers[2];
         buttons[3].textContent = randomizedAnswers[3];
         const buttonsArray = [buttons[0], buttons[1], buttons[2], buttons[3]];
-        buttonsArray.forEach(button => {
+        // Attach onButtonClick hander to the buttons
+        buttonsArray.forEach((button) => {
             button.addEventListener("click", this.onButtonClick);
         });
         // Ref buttons and create event for slider navigation

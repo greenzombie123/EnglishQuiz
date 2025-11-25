@@ -34,9 +34,9 @@ export class QuestionSlide extends HTMLElement {
 
     this.root = this.attachShadow({ mode: "closed" });
 
-    // Get question and button elements
+    // Get and set question and button elements
     const question = clonedContent.querySelector(".question") as HTMLElement;
-    question.textContent = this.question
+    question.textContent = this.question;
 
     const buttons = Array.from(clonedContent.querySelectorAll("button")) as [
       HTMLButtonElement,
@@ -68,10 +68,10 @@ export class QuestionSlide extends HTMLElement {
 
     const buttonsArray = [buttons[0], buttons[1], buttons[2], buttons[3]];
 
-    buttonsArray.forEach(button=>{
-      button.addEventListener("click", this.onButtonClick)
-    })
-
+    // Attach onButtonClick hander to the buttons
+    buttonsArray.forEach((button) => {
+      button.addEventListener("click", this.onButtonClick);
+    });
 
     // Ref buttons and create event for slider navigation
 
@@ -85,7 +85,7 @@ export class QuestionSlide extends HTMLElement {
     this.wrongAnswer1 = questionSlideData.wrongAnswer1;
     this.wrongAnswer2 = questionSlideData.wrongAnswer2;
     this.wrongAnswer3 = questionSlideData.wrongAnswer3;
-    this.question = questionSlideData.question
+    this.question = questionSlideData.question;
   };
 
   onWrongAnswer = () => {
@@ -100,9 +100,11 @@ export class QuestionSlide extends HTMLElement {
     );
   };
 
-  onButtonClick = (e:Event)=>{
-
-  }
+  onButtonClick = (e: Event) => {
+    const button = e.currentTarget as HTMLButtonElement
+    const answer = button.textContent
+    console.log(answer)
+  };
 
   checkAnswer = (answer: string) => this.correctAnswer === answer;
 

@@ -18,7 +18,7 @@ export declare class LessonSlider extends HTMLElement {
     connectedCallback(): void;
     disconnectedCallback(): void;
     setSlides(slides: Slide[]): void;
-    createSlide: () => IntroSlide | QuestionSlide | undefined;
+    createSlide: () => QuestionSlide | IntroSlide | undefined;
     createIntroSlide: (introSlideData: IntroSlideData) => IntroSlide;
     createQuestionSlide: (questionSlideData: QuestionSlideData) => QuestionSlide;
     removeCurrentSlide: () => void;
