@@ -37,9 +37,18 @@ export class LessonSlider extends HTMLElement {
             }
         };
         this.handleWrongAnswer = () => {
-            console.log('WRONG!');
+            this.slideState.changeSlide(-2);
+            this.removeCurrentSlide();
+            this.render();
         };
-        this.handleCorrectAnswer = () => { };
+        this.handleCorrectAnswer = () => {
+            const isLastSlide = this.slideState.isLastSlide();
+            if (isLastSlide)
+                return;
+            this.slideState.changeSlide(1);
+            this.removeCurrentSlide();
+            this.render();
+        };
         this.slideState = slideState();
     }
     connectedCallback() {
@@ -60,10 +69,8 @@ export class LessonSlider extends HTMLElement {
             this.removeCurrentSlide();
             this.render();
         });
-        this.addEventListener("wrongAnswer", () => {
-            console.log(100000);
-        });
-        // this.addEventListener("correctAnswer")
+        this.addEventListener("wrongAnswer", this.handleWrongAnswer);
+        this.addEventListener("correctAnswer", this.handleCorrectAnswer);
         this.root.appendChild(clonedContent);
     }
     disconnectedCallback() { }

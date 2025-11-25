@@ -59,11 +59,9 @@ export class LessonSlider extends HTMLElement {
       this.render();
     });
 
-    this.addEventListener("wrongAnswer", ()=>{
-        console.log(100000)
-    })
+    this.addEventListener("wrongAnswer", this.handleWrongAnswer);
 
-    // this.addEventListener("correctAnswer")
+    this.addEventListener("correctAnswer", this.handleCorrectAnswer)
 
     this.root.appendChild(clonedContent);
   }
@@ -115,11 +113,19 @@ export class LessonSlider extends HTMLElement {
     }
   }
 
-  handleWrongAnswer = ()=>{
-    console.log('WRONG!')
-  }
+  handleWrongAnswer = () => {
+    this.slideState.changeSlide(-2);
+    this.removeCurrentSlide();
+    this.render();
+  };
 
-  handleCorrectAnswer = ()=>{}
+  handleCorrectAnswer = () => {
+    const isLastSlide = this.slideState.isLastSlide();
+    if (isLastSlide) return;
+    this.slideState.changeSlide(1);
+    this.removeCurrentSlide();
+    this.render();
+  };
 }
 
 customElements.define("lesson-slider", LessonSlider);

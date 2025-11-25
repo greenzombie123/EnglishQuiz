@@ -22,6 +22,7 @@ export const slideState = (): SlideState => {
 
   const changeSlide = (nextIndex: number) => {
     currentSlideIndex += nextIndex;
+    if(currentSlideIndex < 0) currentSlideIndex = 0
   };
 
   const setSlides = (newSlides: Slide[]) => {

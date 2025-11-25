@@ -5,6 +5,8 @@ export const slideState = () => {
     const isLastSlide = () => slides.length - 1 === currentSlideIndex;
     const changeSlide = (nextIndex) => {
         currentSlideIndex += nextIndex;
+        if (currentSlideIndex < 0)
+            currentSlideIndex = 0;
     };
     const setSlides = (newSlides) => {
         slides = newSlides;
