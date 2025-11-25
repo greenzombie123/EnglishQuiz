@@ -25,7 +25,10 @@ export class QuestionSlide extends HTMLElement {
             const button = e.currentTarget;
             const answer = button.textContent;
             const isCorrect = this.checkAnswer(answer);
-            console.log(isCorrect);
+            if (isCorrect)
+                this.onCorrectAnswer();
+            else
+                this.onWrongAnswer();
         };
         this.checkAnswer = (answer) => this.correctAnswer === answer;
         this.shuffle = (array) => array.sort(() => Math.random() - 0.5);

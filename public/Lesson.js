@@ -36,6 +36,10 @@ export class LessonSlider extends HTMLElement {
                     lessonSlider.textContent = null;
             }
         };
+        this.handleWrongAnswer = () => {
+            console.log('WRONG!');
+        };
+        this.handleCorrectAnswer = () => { };
         this.slideState = slideState();
     }
     connectedCallback() {
@@ -56,6 +60,10 @@ export class LessonSlider extends HTMLElement {
             this.removeCurrentSlide();
             this.render();
         });
+        this.addEventListener("wrongAnswer", () => {
+            console.log(100000);
+        });
+        // this.addEventListener("correctAnswer")
         this.root.appendChild(clonedContent);
     }
     disconnectedCallback() { }

@@ -18,10 +18,12 @@ export declare class LessonSlider extends HTMLElement {
     connectedCallback(): void;
     disconnectedCallback(): void;
     setSlides(slides: Slide[]): void;
-    createSlide: () => QuestionSlide | IntroSlide | undefined;
+    createSlide: () => IntroSlide | QuestionSlide | undefined;
     createIntroSlide: (introSlideData: IntroSlideData) => IntroSlide;
     createQuestionSlide: (questionSlideData: QuestionSlideData) => QuestionSlide;
     removeCurrentSlide: () => void;
     render(): void;
+    handleWrongAnswer: () => void;
+    handleCorrectAnswer: () => void;
 }
 //# sourceMappingURL=Lesson.d.ts.map

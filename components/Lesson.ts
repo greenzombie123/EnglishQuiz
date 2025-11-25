@@ -59,6 +59,12 @@ export class LessonSlider extends HTMLElement {
       this.render();
     });
 
+    this.addEventListener("wrongAnswer", ()=>{
+        console.log(100000)
+    })
+
+    // this.addEventListener("correctAnswer")
+
     this.root.appendChild(clonedContent);
   }
 
@@ -108,6 +114,12 @@ export class LessonSlider extends HTMLElement {
       if (slider) slider.appendChild(slide);
     }
   }
+
+  handleWrongAnswer = ()=>{
+    console.log('WRONG!')
+  }
+
+  handleCorrectAnswer = ()=>{}
 }
 
 customElements.define("lesson-slider", LessonSlider);
