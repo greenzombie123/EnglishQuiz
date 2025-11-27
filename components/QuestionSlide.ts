@@ -104,7 +104,7 @@ export class QuestionSlide extends HTMLElement {
 
   onButtonClick = (e: Event) => {
     const button = e.currentTarget as HTMLButtonElement
-    const answer = button.textContent
+    const answer = button.textContent as string
     const isCorrect = this.checkAnswer(answer)
     if(isCorrect) this.onCorrectAnswer()
     else this.onWrongAnswer()

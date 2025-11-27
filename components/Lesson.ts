@@ -1,6 +1,5 @@
 import "./IntroSlide.ts";
 import type { IntroSlide, IntroSlideData } from "./IntroSlide.ts";
-import type { MultiChoiceButtonBase } from "./MultipleChoiceButton.ts";
 import "./QuestionSlide.ts";
 import type { QuestionSlide, QuestionSlideData } from "./QuestionSlide.ts";
 import type { Slide } from "./SlideState.ts";
