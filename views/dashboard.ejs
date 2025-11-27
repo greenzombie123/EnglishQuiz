@@ -4,12 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+</head>
+<body>
     <h1>Hello, <%= username %></h1>
     <% if (userType === "teacher") { %>
      <button>Create a lesson</button>
     <% } %>
-</head>
-<body>
-    
+
+    <% lessonsData.forEach(lesson => { %>
+     <a href=<%= `/lesson/${lesson.id}` %>><%= lesson.name %></a>
+    <% }) %>
 </body>
 </html>
