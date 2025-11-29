@@ -1,7 +1,5 @@
-import type { IntroSlideData } from "./IntroSlide.ts";
 import "./Lesson.ts";
 import type { Lesson, LessonSlider } from "./Lesson.ts";
-import type { Slide } from "./SlideState.ts";
 
 const startLesson = async () => {
   // get reference for lesson component

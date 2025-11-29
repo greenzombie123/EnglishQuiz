@@ -33,6 +33,7 @@ server.use(express.json());
 
 // Serve static files from views directory
 server.use(express.static(views[0] as string));
+server.use(express.static('public'));
 
 server.use(
   session({

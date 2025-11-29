@@ -22,8 +22,7 @@ export const getDashBoard = async (
 
 const getLessons = async (userType: string, userName: string) => {
     const queryString = getQueryString(userType)
-
-    console.log(queryString, userName)
+    
     const {rows} = await pool.query<LessonData>(queryString, [userName])
 
     return rows
