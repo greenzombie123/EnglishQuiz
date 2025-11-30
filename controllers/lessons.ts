@@ -6,6 +6,12 @@ type LessonData = {
     id:number
 }
 
+export const getLessonPage = (req:Request, res:Response, next:NextFunction)=>{
+    const {lessonId} = req.params as {lessonId:string}
+    res.locals.lessonId = lessonId
+    res.render("lesson")
+}
+
 export const getDashBoard = async (
   req: Request,
   res: Response,
@@ -22,7 +28,7 @@ export const getDashBoard = async (
 
 const getLessons = async (userType: string, userName: string) => {
     const queryString = getQueryString(userType)
-    
+
     const {rows} = await pool.query<LessonData>(queryString, [userName])
 
     return rows

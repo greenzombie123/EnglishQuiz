@@ -32,15 +32,17 @@ server.use(express.urlencoded({ extended: true }));
 server.use(express.json());
 
 // Serve static files from views directory
-server.use(express.static(views[0] as string));
+
 server.use(express.static('public'));
+server.use(express.static(views[0] as string));
+
 
 server.use(
   session({
     secret: "keyboard cat",
     resave: false,
     saveUninitialized: false,
-    cookie: { maxAge: 60000 },
+    cookie: { maxAge: 600000 },
   })
 );
 
