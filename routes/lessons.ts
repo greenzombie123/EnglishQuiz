@@ -1,9 +1,9 @@
 import { Router } from "express";
-import { getDashBoard, getLessonPage } from "../controllers/lessons.ts";
+import { fetchLessonSlides, getDashBoard, getLessonPage } from "../controllers/lessons.ts";
 
 const lessonsRouter = Router();
 
-
+lessonsRouter.get('/get/:lessonId', fetchLessonSlides)
 lessonsRouter.get('/:lessonId', getLessonPage)
 lessonsRouter.get('/', getDashBoard)
 

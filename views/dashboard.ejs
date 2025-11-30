@@ -13,7 +13,7 @@
     <% } %>
 
     <% lessonsData.forEach(lesson => { %>
-     <a href=<%= `/lessons/${lesson.id}` %>><%= lesson.name %></a>
+     <a href=<%= `/lessons/${lesson.id}?lessonname=${lesson.name}` %>><%= lesson.name %></a>
     <% }) %>
 </body>
 </html>

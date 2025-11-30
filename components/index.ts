@@ -1,18 +1,22 @@
 import "./Lesson.ts";
 import type { Lesson, LessonSlider } from "./Lesson.ts";
+import { Slide } from "./SlideState.ts";
+import type { IntroSlideData } from "./IntroSlide.ts";
+import type { QuestionSlideData } from "./QuestionSlide.ts";
 
-console.log(123)
+declare const lessonId: number;
+declare const lessonName: string;
 
 const startLesson = async () => {
   // get reference for lesson component
   const lessonSlider = getLessonSlider();
 
   // call getLesson to get slides
-  const lesson = await getLesson(1);
-  const { slides } = lesson;
+  const lessons = await getLesson(lessonId);
+  //   const { slides } = lessons;
 
   // pass slides to component
-  lessonSlider.setSlides(slides);
+  lessonSlider.setSlides(lessons);
 
   // render slides
   lessonSlider.render();
@@ -26,8 +30,6 @@ const mockIntroSlides: Lesson = {
   name: "Mock",
   slides: [
     {
-      id: 432,
-      sliderOrder: 3,
       type: "question",
       question: "What is an orange?",
       correctAnswer: "An orange fruit",
@@ -36,22 +38,16 @@ const mockIntroSlides: Lesson = {
       wrongAnswer3: "Yo...um...yo?",
     },
     {
-      id: 1,
-      sliderOrder: 0,
       type: "intro",
       targetWord: "Apple",
       definition: "リンゴ",
     },
     {
-      id: 245,
-      sliderOrder: 1,
       type: "intro",
       targetWord: "Orange",
       definition: "オレンジ",
     },
     {
-      id: 442,
-      sliderOrder: 2,
       type: "question",
       question: "What is an apple?",
       correctAnswer: "A fruit",
@@ -62,7 +58,17 @@ const mockIntroSlides: Lesson = {
   ],
 };
 
-const getLesson = async (lessonId: number): Promise<Lesson> =>
-  await mockIntroSlides;
+const getLesson = async (lessonId: number): Promise<Slide[]> => {
+  return await fetchLesson(lessonId);
+ 
+};
+// await mockIntroSlides;
+
+const fetchLesson = async (lessonId: number) => {
+  const response = await fetch(`/lessons/get/${lessonId}`);
+  return response.json();
+};
+
+
 
 startLesson();

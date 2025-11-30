@@ -13,5 +13,6 @@ const dirname = path.dirname(__filename);
 
 const views = path.join(dirname, "views") as string
 const errors = path.join(dirname, "errors") as string
+const components = path.join(dirname, "components") as string
 
-export default [views, errors]
+export default [views, errors, components]

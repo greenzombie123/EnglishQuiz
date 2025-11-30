@@ -1,13 +1,12 @@
 import "./Lesson.js";
-console.log(123);
 const startLesson = async () => {
     // get reference for lesson component
     const lessonSlider = getLessonSlider();
     // call getLesson to get slides
-    const lesson = await getLesson(1);
-    const { slides } = lesson;
+    const lessons = await getLesson(lessonId);
+    //   const { slides } = lessons;
     // pass slides to component
-    lessonSlider.setSlides(slides);
+    lessonSlider.setSlides(lessons);
     // render slides
     lessonSlider.render();
 };
@@ -17,8 +16,6 @@ const mockIntroSlides = {
     name: "Mock",
     slides: [
         {
-            id: 432,
-            sliderOrder: 3,
             type: "question",
             question: "What is an orange?",
             correctAnswer: "An orange fruit",
@@ -27,22 +24,16 @@ const mockIntroSlides = {
             wrongAnswer3: "Yo...um...yo?",
         },
         {
-            id: 1,
-            sliderOrder: 0,
             type: "intro",
             targetWord: "Apple",
             definition: "リンゴ",
         },
         {
-            id: 245,
-            sliderOrder: 1,
             type: "intro",
             targetWord: "Orange",
             definition: "オレンジ",
         },
         {
-            id: 442,
-            sliderOrder: 2,
             type: "question",
             question: "What is an apple?",
             correctAnswer: "A fruit",
@@ -52,6 +43,13 @@ const mockIntroSlides = {
         },
     ],
 };
-const getLesson = async (lessonId) => await mockIntroSlides;
+const getLesson = async (lessonId) => {
+    return await fetchLesson(lessonId);
+};
+// await mockIntroSlides;
+const fetchLesson = async (lessonId) => {
+    const response = await fetch(`/lessons/get/${lessonId}`);
+    return response.json();
+};
 startLesson();
 //# sourceMappingURL=index.js.map

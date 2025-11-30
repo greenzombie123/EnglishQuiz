@@ -31,7 +31,10 @@ server.set("view engine", "ejs");
 server.use(express.urlencoded({ extended: true }));
 server.use(express.json());
 
-// Serve static files from views directory
+// Serve static files from views directory.
+// First one create a vitual path that will point to the directory.
+// Also serve the ts files through the source maps for debuggin
+server.use("/components", express.static("components"));
 server.use("/lessons", express.static("public"));
 server.use(express.static(views[0] as string));
 

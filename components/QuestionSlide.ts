@@ -1,14 +1,14 @@
 import { check } from "express-validator";
 
 export type QuestionSlideData = {
-  id: number;
+  // id: number;
   type: "question";
   question: string;
   correctAnswer: string;
   wrongAnswer1: string;
   wrongAnswer2: string;
   wrongAnswer3: string;
-  sliderOrder: number;
+  // sliderOrder: number;
 };
 
 export class QuestionSlide extends HTMLElement {
