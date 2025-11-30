@@ -1,6 +1,8 @@
 import "./Lesson.ts";
 import type { Lesson, LessonSlider } from "./Lesson.ts";
 
+console.log(123)
+
 const startLesson = async () => {
   // get reference for lesson component
   const lessonSlider = getLessonSlider();

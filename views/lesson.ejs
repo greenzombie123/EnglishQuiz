@@ -4,13 +4,52 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
-     <!-- <script> 
+     <script> 
          const lessonId = "<%= lessonId %>"
     </script>
-    <script src="./index.js" type="module" defer></script> -->
+    <script src="./index.js" type="module" defer></script>
     <link rel="stylesheet" href="./Lesson.css">
 </head>
 <body>
-    
+    <lesson-slider></lesson-slider>
+    <template id="lesson-slider">
+         <div class="lesson-slider">
+
+         </div>
+    </template>
+
+    <template id="intro-slide">
+        <div class="intro-slide slide">
+            <div class="words">
+                <span class="targetWord"></span>
+                <span class="definition"></span>
+            </div>
+            <div class="buttons">
+                <button type="button" class="back">Back</button>
+                <button type="button" class="next">Next</button>
+            </div>
+        </div>
+    </template>
+
+    <template id="question-slide">
+        <div class="question-slide slide">
+            <div class="questionContainer">
+                <span class="question"></span>
+            </div>
+            <div class="buttons">
+                <button type="button"></button>
+                <button type="button"></button>
+                <button type="button"></button>
+                <button type="button"></button>
+            </div>
+        </div>
+    </template>
+
+    <template id="endSlide">
+        <form action="/lessons" method="post">
+            <p>Good Job!</p>
+            <button>Go Back To Lessons</button>
+        </form>
+    </template>
 </body>
 </html>

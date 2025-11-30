@@ -17,6 +17,7 @@ export const getDashBoard = async (
   res: Response,
   next: NextFunction
 ) => {
+    console.log(1313)
   if (!req.user) return res.redirect("/");
   const { username, userType } = req.user;
   const lessonsData = await getLessons(userType, username)

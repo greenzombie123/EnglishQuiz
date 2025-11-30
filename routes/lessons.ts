@@ -3,8 +3,9 @@ import { getDashBoard, getLessonPage } from "../controllers/lessons.ts";
 
 const lessonsRouter = Router();
 
-lessonsRouter.get('/', getDashBoard)
+
 lessonsRouter.get('/:lessonId', getLessonPage)
+lessonsRouter.get('/', getDashBoard)
 
 
 // lessonsRouter.post('/')

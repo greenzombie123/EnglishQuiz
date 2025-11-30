@@ -1,4 +1,5 @@
 import "./Lesson.js";
+console.log(123);
 const startLesson = async () => {
     // get reference for lesson component
     const lessonSlider = getLessonSlider();

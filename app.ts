@@ -32,10 +32,8 @@ server.use(express.urlencoded({ extended: true }));
 server.use(express.json());
 
 // Serve static files from views directory
-
-server.use(express.static('public'));
+server.use("/lessons", express.static("public"));
 server.use(express.static(views[0] as string));
-
 
 server.use(
   session({
@@ -85,20 +83,25 @@ const strategy = new Strategy(async function verify(username, password, done) {
 
     if (studentUser) {
       if (studentUser.password === password) {
-        const authenticatedStudent: Student = {...studentUser, userType: "student"};
+        const authenticatedStudent: Student = {
+          ...studentUser,
+          userType: "student",
+        };
         return done(null, authenticatedStudent);
       }
+    }
 
-    }  
-    
     if (teacherUser) {
       if (teacherUser.password === password) {
-        const authenticatedTeacher: Teacher = {...teacherUser, userType: "teacher"};
+        const authenticatedTeacher: Teacher = {
+          ...teacherUser,
+          userType: "teacher",
+        };
         return done(null, authenticatedTeacher);
-    } 
-  }
-    
-  return done(null, false, { message: "Incorrect password" });
+      }
+    }
+
+    return done(null, false, { message: "Incorrect password" });
   } catch (error) {
     return done(error);
   }
@@ -107,7 +110,7 @@ const strategy = new Strategy(async function verify(username, password, done) {
 passport.serializeUser(function (user, done) {
   return done(null, {
     username: user.username,
-    userType: user.userType
+    userType: user.userType,
   });
 });
 
@@ -119,8 +122,8 @@ passport.use(strategy);
 
 // Routers
 
-server.use("/findTeacher", findTeacherRouter)
-server.use("/lessons", lessonsRouter)
+server.use("/findTeacher", findTeacherRouter);
+server.use("/lessons", lessonsRouter);
 server.use("/login", logInRouter);
 server.use("/signup", signupRouter);
 server.use("/", indexRouter);
