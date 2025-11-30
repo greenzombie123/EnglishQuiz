@@ -9,7 +9,7 @@
 <body>
     <h1>Hello, <%= username %></h1>
     <% if (userType === "teacher") { %>
-     <button>Create a lesson</button>
+     <a href="/lessons/createlesson">Create A Lesson</a>
     <% } %>
 
     <% lessonsData.forEach(lesson => { %>

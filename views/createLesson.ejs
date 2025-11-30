@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <!-- <h1>Create Your Lesson</h1>
+    <p class="selectContainer">
+        <label for="">Choose what type of slide to make.</label>
+        <select name="" id="select">
+            <option value="intro">Introduce grammar or vocabulary</option>
+            <option value="question">Make a question</option>
+        </select>
+    </p>
+    <button type="button">Add New Slide</button> -->
+    <form action="lessons/createlesson" method="post">
+        <fieldset class="intro">
+            <p>
+                <label for="targetWord">Enter the target word</label>
+                <input type="text" id="targetWord" name="a">
+            </p>
+            <p>
+                <label for="definition">Enter definition of target word</label>
+                <input type="text" id="definition" name="b">
+            </p>
+        </fieldset>
+
+        <fieldset class="intro">
+            <p>
+                <label for="targetWord">Enter the target word</label>
+                <input type="text" id="targetWord" name="a">
+            </p>
+            <p>
+                <label for="definition">Enter definition of target word</label>
+                <input type="text" id="definition" name="b">
+            </p>
+        </fieldset>
+        <button>Create Lesson</button>
+    </form>
+</body>
+</html>
