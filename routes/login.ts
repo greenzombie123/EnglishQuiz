@@ -11,7 +11,9 @@ logInRouter.get("/", getLogInPage);
 logInRouter.post(
   "/",
   logInUser(),
-  getDashBoard
+  (req:Request, res:Response, next:NextFunction)=>{
+    res.redirect('lessons')
+  }
 );
 
 export default logInRouter
