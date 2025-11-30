@@ -1,5 +1,6 @@
 import "./IntroSlide.js";
 import "./QuestionSlide.js";
+import "./EndSlide.js";
 import { slideState } from "./SlideState.js";
 export class LessonSlider extends HTMLElement {
     constructor() {
@@ -44,10 +45,30 @@ export class LessonSlider extends HTMLElement {
         this.handleCorrectAnswer = () => {
             const isLastSlide = this.slideState.isLastSlide();
             if (isLastSlide)
-                return;
+                return this.handleLessonFinished();
             this.slideState.changeSlide(1);
             this.removeCurrentSlide();
             this.render();
+        };
+        this.handleNextButtonClicked = () => {
+            const isLastSlide = this.slideState.isLastSlide();
+            if (isLastSlide)
+                return this.handleLessonFinished();
+            this.slideState.changeSlide(1);
+            this.removeCurrentSlide();
+            this.render();
+        };
+        this.handleLessonFinished = () => {
+            this.removeCurrentSlide();
+            this.renderEndSlide();
+        };
+        this.renderEndSlide = () => {
+            const endSlide = document.createElement("end-slide");
+            if (this.root) {
+                const slider = this.root.querySelector(".lesson-slider");
+                if (slider)
+                    slider.appendChild(endSlide);
+            }
         };
         this.slideState = slideState();
     }
@@ -56,14 +77,7 @@ export class LessonSlider extends HTMLElement {
         const templateContent = template.content;
         const clonedContent = templateContent.cloneNode(true);
         this.root = this.attachShadow({ mode: "closed" });
-        this.addEventListener("nextButtonClicked", () => {
-            const isLastSlide = this.slideState.isLastSlide();
-            if (isLastSlide)
-                return;
-            this.slideState.changeSlide(1);
-            this.removeCurrentSlide();
-            this.render();
-        });
+        this.addEventListener("nextButtonClicked", this.handleNextButtonClicked);
         this.addEventListener("backButtonClicked", () => {
             this.slideState.changeSlide(-1);
             this.removeCurrentSlide();

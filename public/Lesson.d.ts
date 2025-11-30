@@ -1,6 +1,7 @@
 import "./IntroSlide.ts";
 import type { IntroSlide, IntroSlideData } from "./IntroSlide.ts";
 import "./QuestionSlide.ts";
+import "./EndSlide.ts";
 import type { QuestionSlide, QuestionSlideData } from "./QuestionSlide.ts";
 import type { Slide } from "./SlideState.ts";
 import { type SlideState } from "./SlideState.ts";
@@ -25,5 +26,8 @@ export declare class LessonSlider extends HTMLElement {
     render(): void;
     handleWrongAnswer: () => void;
     handleCorrectAnswer: () => void;
+    handleNextButtonClicked: () => void;
+    handleLessonFinished: () => void;
+    renderEndSlide: () => void;
 }
 //# sourceMappingURL=Lesson.d.ts.map

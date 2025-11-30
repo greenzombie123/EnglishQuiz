@@ -1,6 +1,7 @@
 import "./IntroSlide.ts";
 import type { IntroSlide, IntroSlideData } from "./IntroSlide.ts";
 import "./QuestionSlide.ts";
+import "./EndSlide.ts"
 import type { QuestionSlide, QuestionSlideData } from "./QuestionSlide.ts";
 import type { Slide } from "./SlideState.ts";
 import { slideState, type SlideState } from "./SlideState.ts";
@@ -31,13 +32,7 @@ export class LessonSlider extends HTMLElement {
     const clonedContent = templateContent.cloneNode(true);
     this.root = this.attachShadow({ mode: "closed" });
 
-    this.addEventListener("nextButtonClicked", () => {
-      const isLastSlide = this.slideState.isLastSlide();
-      if (isLastSlide) return;
-      this.slideState.changeSlide(1);
-      this.removeCurrentSlide();
-      this.render();
-    });
+    this.addEventListener("nextButtonClicked", this.handleNextButtonClicked);
 
     this.addEventListener("backButtonClicked", () => {
       this.slideState.changeSlide(-1);
@@ -47,7 +42,7 @@ export class LessonSlider extends HTMLElement {
 
     this.addEventListener("wrongAnswer", this.handleWrongAnswer);
 
-    this.addEventListener("correctAnswer", this.handleCorrectAnswer)
+    this.addEventListener("correctAnswer", this.handleCorrectAnswer);
 
     this.root.appendChild(clonedContent);
   }
@@ -107,10 +102,31 @@ export class LessonSlider extends HTMLElement {
 
   handleCorrectAnswer = () => {
     const isLastSlide = this.slideState.isLastSlide();
-    if (isLastSlide) return;
+    if (isLastSlide) return this.handleLessonFinished()
     this.slideState.changeSlide(1);
     this.removeCurrentSlide();
     this.render();
+  };
+
+  handleNextButtonClicked = () => {
+    const isLastSlide = this.slideState.isLastSlide();
+    if (isLastSlide) return this.handleLessonFinished()
+    this.slideState.changeSlide(1);
+    this.removeCurrentSlide();
+    this.render();
+  };
+
+  handleLessonFinished = () => {
+    this.removeCurrentSlide();
+    this.renderEndSlide();
+  };
+
+  renderEndSlide = () => {
+    const endSlide = document.createElement("end-slide");
+    if (this.root) {
+      const slider = this.root.querySelector(".lesson-slider");
+      if (slider) slider.appendChild(endSlide);
+    }
   };
 }
 
