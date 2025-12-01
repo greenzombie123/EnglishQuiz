@@ -6,3 +6,8 @@ export const getCreateLessonPage = (req:Request, res:Response, next:NextFunction
     // if(!req.user)return res.redirect("/")
     res.render("createLesson")
 }
+
+export const addLesson = (req:Request, res:Response, next:NextFunction)=>{
+    console.log(req.body)
+    res.end()
+}

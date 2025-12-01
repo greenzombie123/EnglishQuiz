@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+    <link rel="stylesheet" href="/createLesson.css">
 </head>
 <body>
     <!-- <h1>Create Your Lesson</h1>
@@ -15,27 +16,24 @@
         </select>
     </p>
     <button type="button">Add New Slide</button> -->
-    <form action="lessons/createlesson" method="post">
+    <form action="/lessons/createlesson" method="post">
         <fieldset class="intro">
-            <p>
-                <label for="targetWord">Enter the target word</label>
-                <input type="text" id="targetWord" name="a">
-            </p>
-            <p>
-                <label for="definition">Enter definition of target word</label>
-                <input type="text" id="definition" name="b">
-            </p>
+                <label>Enter the target word
+                     <input type="text" name="a[1][g]">
+                </label>
+                <label>Enter definition of target word
+                    <input type="text" name="a[1][bob]">
+                </label>
+                
         </fieldset>
 
         <fieldset class="intro">
-            <p>
-                <label for="targetWord">Enter the target word</label>
-                <input type="text" id="targetWord" name="a">
-            </p>
-            <p>
-                <label for="definition">Enter definition of target word</label>
-                <input type="text" id="definition" name="b">
-            </p>
+           <label>Enter the target word
+                     <input type="text" name="a[3][g]">
+                </label>
+                <label>Enter definition of target word
+                    <input type="text" name="a[3][bob]">
+                </label>
         </fieldset>
         <button>Create Lesson</button>
     </form>
