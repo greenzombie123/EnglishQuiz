@@ -174,6 +174,11 @@ CREATE TABLE lessons (
 
 ```
 
+Select an option
+Press button
+Create a fieldset before the slide selecter 
+Can move a fieldset up or down
+
  
 
 

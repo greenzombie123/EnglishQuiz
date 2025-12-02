@@ -1,41 +1,196 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
-    <link rel="stylesheet" href="/createLesson.css">
+    <link rel="stylesheet" href="/createLesson.css" />
+    <script src="./lessonCreaterIndex.js" type="module" defer></script>
 </head>
+
 <body>
-    <!-- <h1>Create Your Lesson</h1>
-    <p class="selectContainer">
-        <label for="">Choose what type of slide to make.</label>
-        <select name="" id="select">
+    <h1>Create Your Lesson</h1>
+    <lesson-creater></lesson-creater>
+    <!-- <form action="/lessons/createlesson" method="post">
+      <fieldset class="intro">
+        <legend>Introduction</legend>
+        <label
+          >Enter the target word
+          <input type="text" name="intro[1][targetword]" required />
+        </label>
+        <label
+          >Enter definition of target word
+          <input type="text" name="intro[1][definition]" required />
+        </label>
+      </fieldset>
+
+      <fieldset class="question">
+        <legend>Question</legend>
+        <label
+          >Enter question
+          <input type="text" name="question[1][question]" required />
+        </label>
+        <label
+          >Enter the correct answer
+          <input type="text" name="question[1][correntanswer]" required />
+        </label>
+        <label
+          >Enter the wrong answer
+          <input type="text" name="question[1][wronganswer1]" required />
+        </label>
+        <label
+          >Enter the wrong answer
+          <input type="text" name="question[1][wronganswer2]" required />
+        </label>
+        <label
+          >Enter the wrong answer
+          <input type="text" name="question[1][wronganswer3]" required />
+        </label>
+      </fieldset>
+      <button>Create Lesson</button>
+    </form> -->
+    <template id="lesson-creater">
+        <style>
+            form {
+
+                .slideSelecter {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 20px;
+                    width: fit-content;
+                    border: 1px black solid;
+                    margin: 25px 0;
+                    padding: 10px;
+
+                    label {}
+
+                    select {}
+                }
+
+
+                fieldset {
+                    width: 33%;
+                    margin: 25px 0;
+
+                    label {
+                        display: flex;
+                        flex-direction: column;
+                        margin-bottom: 20px;
+                    }
+                }
+            }
+        </style>
+        <form action="/lessons/createlesson" method="post">
+            <div class="slideSelecter">
+                <label for="select">Choose what type of slide to make.</label>
+                <select name="" id="slideSelecter">
+                    <option value="" selected>--Choose a slide</option>
+                    <option value="intro">Introduce grammar or vocabulary</option>
+                    <option value="question">Make a question</option>
+                </select>
+                <button type="button" id="slide-selecterButton">Add New Slide</button>
+            </div>
+            <button>Create Lesson</button>
+        </form>
+    </template>
+
+    <template id="question-fieldset">
+        <style>
+            fieldset {
+                    width: 33%;
+                    margin: 25px 0;
+
+                    label {
+                        display: flex;
+                        flex-direction: column;
+                        margin-bottom: 20px;
+                    }
+                }
+        </style>
+        <fieldset class="question">
+            <legend>Question</legend>
+            <label>Enter question
+                <input type="text" name="question[1][question]" required />
+            </label>
+            <label>Enter the correct answer
+                <input type="text" name="question[1][correntanswer]" required />
+            </label>
+            <label>Enter the wrong answer
+                <input type="text" name="question[1][wronganswer1]" required />
+            </label>
+            <label>Enter the wrong answer
+                <input type="text" name="question[1][wronganswer2]" required />
+            </label>
+            <label>Enter the wrong answer
+                <input type="text" name="question[1][wronganswer3]" required />
+            </label>
+        </fieldset>
+    </template>
+
+    <template id="intro-fieldset">
+          <style>
+            fieldset {
+                    width: 33%;
+                    margin: 25px 0;
+
+                    label {
+                        display: flex;
+                        flex-direction: column;
+                        margin-bottom: 20px;
+                    }
+                }
+        </style>
+        <fieldset class="intro">
+            <legend>Introduction</legend>
+            <label>Enter the target word
+                <input type="text" name="intro[1][targetword]" required />
+            </label>
+            <label>Enter definition of target word
+                <input type="text" name="intro[1][definition]" required />
+            </label>
+        </fieldset>
+    </template>
+</body>
+
+</html>
+
+<!-- <div class="selectContainer">
+        <label for="select">Choose what type of slide to make.</label>
+        <select name="" id="slideSelecter">
+            <option value=""selected>--Choose a slide</option>
             <option value="intro">Introduce grammar or vocabulary</option>
             <option value="question">Make a question</option>
         </select>
-    </p>
-    <button type="button">Add New Slide</button> -->
-    <form action="/lessons/createlesson" method="post">
-        <fieldset class="intro">
+        <button type="button">Add New Slide</button>
+    </div>
+
+<fieldset class="intro">
+            <legend>Introduction</legend>
                 <label>Enter the target word
-                     <input type="text" name="a[1][g]">
+                     <input type="text" name="intro[1][targetword]" required>
                 </label>
                 <label>Enter definition of target word
-                    <input type="text" name="a[1][bob]">
+                    <input type="text" name="intro[1][definition]" required>
                 </label>
                 
         </fieldset>
 
-        <fieldset class="intro">
-           <label>Enter the target word
-                     <input type="text" name="a[3][g]">
+        <fieldset class="question">
+                <legend>Question</legend>
+                <label>Enter question
+                     <input type="text" name="question[1][question]" required>
                 </label>
-                <label>Enter definition of target word
-                    <input type="text" name="a[3][bob]">
+                <label>Enter the correct answer
+                    <input type="text" name="question[1][correntanswer]" required>
                 </label>
-        </fieldset>
-        <button>Create Lesson</button>
-    </form>
-</body>
-</html>
+                <label>Enter the wrong answer
+                    <input type="text" name="question[1][wronganswer1]" required>
+                </label>
+                <label>Enter the wrong answer
+                    <input type="text" name="question[1][wronganswer2]" required>
+                </label>
+                <label>Enter the wrong answer
+                    <input type="text" name="question[1][wronganswer3]" required>
+                </label>
+        </fieldset> -->

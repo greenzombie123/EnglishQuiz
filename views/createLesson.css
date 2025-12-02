@@ -1,14 +1,29 @@
-body *{
-    /* color: red; */
-}
-
-fieldset{
-    width: 30%;
-    label{
+form {
+    .slideSelecter {
         display: flex;
         flex-direction: column;
+        gap: 20px;
+        width: fit-content;
+        border: 1px black solid;
+        margin-bottom: 50px;
+        padding: 10px;
+
+        label {}
+
+        select {}
+    }
+
+
+    fieldset {
+        width: 33%;
+
+        label {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 20px;
+        }
+
         margin-bottom: 20px;
     }
-    margin-bottom: 20px;
-}
 
+}
