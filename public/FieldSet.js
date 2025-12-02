@@ -1,14 +1,19 @@
 export class IntroFieldSet extends HTMLElement {
     constructor() {
         super();
-        this.connectedCallback = () => { };
+        this.connectedCallback = () => {
+            this.internals.setFormValue("efefe");
+        };
         this.disconnectedCallback = () => { };
         this.connectedMoveCallback = () => { };
+        this.internals = this.attachInternals();
         this.root = this.attachShadow({ mode: "open" });
         const template = document.getElementById("intro-fieldset");
         this.root.appendChild(template.content.cloneNode(true));
+        // this.setAttribute("name", "Squid")
     }
 }
+IntroFieldSet.formAssociated = true;
 export class QuestionFieldSet extends HTMLElement {
     constructor() {
         super();

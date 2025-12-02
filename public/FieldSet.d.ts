@@ -1,5 +1,7 @@
 export declare class IntroFieldSet extends HTMLElement {
+    static formAssociated: boolean;
     root: ShadowRoot;
+    internals: ElementInternals;
     constructor();
     connectedCallback: () => void;
     disconnectedCallback: () => void;
