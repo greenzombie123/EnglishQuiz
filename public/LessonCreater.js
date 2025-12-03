@@ -6,7 +6,7 @@ class LessonCreater extends HTMLElement {
         this.changeSlideIndex = (index) => {
             this.slideIndex += index;
         };
-        // Get the value from the select element
+        // Create and add a specified fieldset with move and delete buttons added when appropriate
         this.handleSelecterButtonClicked = (e) => {
             // Search for node with the specified css selecter by tranversing the element and its parents
             const isSelecterButton = e.currentTarget.closest("#slide-selecterButton");
@@ -129,10 +129,13 @@ class LessonCreater extends HTMLElement {
             const deleteFieldSetButton = fieldSet.querySelector('.deleteFieldSet');
             deleteFieldSetButton.addEventListener("click", this.deleteFieldSet);
         };
+        // Delete a fieldset and rearrange move buttons
         this.deleteFieldSet = (e) => {
             const button = e.currentTarget;
             const fieldSet = button.closest(".slide-fieldSet");
-            console.log(fieldSet);
+            fieldSet === null || fieldSet === void 0 ? void 0 : fieldSet.remove();
+            // Remove and add new appropriate move buttons
+            this.handleAddMoveButtons();
         };
         this.connectedCallback = () => { };
         this.disconnectedCallback = () => { };
