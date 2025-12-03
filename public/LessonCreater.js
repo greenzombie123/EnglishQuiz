@@ -110,12 +110,16 @@ class LessonCreater extends HTMLElement {
             const upButton = document.createElement("button");
             upButton.className = "up";
             upButton.textContent = "up";
+            upButton.type = "button";
+            upButton.addEventListener("click", this.handleMoveFieldSet);
             fieldSetButtons.appendChild(upButton);
         };
         this.attachMoveDownButton = (fieldSetButtons) => {
             const downButton = document.createElement("button");
             downButton.className = "down";
             downButton.textContent = "down";
+            downButton.type = "button";
+            downButton.addEventListener("click", this.handleMoveFieldSet);
             fieldSetButtons.appendChild(downButton);
         };
         this.resetMoveButtons = (fieldSetButtonsContainers) => {
@@ -134,6 +138,22 @@ class LessonCreater extends HTMLElement {
             const button = e.currentTarget;
             const fieldSet = button.closest(".slide-fieldSet");
             fieldSet === null || fieldSet === void 0 ? void 0 : fieldSet.remove();
+            // Remove and add new appropriate move buttons
+            this.handleAddMoveButtons();
+        };
+        this.handleMoveFieldSet = (e) => {
+            const button = e.currentTarget;
+            const value = button.className;
+            if (value === "up") {
+                const currentFieldSet = button.closest(".slide-fieldSet");
+                const previousFieldSet = currentFieldSet === null || currentFieldSet === void 0 ? void 0 : currentFieldSet.previousElementSibling;
+                previousFieldSet.before(currentFieldSet);
+            }
+            else if (value === "down") {
+                const currentFieldSet = button.closest(".slide-fieldSet");
+                const nextFieldSet = currentFieldSet === null || currentFieldSet === void 0 ? void 0 : currentFieldSet.nextElementSibling;
+                currentFieldSet.before(nextFieldSet);
+            }
             // Remove and add new appropriate move buttons
             this.handleAddMoveButtons();
         };

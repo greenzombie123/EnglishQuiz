@@ -140,6 +140,8 @@ class LessonCreater extends HTMLElement {
     const upButton = document.createElement("button") as HTMLButtonElement;
     upButton.className = "up";
     upButton.textContent = "up"
+    upButton.type = "button"
+    upButton.addEventListener("click", this.handleMoveFieldSet)
     fieldSetButtons.appendChild(upButton);
   };
 
@@ -147,6 +149,8 @@ class LessonCreater extends HTMLElement {
     const downButton = document.createElement("button") as HTMLButtonElement;
     downButton.className = "down";
     downButton.textContent = "down"
+    downButton.type = "button"
+    downButton.addEventListener("click", this.handleMoveFieldSet)
     fieldSetButtons.appendChild(downButton);
   };
 
@@ -167,6 +171,24 @@ class LessonCreater extends HTMLElement {
     const button = e.currentTarget as HTMLButtonElement
     const fieldSet = button.closest(".slide-fieldSet")
     fieldSet?.remove()
+
+    // Remove and add new appropriate move buttons
+    this.handleAddMoveButtons();
+  }
+
+  handleMoveFieldSet = (e:Event)=>{
+    const button = e.currentTarget as HTMLButtonElement
+    const value = button.className
+    if(value === "up"){
+        const currentFieldSet = button.closest(".slide-fieldSet") as HTMLDivElement
+        const previousFieldSet = currentFieldSet?.previousElementSibling as HTMLDivElement
+        previousFieldSet.before(currentFieldSet)
+    }
+    else if(value === "down"){
+        const currentFieldSet = button.closest(".slide-fieldSet") as HTMLDivElement
+        const nextFieldSet = currentFieldSet?.nextElementSibling as HTMLDivElement
+        currentFieldSet.before(nextFieldSet)
+    }
 
     // Remove and add new appropriate move buttons
     this.handleAddMoveButtons();
