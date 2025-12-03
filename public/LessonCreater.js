@@ -18,6 +18,7 @@ class LessonCreater extends HTMLElement {
             this.changeSlideIndex(1);
             const fieldSet = this.createFieldSet(this.slideIndex, slideValue);
             this.insertNewFieldSet(fieldSet);
+            this.handleAddMoveButtons();
         };
         // Get value from the select in the slide selecter
         this.getSlideValue = () => {
@@ -32,7 +33,7 @@ class LessonCreater extends HTMLElement {
         this.createFieldSet = (index, fieldSetType) => {
             const fieldSet = document.createElement("div");
             if (fieldSetType === "intro") {
-                fieldSet.className = "intro-FieldSet";
+                fieldSet.className = "slide-fieldSet";
                 fieldSet.innerHTML = `
             <fieldset>
             <legend>Introduction</legend>
@@ -43,12 +44,14 @@ class LessonCreater extends HTMLElement {
                 <input type="text" name="intro[${index}][definition]" required />
             </label>
         </fieldset>
-        <button class="deleteFieldSet">X</button>
+        <div class="fieldSetButtons">
+            <button class="deleteFieldSet">X</button>
+        </div>
         `;
                 return fieldSet;
             }
             else {
-                fieldSet.className = "question-FieldSet";
+                fieldSet.className = "slide-fieldSet";
                 fieldSet.innerHTML = `
              <fieldset class="question">
             <legend>Question</legend>
@@ -68,11 +71,58 @@ class LessonCreater extends HTMLElement {
                 <input type="text" name="question[${index}][wronganswer3]" required />
             </label>
         </fieldset>
-        <button class="deleteFieldSet">X</button>
+        <div class="fieldSetButtons">
+            <button class="deleteFieldSet">X</button>
+        </div>
         `;
                 return fieldSet;
             }
-            ;
+        };
+        this.handleAddMoveButtons = () => {
+            const fieldSetButtons = this.getAllFieldSetButtons();
+            this.resetMoveButtons(fieldSetButtons);
+            this.attachMoveButtons(fieldSetButtons);
+        };
+        // get all the fieldSetButtons divs from the fieldsets
+        this.getAllFieldSetButtons = () => {
+            return Array.from(this.root.querySelectorAll(".fieldSetButtons"));
+        };
+        // Attach move buttons based on fieldset positioning
+        this.attachMoveButtons = (fieldButtonContainers) => {
+            const numOfFieldSets = fieldButtonContainers.length;
+            fieldButtonContainers.forEach((fieldButtons, index) => {
+                if (numOfFieldSets === 1)
+                    return;
+                else if (index === 0) {
+                    this.attachMoveDownButton(fieldButtons);
+                }
+                else if (index === (numOfFieldSets - 1)) {
+                    this.attachMoveUpButton(fieldButtons);
+                }
+                else {
+                    this.attachMoveUpButton(fieldButtons);
+                    this.attachMoveDownButton(fieldButtons);
+                }
+            });
+        };
+        this.attachMoveUpButton = (fieldSetButtons) => {
+            const upButton = document.createElement("button");
+            upButton.className = "up";
+            upButton.textContent = "up";
+            fieldSetButtons.appendChild(upButton);
+        };
+        this.attachMoveDownButton = (fieldSetButtons) => {
+            const downButton = document.createElement("button");
+            downButton.className = "down";
+            downButton.textContent = "down";
+            fieldSetButtons.appendChild(downButton);
+        };
+        this.resetMoveButtons = (fieldSetButtonsContainers) => {
+            fieldSetButtonsContainers.forEach(fieldSetButtons => {
+                var _a, _b;
+                (_a = fieldSetButtons.querySelector(".up")) === null || _a === void 0 ? void 0 : _a.remove();
+                (_b = fieldSetButtons.querySelector(".down")) === null || _b === void 0 ? void 0 : _b.remove();
+            });
         };
         this.connectedCallback = () => { };
         this.disconnectedCallback = () => { };

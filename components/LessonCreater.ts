@@ -2,64 +2,65 @@ import "./FieldSet.ts";
 import { IntroFieldSet, QuestionFieldSet } from "./FieldSet.ts";
 
 class LessonCreater extends HTMLElement {
-    root;
-    slideIndex = 0
+  root;
+  slideIndex = 0;
 
-    constructor() {
-        super();
-        this.root = this.attachShadow({ mode: "open" });
-        const template = document.getElementById(
-            "lesson-creater"
-        ) as HTMLTemplateElement;
+  constructor() {
+    super();
+    this.root = this.attachShadow({ mode: "open" });
+    const template = document.getElementById(
+      "lesson-creater"
+    ) as HTMLTemplateElement;
 
-        this.root.appendChild(template.content.cloneNode(true));
+    this.root.appendChild(template.content.cloneNode(true));
 
-        const selecterButton = this.root.getElementById(
-            "slide-selecterButton"
-        ) as HTMLButtonElement;
+    const selecterButton = this.root.getElementById(
+      "slide-selecterButton"
+    ) as HTMLButtonElement;
 
-        selecterButton.addEventListener("click", this.handleSelecterButtonClicked);
-    }
+    selecterButton.addEventListener("click", this.handleSelecterButtonClicked);
+  }
 
-    changeSlideIndex = (index:number)=>{
-        this.slideIndex += index
-    }
+  changeSlideIndex = (index: number) => {
+    this.slideIndex += index;
+  };
 
-    // Get the value from the select element
-    handleSelecterButtonClicked = (e: Event) => {
-        // Search for node with the specified css selecter by tranversing the element and its parents
-        const isSelecterButton = (e.currentTarget as HTMLButtonElement).closest(
-            "#slide-selecterButton"
-        );
-        if (!isSelecterButton) return;
-        const slideValue = this.getSlideValue();
-        if (!slideValue) return;
-        this.changeSlideIndex(1)
-        const fieldSet = this.createFieldSet(this.slideIndex, slideValue);
-        this.insertNewFieldSet(fieldSet);
-    };
+  // Get the value from the select element
+  handleSelecterButtonClicked = (e: Event) => {
+    // Search for node with the specified css selecter by tranversing the element and its parents
+    const isSelecterButton = (e.currentTarget as HTMLButtonElement).closest(
+      "#slide-selecterButton"
+    );
+    if (!isSelecterButton) return;
+    const slideValue = this.getSlideValue();
+    if (!slideValue) return;
+    this.changeSlideIndex(1);
+    const fieldSet = this.createFieldSet(this.slideIndex, slideValue);
+    this.insertNewFieldSet(fieldSet);
+    this.handleAddMoveButtons();
+  };
 
-    // Get value from the select in the slide selecter
-    getSlideValue = () => {
-        const select = this.root.getElementById(
-            "slideSelecter"
-        ) as HTMLSelectElement;
-        return select.value;
-    };
+  // Get value from the select in the slide selecter
+  getSlideValue = () => {
+    const select = this.root.getElementById(
+      "slideSelecter"
+    ) as HTMLSelectElement;
+    return select.value;
+  };
 
-    // Place new fieldset just before the slide selecter
-    insertNewFieldSet = (fieldSet: HTMLElement) => {
-        const slideSelecter = this.root.querySelector(
-            ".slideSelecter"
-        ) as HTMLElement;
-        slideSelecter.before(fieldSet);
-    };
+  // Place new fieldset just before the slide selecter
+  insertNewFieldSet = (fieldSet: HTMLElement) => {
+    const slideSelecter = this.root.querySelector(
+      ".slideSelecter"
+    ) as HTMLElement;
+    slideSelecter.before(fieldSet);
+  };
 
-    createFieldSet = (index: number, fieldSetType: string) => {
-        const fieldSet = document.createElement("div") as HTMLDivElement
-        if (fieldSetType === "intro") {
-            fieldSet.className = "intro-FieldSet"
-            fieldSet.innerHTML = `
+  createFieldSet = (index: number, fieldSetType: string) => {
+    const fieldSet = document.createElement("div") as HTMLDivElement;
+    if (fieldSetType === "intro") {
+      fieldSet.className = "slide-fieldSet";
+      fieldSet.innerHTML = `
             <fieldset>
             <legend>Introduction</legend>
             <label>Enter the target word
@@ -69,12 +70,14 @@ class LessonCreater extends HTMLElement {
                 <input type="text" name="intro[${index}][definition]" required />
             </label>
         </fieldset>
-        <button class="deleteFieldSet">X</button>
-        `
-            return fieldSet
-        } else {
-            fieldSet.className = "question-FieldSet"
-            fieldSet.innerHTML = `
+        <div class="fieldSetButtons">
+            <button class="deleteFieldSet">X</button>
+        </div>
+        `;
+      return fieldSet;
+    } else {
+      fieldSet.className = "slide-fieldSet";
+      fieldSet.innerHTML = `
              <fieldset class="question">
             <legend>Question</legend>
             <label>Enter question
@@ -93,16 +96,72 @@ class LessonCreater extends HTMLElement {
                 <input type="text" name="question[${index}][wronganswer3]" required />
             </label>
         </fieldset>
-        <button class="deleteFieldSet">X</button>
-        `
-            return fieldSet
-        };
+        <div class="fieldSetButtons">
+            <button class="deleteFieldSet">X</button>
+        </div>
+        `;
+      return fieldSet;
     }
-    connectedCallback = () => { };
+  };
 
-    disconnectedCallback = () => { };
+  handleAddMoveButtons = () => {
+    const fieldSetButtons = this.getAllFieldSetButtons();
+    this.resetMoveButtons(fieldSetButtons)
+    this.attachMoveButtons(fieldSetButtons)
+  };
 
-    connectedMoveCallback = () => { };
+  // get all the fieldSetButtons divs from the fieldsets
+  getAllFieldSetButtons = () => {
+    return Array.from(
+      this.root.querySelectorAll(".fieldSetButtons")
+    ) as HTMLDivElement[];
+  };
+
+  // Attach move buttons based on fieldset positioning
+  attachMoveButtons = (fieldButtonContainers: HTMLDivElement[]) => {
+    const numOfFieldSets = fieldButtonContainers.length
+    fieldButtonContainers.forEach((fieldButtons, index) => {
+        if(numOfFieldSets === 1) return
+        else if(index === 0){
+            this.attachMoveDownButton(fieldButtons)
+        }
+        else if(index === (numOfFieldSets - 1)){
+            this.attachMoveUpButton(fieldButtons)
+        }
+        else{
+            this.attachMoveUpButton(fieldButtons)
+            this.attachMoveDownButton(fieldButtons)
+        }
+    });
+  };
+
+  attachMoveUpButton = (fieldSetButtons: HTMLDivElement) => {
+    const upButton = document.createElement("button") as HTMLButtonElement;
+    upButton.className = "up";
+    upButton.textContent = "up"
+    fieldSetButtons.appendChild(upButton);
+  };
+
+  attachMoveDownButton = (fieldSetButtons: HTMLDivElement) => {
+    const downButton = document.createElement("button") as HTMLButtonElement;
+    downButton.className = "down";
+    downButton.textContent = "down"
+    fieldSetButtons.appendChild(downButton);
+  };
+
+  resetMoveButtons = (fieldSetButtonsContainers:HTMLElement[])=>{
+    fieldSetButtonsContainers.forEach(fieldSetButtons=>{
+        fieldSetButtons.querySelector(".up")?.remove()
+        fieldSetButtons.querySelector(".down")?.remove()
+    })
+  }
+
+
+  connectedCallback = () => {};
+
+  disconnectedCallback = () => {};
+
+  connectedMoveCallback = () => {};
 }
 
 customElements.define("lesson-creater", LessonCreater);
