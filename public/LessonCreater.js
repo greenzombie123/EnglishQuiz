@@ -18,6 +18,7 @@ class LessonCreater extends HTMLElement {
             this.changeSlideIndex(1);
             const fieldSet = this.createFieldSet(this.slideIndex, slideValue);
             this.insertNewFieldSet(fieldSet);
+            this.handleAttachDeleteFieldSetHandler(fieldSet);
             this.handleAddMoveButtons();
         };
         // Get value from the select in the slide selecter
@@ -45,7 +46,7 @@ class LessonCreater extends HTMLElement {
             </label>
         </fieldset>
         <div class="fieldSetButtons">
-            <button class="deleteFieldSet">X</button>
+            <button class="deleteFieldSet" type="button">X</button>
         </div>
         `;
                 return fieldSet;
@@ -72,7 +73,7 @@ class LessonCreater extends HTMLElement {
             </label>
         </fieldset>
         <div class="fieldSetButtons">
-            <button class="deleteFieldSet">X</button>
+            <button class="deleteFieldSet" type="button">X</button>
         </div>
         `;
                 return fieldSet;
@@ -123,6 +124,15 @@ class LessonCreater extends HTMLElement {
                 (_a = fieldSetButtons.querySelector(".up")) === null || _a === void 0 ? void 0 : _a.remove();
                 (_b = fieldSetButtons.querySelector(".down")) === null || _b === void 0 ? void 0 : _b.remove();
             });
+        };
+        this.handleAttachDeleteFieldSetHandler = (fieldSet) => {
+            const deleteFieldSetButton = fieldSet.querySelector('.deleteFieldSet');
+            deleteFieldSetButton.addEventListener("click", this.deleteFieldSet);
+        };
+        this.deleteFieldSet = (e) => {
+            const button = e.currentTarget;
+            const fieldSet = button.closest(".slide-fieldSet");
+            console.log(fieldSet);
         };
         this.connectedCallback = () => { };
         this.disconnectedCallback = () => { };
