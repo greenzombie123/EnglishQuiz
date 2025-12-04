@@ -3,6 +3,7 @@ class LessonCreater extends HTMLElement {
     constructor() {
         super();
         this.slideIndex = 0;
+        this.slideOrder = 1;
         this.changeSlideIndex = (index) => {
             this.slideIndex += index;
         };
@@ -20,6 +21,7 @@ class LessonCreater extends HTMLElement {
             this.insertNewFieldSet(fieldSet);
             this.handleAttachDeleteFieldSetHandler(fieldSet);
             this.handleAddMoveButtons();
+            this.handleSlideOrderAdjustment();
         };
         // Get value from the select in the slide selecter
         this.getSlideValue = () => {
@@ -44,6 +46,7 @@ class LessonCreater extends HTMLElement {
             <label>Enter definition of target word
                 <input type="text" name="intro[${index}][definition]" required />
             </label>
+            <input type="hidden" name="slideOrder" id="slideOrderInput"/>
         </fieldset>
         <div class="fieldSetButtons">
             <button class="deleteFieldSet" type="button">X</button>
@@ -65,12 +68,13 @@ class LessonCreater extends HTMLElement {
             <label>Enter the wrong answer
                 <input type="text" name="question[${index}][wronganswer1]" required />
             </label>
-            <label>Enter the wrong answer
-                <input type="text" name="question[${index}][wronganswer2]" required />
+            <label>Enter the wrong answer (Optional)
+                <input type="text" name="question[${index}][wronganswer2]" />
             </label>
-            <label>Enter the wrong answer
-                <input type="text" name="question[${index}][wronganswer3]" required />
+            <label>Enter the wrong answer (Optional)
+                <input type="text" name="question[${index}][wronganswer3]" />
             </label>
+            <input type="hidden" name="slideOrder" id="slideOrderInput"/>
         </fieldset>
         <div class="fieldSetButtons">
             <button class="deleteFieldSet" type="button">X</button>
@@ -83,6 +87,8 @@ class LessonCreater extends HTMLElement {
             const fieldSetButtons = this.getAllFieldSetButtons();
             this.resetMoveButtons(fieldSetButtons);
             this.attachMoveButtons(fieldSetButtons);
+            // Adjust slide order for slides
+            this.handleSlideOrderAdjustment();
         };
         // get all the fieldSetButtons divs from the fieldsets
         this.getAllFieldSetButtons = () => {
@@ -140,7 +146,10 @@ class LessonCreater extends HTMLElement {
             fieldSet === null || fieldSet === void 0 ? void 0 : fieldSet.remove();
             // Remove and add new appropriate move buttons
             this.handleAddMoveButtons();
+            // Adjust slide order for slides
+            this.handleSlideOrderAdjustment();
         };
+        // Switch the placement of field sets
         this.handleMoveFieldSet = (e) => {
             const button = e.currentTarget;
             const value = button.className;
@@ -156,6 +165,18 @@ class LessonCreater extends HTMLElement {
             }
             // Remove and add new appropriate move buttons
             this.handleAddMoveButtons();
+        };
+        this.handleSlideOrderAdjustment = () => {
+            const inputs = this.getAllSlideOrderInputs();
+            this.adjustSlideOrderInputs(inputs);
+        };
+        this.getAllSlideOrderInputs = () => {
+            return Array.from(this.root.querySelectorAll('#slideOrderInput'));
+        };
+        this.adjustSlideOrderInputs = (inputs) => {
+            inputs.forEach((input, index) => {
+                input.value = `${index + 1}`;
+            });
         };
         this.connectedCallback = () => { };
         this.disconnectedCallback = () => { };

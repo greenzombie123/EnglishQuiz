@@ -44,6 +44,10 @@
             }
         </style>
         <form action="/lessons/createlesson" method="post">
+            <label for="lessonName" class="lessonNameLabel">
+                Write the name of your lesson.
+                <input type="text" id="lessonName" placeholder="Lesson Name" name="lessonName">
+            </label>
             <div class="slideSelecter">
                 <label for="select">Choose what type of slide to make.</label>
                 <select name="" id="slideSelecter">
@@ -56,8 +60,11 @@
              <button>Create Lesson</button>
         </form>
     </template>
+</body>
 
-    <template id="question-fieldset">
+</html>
+
+ <!-- <template id="question-fieldset">
         <style>
             fieldset {
                     width: 33%;
@@ -112,8 +119,4 @@
                 <input type="text" name="intro[1][definition]" required />
             </label>
         </fieldset>
-    </template>
-</body>
-
-</html>
-
+    </template> -->
