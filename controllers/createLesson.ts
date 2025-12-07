@@ -13,32 +13,45 @@ export const getCreateLessonPage = (
   res.render("createLesson");
 };
 
-interface QuestionSlide extends QuestionSlideData {
+type QuestionSlide = Omit<QuestionSlideData, "type"> & {
   slideorder: number;
-}
+};
 
-interface IntroSlide extends IntroSlideData {
+type IntroSlide = Omit<IntroSlideData, "type"> & {
   slideorder: number;
-}
+};
 
 type Slide = QuestionSlide | IntroSlide;
 
 export const addLesson = (req: Request, res: Response, next: NextFunction) => {
-    console.log(req.body)
-  const {questions, introductions, name} = req.body as {questions:QuestionSlide[], introductions:IntroSlide[], name:string}
+  // console.log(req.body)
+  const { question, intro, lessonName } = req.body as {
+    question: QuestionSlide[];
+    intro: IntroSlide[];
+    lessonName: string;
+  };
+  
+  console.log(createIntroValues(intro));
+
   res.end();
 };
 
-const createValues = (slides: Slide[]) => {
- const newSlides = slides.map((slide) => {
-    if (slide.type === "intro")
-      return `(${slide.targetWord},${slide.definition},${slide.slideorder})`;
-    else
-      return `
+const createIntroValues = (slides: IntroSlide[]) => {
+  const introSlideValues = slides.map(
+    (slide) => `('${slide.targetWord}','${slide.definition}',${slide.slideorder})`
+  );
+
+  return introSlideValues.join(", ");
+};
+
+const createQuestionValues = (slides: QuestionSlide[]) => {
+  const questionSlideValues = slides.map(
+    (slide) => `
         (${slide.question},${slide.correctAnswer},${slide.wrongAnswer1},
         ${slide.wrongAnswer2},${slide.wrongAnswer3},${slide.slideorder},)
-        `;
-  });
+        `
+  );
 
-  return newSlides.join(", ")
+  questionSlideValues.join(", ");
+  return questionSlideValues;
 };

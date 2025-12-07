@@ -67,7 +67,7 @@ class LessonCreater extends HTMLElement {
             <fieldset>
             <legend>Introduction</legend>
             <label>Enter the target word
-                <input type="text" name="intro[${index}][targetword]" required />
+                <input type="text" name="intro[${index}][targetWord]" required />
             </label>
             <label>Enter definition of target word
                 <input type="text" name="intro[${index}][definition]" required />
@@ -94,10 +94,10 @@ class LessonCreater extends HTMLElement {
                 <input type="text" name="question[${index}][wronganswer1]" required />
             </label>
             <label>Enter the wrong answer (Optional)
-                <input type="text" name="question[${index}][wronganswer2]" />
+                <input type="text" name="question[${index}][wronganswer2]" value="" />
             </label>
             <label>Enter the wrong answer (Optional)
-                <input type="text" name="question[${index}][wronganswer3]" />
+                <input type="text" name="question[${index}][wronganswer3]" value="" />
             </label>
             <input type="hidden" name="question[${index}][slideorder]" id="slideOrderInput"/>
         </fieldset>
