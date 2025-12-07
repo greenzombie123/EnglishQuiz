@@ -63,16 +63,16 @@ class LessonCreater extends HTMLElement {
                 <input type="text" name="question[${index}][question]" required />
             </label>
             <label>Enter the correct answer
-                <input type="text" name="question[${index}][correntanswer]" required />
+                <input type="text" name="question[${index}][correctAnswer]" required />
             </label>
             <label>Enter the wrong answer
-                <input type="text" name="question[${index}][wronganswer1]" required />
+                <input type="text" name="question[${index}][wrongAnswer1]" required />
             </label>
             <label>Enter the wrong answer (Optional)
-                <input type="text" name="question[${index}][wronganswer2]" value="" />
+                <input type="text" name="question[${index}][wrongAnswer2]" value="" />
             </label>
             <label>Enter the wrong answer (Optional)
-                <input type="text" name="question[${index}][wronganswer3]" value="" />
+                <input type="text" name="question[${index}][wrongAnswer3]" value="" />
             </label>
             <input type="hidden" name="question[${index}][slideorder]" id="slideOrderInput"/>
         </fieldset>
