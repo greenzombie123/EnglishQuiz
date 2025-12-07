@@ -9,3 +9,5 @@ export const pool = new Pool({
     password:process.env.PASSWORD,
     port:5432
 })
+
+
