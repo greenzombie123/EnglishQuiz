@@ -1,26 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
-    <link rel="stylesheet" href="/indexPage.css">
-</head>
-<body>
+    <link rel="stylesheet" href="/index.css" />
+  </head>
+  <body>
+    <header>Konnnyaku English</header>
     <% if (locals.user) { %>
-     <h1>Hello, <%= locals.user.username %></h1>
+    <h1>Hello, <%= locals.user.username %></h1>
     <% } %>
-    <div class="mainContainer">
-        <form action="/login" method="get" id="login">
-            <button type="submit">Log In</button>
-        </form>
-        <form action="/signup" method="get" id="signup">
-           <button type="submit">Sign Up</button>
-        </form>
-        <form action="" method="get" id="letstry">
-           <button type="button">Let's Try</button>
-        </form>
-    </div>
-    <footer>Konnnyaku English</footer>
-</body>
+    <ul class="mainContainer">
+      <li><a href="/login">Log In</a></li>
+      <li><a href="/signup">Sign Up</a></li>
+      <li><a href="">Let's Try</a></li>
+    </ul>
+    <footer>Made By Green Zombie 2025</footer>
+  </body>
 </html>
