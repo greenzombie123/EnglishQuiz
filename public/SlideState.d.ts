@@ -4,7 +4,7 @@ export type Slide = IntroSlideData | QuestionSlideData;
 export type SlideState = {
     changeSlide(nextIndex: number): void;
     setSlides(slides: Slide[]): void;
-    getCurrentSlide(): Slide | null;
+    getCurrentSlide(): Slide;
     isLastSlide(): boolean;
     getCurrentSlideIndex(): number;
     isFirstSlide(): boolean;

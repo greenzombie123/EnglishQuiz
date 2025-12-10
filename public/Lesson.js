@@ -3,21 +3,20 @@ import "./QuestionSlide.js";
 import "./EndSlide.js";
 import { slideState } from "./SlideState.js";
 export class LessonSlider extends HTMLElement {
+    // slider: Node | null = null;
     constructor() {
         super();
         this.root = null;
-        this.slider = null;
+        this.currentSlide = null;
         this.createSlide = () => {
             const currentSlide = this.slideState.getCurrentSlide();
-            if (currentSlide) {
-                const { type } = currentSlide;
-                if (type === "intro") {
-                    return this.createIntroSlide(currentSlide);
-                }
-                else if (type === "question") {
-                    return this.createQuestionSlide(currentSlide);
-                }
+            // if (currentSlide) {
+            const { type } = currentSlide;
+            if (type === "intro") {
+                return this.createIntroSlide(currentSlide);
             }
+            else //if (type === "question") {
+                return this.createQuestionSlide(currentSlide);
         };
         this.createIntroSlide = (introSlideData) => {
             const slide = document.createElement(`intro-slide`);
@@ -32,9 +31,8 @@ export class LessonSlider extends HTMLElement {
         };
         this.removeCurrentSlide = () => {
             if (this.root) {
-                const lessonSlider = this.root.querySelector(".lesson-slider");
-                if (lessonSlider)
-                    lessonSlider.textContent = null;
+                // const lessonSlider = this.root.querySelector(".lesson-slider");
+                this.root.textContent = null;
             }
         };
         this.handleWrongAnswer = () => {
@@ -64,18 +62,17 @@ export class LessonSlider extends HTMLElement {
         };
         this.renderEndSlide = () => {
             const endSlide = document.createElement("end-slide");
-            if (this.root) {
-                const slider = this.root.querySelector(".lesson-slider");
-                if (slider)
-                    slider.appendChild(endSlide);
-            }
+            if (this.root)
+                this.root.appendChild(endSlide);
         };
         this.slideState = slideState();
     }
     connectedCallback() {
-        const template = document.getElementById("lesson-slider");
-        const templateContent = template.content;
-        const clonedContent = templateContent.cloneNode(true);
+        // const template = document.getElementById(
+        //   "lesson-slider"
+        // ) as HTMLTemplateElement;
+        // const templateContent = template.content;
+        // const clonedContent = templateContent.cloneNode(true);
         this.root = this.attachShadow({ mode: "closed" });
         this.addEventListener("nextButtonClicked", this.handleNextButtonClicked);
         this.addEventListener("backButtonClicked", () => {
@@ -85,19 +82,19 @@ export class LessonSlider extends HTMLElement {
         });
         this.addEventListener("wrongAnswer", this.handleWrongAnswer);
         this.addEventListener("correctAnswer", this.handleCorrectAnswer);
-        this.root.appendChild(clonedContent);
+        // this.root.appendChild(clonedContent);
     }
     disconnectedCallback() { }
     setSlides(slides) {
         this.slideState.setSlides(slides);
-        this.createSlide();
+        //! Is this necessary?
+        // this.createSlide();
     }
     render() {
-        const slide = this.createSlide();
-        if (this.root && slide) {
-            const slider = this.root.querySelector(".lesson-slider");
-            if (slider)
-                slider.appendChild(slide);
+        this.currentSlide = this.createSlide();
+        if (this.root) {
+            // const slider = this.root.querySelector(".lesson-slider");
+            this.root.appendChild(this.currentSlide);
         }
     }
 }

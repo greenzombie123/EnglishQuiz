@@ -1,22 +1,25 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
-     <script> 
-         const lessonId = "<%= lessonId %>"
-         const lessonName = "<%= lessonName %>"
+    <script>
+        const lessonId = "<%= lessonId %>"
+        const lessonName = "<%= lessonName %>"
     </script>
     <script src="./index.js" type="module" defer></script>
     <link rel="stylesheet" href="/lesson.css">
 </head>
+
 <body>
+    <header>Konnyaku English</header>
     <lesson-slider></lesson-slider>
     <template id="lesson-slider">
-         <div class="lesson-slider">
+        <div class="lesson-slider">
 
-         </div>
+        </div>
     </template>
 
     <template id="intro-slide">
@@ -52,5 +55,7 @@
             <button>Go Back To Lessons</button>
         </form>
     </template>
+    <footer>Made By Green Zombie</footer>
 </body>
+
 </html>

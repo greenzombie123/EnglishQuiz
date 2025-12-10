@@ -1,0 +1,47 @@
+:root{
+    --height:200px;
+}
+
+html *{
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+    font-size: 16px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body{
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+
+    header{
+          background-color: rgb(248, 248, 109);
+          padding: 5px;
+          font-size: 2rem;
+    }
+
+    footer{
+        background-color: rgb(188, 188, 188);
+        text-align: center;
+    }
+}
+
+@media screen and (width <= 400px) {
+    body{
+
+    header{
+          
+          font-size: 1.5rem;
+          text-align: center;
+    }
+
+    .mainContainer{
+     
+    }
+
+    footer{
+      
+    }
+}
+}

@@ -1,7 +1,7 @@
 import "./IntroSlide.ts";
 import type { IntroSlide, IntroSlideData } from "./IntroSlide.ts";
 import "./QuestionSlide.ts";
-import "./EndSlide.ts"
+import "./EndSlide.ts";
 import type { QuestionSlide, QuestionSlideData } from "./QuestionSlide.ts";
 import type { Slide } from "./SlideState.ts";
 import { slideState, type SlideState } from "./SlideState.ts";
@@ -17,7 +17,8 @@ export type LessonData = {};
 export class LessonSlider extends HTMLElement {
   slideState: SlideState;
   root: ShadowRoot | null = null;
-  slider: Node | null = null;
+  currentSlide: IntroSlide | QuestionSlide | null = null
+  // slider: Node | null = null;
 
   constructor() {
     super();
@@ -25,11 +26,11 @@ export class LessonSlider extends HTMLElement {
   }
 
   connectedCallback() {
-    const template = document.getElementById(
-      "lesson-slider"
-    ) as HTMLTemplateElement;
-    const templateContent = template.content;
-    const clonedContent = templateContent.cloneNode(true);
+    // const template = document.getElementById(
+    //   "lesson-slider"
+    // ) as HTMLTemplateElement;
+    // const templateContent = template.content;
+    // const clonedContent = templateContent.cloneNode(true);
     this.root = this.attachShadow({ mode: "closed" });
 
     this.addEventListener("nextButtonClicked", this.handleNextButtonClicked);
@@ -44,27 +45,27 @@ export class LessonSlider extends HTMLElement {
 
     this.addEventListener("correctAnswer", this.handleCorrectAnswer);
 
-    this.root.appendChild(clonedContent);
+    // this.root.appendChild(clonedContent);
   }
 
   disconnectedCallback() {}
 
   setSlides(slides: Slide[]): void {
     this.slideState.setSlides(slides);
-    this.createSlide();
+    //! Is this necessary?
+    // this.createSlide();
   }
 
   createSlide = () => {
     const currentSlide = this.slideState.getCurrentSlide();
-    if (currentSlide) {
+    // if (currentSlide) {
       const { type } = currentSlide;
       if (type === "intro") {
         return this.createIntroSlide(currentSlide);
-      } else if (type === "question") {
+      } else //if (type === "question") {
         return this.createQuestionSlide(currentSlide);
       }
-    }
-  };
+  
 
   createIntroSlide = (introSlideData: IntroSlideData) => {
     const slide = document.createElement(`intro-slide`) as IntroSlide;
@@ -81,16 +82,16 @@ export class LessonSlider extends HTMLElement {
 
   removeCurrentSlide = () => {
     if (this.root) {
-      const lessonSlider = this.root.querySelector(".lesson-slider");
-      if (lessonSlider) lessonSlider.textContent = null;
+      // const lessonSlider = this.root.querySelector(".lesson-slider");
+      this.root.textContent = null;
     }
   };
 
   render() {
-    const slide = this.createSlide();
-    if (this.root && slide) {
-      const slider = this.root.querySelector(".lesson-slider");
-      if (slider) slider.appendChild(slide);
+    this.currentSlide = this.createSlide();
+    if (this.root) {
+      // const slider = this.root.querySelector(".lesson-slider");
+      this.root.appendChild(this.currentSlide);
     }
   }
 
@@ -102,7 +103,7 @@ export class LessonSlider extends HTMLElement {
 
   handleCorrectAnswer = () => {
     const isLastSlide = this.slideState.isLastSlide();
-    if (isLastSlide) return this.handleLessonFinished()
+    if (isLastSlide) return this.handleLessonFinished();
     this.slideState.changeSlide(1);
     this.removeCurrentSlide();
     this.render();
@@ -110,7 +111,7 @@ export class LessonSlider extends HTMLElement {
 
   handleNextButtonClicked = () => {
     const isLastSlide = this.slideState.isLastSlide();
-    if (isLastSlide) return this.handleLessonFinished()
+    if (isLastSlide) return this.handleLessonFinished();
     this.slideState.changeSlide(1);
     this.removeCurrentSlide();
     this.render();
@@ -123,10 +124,7 @@ export class LessonSlider extends HTMLElement {
 
   renderEndSlide = () => {
     const endSlide = document.createElement("end-slide");
-    if (this.root) {
-      const slider = this.root.querySelector(".lesson-slider");
-      if (slider) slider.appendChild(endSlide);
-    }
+    if (this.root) this.root.appendChild(endSlide);
   };
 }
 

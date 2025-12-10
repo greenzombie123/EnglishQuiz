@@ -6,7 +6,7 @@ export type Slide = IntroSlideData | QuestionSlideData;
 export type SlideState = {
   changeSlide(nextIndex: number): void;
   setSlides(slides: Slide[]): void;
-  getCurrentSlide(): Slide | null;
+  getCurrentSlide(): Slide;
   isLastSlide(): boolean;
   getCurrentSlideIndex():number
   isFirstSlide():boolean
@@ -29,7 +29,7 @@ export const slideState = (): SlideState => {
     slides = newSlides;
   };
 
-  const getCurrentSlide = () => slides[currentSlideIndex] || null;
+  const getCurrentSlide = () => slides[currentSlideIndex]!;
 
   const getCurrentSlideIndex = ()=>currentSlideIndex
 

@@ -2,6 +2,7 @@ html *{
     padding: 0;
     margin: 0;
     font-size: 16px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 body{
@@ -110,6 +111,55 @@ body{
         button{
                 padding: 5px;
                  font-size: 1.3rem;
+        }
+    }
+
+    .signupDone{
+            flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+
+        h1{
+            font-size: 2rem;
+        }
+
+        button{
+            padding: 5px;
+            font-size: 1rem;
+        }
+    }
+
+    .findTeacher{
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 20px;
+
+        & *{
+            font-size: 1.2rem;
+        }
+
+        button, input{
+            padding: 5px;
+            font-size: 1rem;
+        }
+
+        input{
+            width: 260px;
+        }
+
+        div{
+            display: flex;
+            gap: 40px;
+            
+            button{
+                padding: 5px 15px;
+            }
         }
     }
 

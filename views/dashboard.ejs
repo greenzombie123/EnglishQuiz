@@ -7,7 +7,9 @@
     <link rel="stylesheet" href="/dashboard.css">
 </head>
 <body>
-    <h1>Hello, <%= username %></h1>
+    <header>Konnyaku English</header>
+    <div class="mainContainer">
+         <h1>Hello, <%= username %>!</h1>
     <% if (userType === "teacher") { %>
      <a href="/lessons/createlesson">Create A Lesson</a>
     <% } %>
@@ -15,5 +17,7 @@
     <% lessonsData.forEach(lesson => { %>
      <a href=<%= `/lessons/${lesson.id}?lessonname=${lesson.name}` %>><%= lesson.name %></a>
     <% }) %>
+    </div>  
+    <footer>Made By Green Zombie</footer>
 </body>
 </html>

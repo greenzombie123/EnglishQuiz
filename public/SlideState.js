@@ -11,7 +11,7 @@ export const slideState = () => {
     const setSlides = (newSlides) => {
         slides = newSlides;
     };
-    const getCurrentSlide = () => slides[currentSlideIndex] || null;
+    const getCurrentSlide = () => slides[currentSlideIndex];
     const getCurrentSlideIndex = () => currentSlideIndex;
     return {
         changeSlide,

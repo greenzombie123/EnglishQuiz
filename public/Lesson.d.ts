@@ -14,12 +14,12 @@ export type LessonData = {};
 export declare class LessonSlider extends HTMLElement {
     slideState: SlideState;
     root: ShadowRoot | null;
-    slider: Node | null;
+    currentSlide: IntroSlide | QuestionSlide | null;
     constructor();
     connectedCallback(): void;
     disconnectedCallback(): void;
     setSlides(slides: Slide[]): void;
-    createSlide: () => IntroSlide | QuestionSlide | undefined;
+    createSlide: () => IntroSlide | QuestionSlide;
     createIntroSlide: (introSlideData: IntroSlideData) => IntroSlide;
     createQuestionSlide: (questionSlideData: QuestionSlideData) => QuestionSlide;
     removeCurrentSlide: () => void;

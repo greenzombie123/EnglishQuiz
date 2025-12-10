@@ -4,26 +4,30 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+    <link rel="stylesheet" href="/index.css">
 </head>
 <body>
+      <header>Konnnyaku English</header>
         <% if (!isTeacherFound) { %>
-            <form action="/findTeacher" method="post">
+            <form action="/findTeacher" method="post" class="findTeacher">
                 <label for="username">Enter your teacher's username</label>
                 <input type="text" id="username" name="username">
                 <% if (username) { %>
-                <p>Couldn't find <%= username %></p>
+                <p>Couldn't find <%= username %>.</p>
                 <%}%>
                 <button>Find Teacher</button>
             </form>
         <% }  else { %>
-            <form action="/findTeacher/finished" method="post">
+            <form action="/findTeacher/finished" method="post" class="findTeacher">
                 <h3>Is this your teacher?</h3>
                 <p><%= username %> </p>
                 <input type="hidden" name="teacher" value=<%= username %>>
-                <button>Yes</button>
+                <div>
+                     <button>Yes</button>
                 <button formaction="/findTeacher" formmethod="get">No</button>
+                </div>
             </form>
         <% } %>
-    
+    <footer>Made By Green Zombie</footer>
 </body>
 </html>
