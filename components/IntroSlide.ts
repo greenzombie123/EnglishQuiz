@@ -28,7 +28,7 @@ export class IntroSlide extends HTMLElement {
 
     this.root = this.attachShadow({ mode: "closed" });
 
-    // Add text toe targetword and definition spans
+    // Add text to targetword and definition spans
     const targetWord = clonedContent.querySelector(
       ".targetWord"
     ) as HTMLElement;

@@ -9,7 +9,7 @@ export const getCreateLessonPage = (
   res: Response,
   next: NextFunction
 ) => {
-  if(!req.user)return res.redirect("/")
+  if (!req.user) return res.redirect("/");
   res.render("createLesson");
 };
 
@@ -36,7 +36,7 @@ export const addLesson = async (
     lessonName: string;
   };
 
-  console.log(131231, intro, question)
+  // console.log(131231, intro, question);
 
   const introSlidesValues = createIntroValues(intro);
   const questionSlidesValues = createQuestionValues(question);

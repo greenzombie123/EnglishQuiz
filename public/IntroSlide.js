@@ -17,7 +17,7 @@ export class IntroSlide extends HTMLElement {
         const templateContent = template.content;
         const clonedContent = templateContent.cloneNode(true);
         this.root = this.attachShadow({ mode: "closed" });
-        // Add text toe targetword and definition spans
+        // Add text to targetword and definition spans
         const targetWord = clonedContent.querySelector(".targetWord");
         const definition = clonedContent.querySelector(".definition");
         targetWord.textContent = this.targetWord;

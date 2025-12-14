@@ -58,7 +58,11 @@ export class QuestionSlide extends HTMLElement {
         const buttonsArray = [buttons[0], buttons[1], buttons[2], buttons[3]];
         // Attach onButtonClick hander to the buttons
         buttonsArray.forEach((button) => {
-            button.addEventListener("click", this.onButtonClick);
+            // If the button has a text value of "", remove it from the dom.
+            if (!button.textContent)
+                button.remove();
+            else
+                button.addEventListener("click", this.onButtonClick);
         });
         // Ref buttons and create event for slider navigation
         this.root.appendChild(clonedContent);
