@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "node --watch app.ts",
-    "dev:client":"npx tsc -p tsconfig.client.json --watch"
+    "dev:client":"npx tsc -p tsconfig.client.json --watch",
+    "commit":"git add -A && git commit"
   },
   "keywords": [],
   "author": "",

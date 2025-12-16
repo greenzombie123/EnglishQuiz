@@ -5,19 +5,27 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <link rel="stylesheet" href="/dashboard.css">
+    <script type="module" src="./ExtendableList.js" defer></script>
 </head>
 <body>
     <header>Konnyaku English</header>
     <div class="mainContainer">
-         <h1>Hello, <%= username %>!</h1>
+    <h1>Hello, <%= username %>!</h1>
     <% if (userType === "teacher") { %>
      <a href="/lessons/createlesson">Create A Lesson</a>
     <% } %>
-
-    <% lessonsData.forEach(lesson => { %>
-     <a href=<%= `/lessons/${lesson.id}?lessonname=${lesson.name}` %>><%= lesson.name %></a>
-    <% }) %>
+     <%- include("nogrouplist", {nogroup:lessonStore.nogroup}) %>
+   <extendable-list>
+    <%- include("grouplist",lessonStore) %>
+   </extendable-list>
+    
     </div>  
     <footer>Made By Green Zombie</footer>
 </body>
+ <template id="extendablelist">
+        <div class="extendablelist">
+            <slot></slot>
+        </div>
+    </template>
 </html>
+

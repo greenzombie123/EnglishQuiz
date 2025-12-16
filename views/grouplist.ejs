@@ -1,0 +1,12 @@
+<% for (const groupname in lessonStore) { %>
+    <% if(groupname === "nogroup") continue %>
+    <p><%= groupname %></p>
+    <ul>
+    <% lessonStore[groupname].forEach(lesson=>{ %>
+        <li>
+            <a href=<%= `/lessons/${lesson.id}?lessonname=${lesson.name}` %>><%= lesson.name %></a>   
+        </li>
+    <%})%>
+    </ul>
+<%}%>
+

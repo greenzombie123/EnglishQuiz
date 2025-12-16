@@ -1,0 +1,5 @@
+<ul class="nogroup">
+    <% nogroup.forEach(lesson => { %>
+        <a href=<%= `/lessons/${lesson.id}?lessonname=${lesson.name}` %>><%= lesson.name %></a>
+    <% }) %>
+</ul>

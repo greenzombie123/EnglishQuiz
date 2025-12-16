@@ -35,6 +35,6 @@
     "skipLibCheck": true,                                 /* Skip type checking all .d.ts files. */
     "rewriteRelativeImportExtensions": true
   },
-  "files": ["./components/index.ts", "./components/lessonCreaterIndex.ts"],
+  "files": ["./components/index.ts", "./components/lessonCreaterIndex.ts", "./components/ExtendableList.ts"],
 
 }

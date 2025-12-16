@@ -5,7 +5,8 @@ import type{ QuestionSlideData } from "../components/QuestionSlide.ts";
 
 type LessonData = {
     name:string,
-    id:number
+    id:number,
+    groupname:string
 }
 
 type LessonSlide = {
@@ -23,7 +24,6 @@ type LessonSlide = {
 export const fetchLessonSlides = async (req:Request, res:Response, next:NextFunction)=>{
     const {lessonId} = req.params as {lessonId:string}
     const { rows: lessonslides } = await pool.query<LessonSlide>(queryLessonSlideString,[lessonId]);
-    console.log(lessonslides, lessonId)
     const slides = transformLessonSlide(lessonslides);
     res.send(slides)
 }
@@ -100,8 +100,13 @@ export const getDashBoard = async (
   if (!req.user) return res.redirect("/");
   const { username, userType } = req.user;
   const lessonsData = await getLessons(userType, username)
+  const lessonStore = sortLessons(lessonsData)
+  
+  // for (const key in lessonStore) {
+  //   console.log()
+  // }
 
-  res.locals = { username, userType, lessonsData };
+  res.locals = { username, userType, lessonStore };
   res.render("dashboard");
 };
 
@@ -116,15 +121,38 @@ const getLessons = async (userType: string, userName: string) => {
 
 const getQueryString = (userType: string) => {
   if (userType === "student") {
-    return `SELECT lessons.name, lessons.id FROM lessons
+    return `SELECT lessons.name, lessons.id, lessons.groupname FROM lessons
             INNER JOIN teachers
             ON lessons.teacherid = teachers.id
             INNER JOIN teachers_students
             ON teachers.username = teachers_students.teacherusername
             WHERE teachers_students.studentusername = $1`;
   } else
-    return `SELECT lessons.name, lessons.id FROM lessons
+    return `SELECT lessons.name, lessons.id, lessons.groupname FROM lessons
             INNER JOIN teachers
             ON lessons.teacherid = teachers.id
             WHERE teachers.username = $1`;
 };
+
+type LessonStore = {
+  [key:string]:LessonData[]
+}
+
+const sortLessons = (lessons:LessonData[])=>{
+  let store:LessonStore = {} 
+  store.nogroup = [] 
+
+  lessons.forEach(lesson=>{
+    const groupname = lesson.groupname 
+    if(!groupname) store.nogroup!.push(lesson)
+    else if(!store[groupname]){
+      store[groupname] = []
+      store[groupname].push(lesson)
+    }
+    else{
+      store[groupname].push(lesson)
+    }
+  })
+
+  return store
+}
