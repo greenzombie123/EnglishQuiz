@@ -2,7 +2,8 @@ import type { NextFunction, Request, Response } from "express";
 import { body, validationResult } from "express-validator";
 import { pool } from "../pool.ts";
 import type { QuestionSlideData } from "../components/QuestionSlide.ts";
-import type { IntroSlideData } from "../components/IntroSlide.ts";
+import type {IntroSlideData } from "../components/IntroSlide.ts";
+import { format } from "node-pg-format";
 
 export const getCreateLessonPage = (
   req: Request,
@@ -21,62 +22,93 @@ type IntroSlide = Omit<IntroSlideData, "type"> & {
   slideorder: number;
 };
 
-type Slide = QuestionSlide | IntroSlide;
-
 export const addLesson = async (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
   if (!req.user) return res.redirect("/");
-  const { username } = req.user as { username: string };
-  const { question, intro, lessonName } = req.body as {
-    question: QuestionSlide[];
-    intro: IntroSlide[];
+  const { username: teacherName } = req.user as { username: string };
+  const { question, intro, lessonName, groupname } = req.body as {
+    question: QuestionSlide[] | undefined;
+    intro: IntroSlide[] | undefined;
     lessonName: string;
+    groupname: string;
   };
 
-  // console.log(131231, intro, question);
 
-  const introSlidesValues = createIntroValues(intro);
-  const questionSlidesValues = createQuestionValues(question);
+  const introString = createIntroSQLString(intro);
+  const questionString = createQuestionSQLString(question);
 
   await insertLesson(
-    introSlidesValues,
-    questionSlidesValues,
+    introString,
+    questionString,
     lessonName,
-    username
+    teacherName,
+    groupname
   );
 
-  res.end();
+  res.redirect("/lessons");
 };
 
-// Create a string to do a bulk insert. Each slide has its values placed in parentheses, seperated by a comma.
-const createIntroValues = (slides: IntroSlide[]) => {
-  const introSlideValues = slides.map(
-    (slide) =>
-      `('${slide.targetWord}','${slide.definition}',${slide.slideorder})`
-  );
+// Create a query string
+const createIntroSQLString = (slides: IntroSlide[] | undefined) => {
+  if (!slides) return "";
 
-  return introSlideValues.join(", ");
+  const introSlides = slides.map((slide) => [
+    slide.targetWord,
+    slide.definition,
+    slide.slideorder,
+  ]);
+
+  const introColumns = ["targetword", "definition", "slideorder"];
+
+  return format(
+    "INSERT INTO introslides (%I) VALUES %L RETURNING id",
+    introColumns,
+    introSlides
+  );
 };
 
-const createQuestionValues = (slides: QuestionSlide[]) => {
-  const questionSlideValues = slides.map(
-    (slide) => `
-        ('${slide.question}','${slide.correctAnswer}','${slide.wrongAnswer1}',
-        '${slide.wrongAnswer2}','${slide.wrongAnswer3}','${slide.slideorder}')
-        `
-  );
+const createQuestionSQLString = (slides: QuestionSlide[] | undefined) => {
+  if (!slides) return "";
 
-  return questionSlideValues.join(", ");
+  const questionslides = slides.map((slide) => [
+    slide.question,
+    slide.correctAnswer,
+    slide.wrongAnswer1,
+    slide.wrongAnswer2,
+    slide.wrongAnswer3,
+    slide.slideorder,
+  ]);
+
+  const questionColumns = [
+    "question",
+    "correctanswer",
+    "wronganswer1",
+    "wronganswer2",
+    "wronganswer3",
+    "slideorder",
+  ];
+
+  return format(
+    "INSERT INTO questionslides (%I) VALUES %L RETURNING id",
+    questionColumns,
+    questionslides
+  );
+};
+
+// Extract id values from each row in the rows prop. Used for bridging tables
+const getIds = (lessonId: string, rows: { id: string }[]) => {
+  return rows.map((row) => [lessonId, row.id]);
 };
 
 const insertLesson = async (
   introString: string,
   questionString: string,
   lessonName: string,
-  teacherName: string
+  teacherName: string,
+  groupName: string
 ) => {
   const client = await pool.connect();
   try {
@@ -85,51 +117,40 @@ const insertLesson = async (
     const { rows } = await client.query<{ id: string }>(teacherIdQuery, [
       teacherName,
     ]);
-    if (rows[0]) {
-      const { id } = rows[0];
-      const string = `
-    WITH newLessonId AS (
-    INSERT INTO lessons (name, teacherid) VALUES( 
-        $1,
-        $2
-    ) 
-    RETURNING id
-) 
-, newQuestionSlideIds AS (
-    INSERT INTO questionslides 
-    (question, correctanswer, wronganswer1, wronganswer2, wronganswer3, slideorder) 
-    VALUES${questionString}
-    RETURNING id 
-) 
+    const teacherId = rows[0]!.id;
 
-, newIntroSlideIds AS (
-    INSERT INTO introslides 
-    (
-        targetword, 
-        definition,
-        slideorder 
-    )
-    VALUES${introString} 
-    RETURNING id
-)
+    if (teacherId) {
 
-, newLessonIntroSlides AS (
-    INSERT INTO lessons_introslides 
-    (
-        lessonid, introslideid
-    )
-    SELECT newLessonId.id, newIntroSlideIds.id FROM newLessonId, newIntroSlideIds
-)
+      const { rows } = await client.query(
+        `INSERT INTO lessons (name, teacherid, groupname) VALUES('${lessonName}', '${teacherId}', '${groupName}') RETURNING id`
+      );
 
-INSERT INTO lessons_questionslides 
-(
-    lessonid,
-    questionslideid
-)
+      // Extract lesson id
+      const lessonId = rows[0]!.id;
 
-SELECT newLessonId.id, newQuestionSlideIds.id FROM newLessonId, newQuestionSlideIds;
-`;
-      await client.query(string, [lessonName, id]);
+
+      if (questionString) {
+        const { rows } = await client.query(questionString);
+        const questionIdsWithLessonId = getIds(lessonId, rows);
+        const lessonQuestionString = format(
+          "INSERT INTO lessons_questionslides (lessonid, questionslideid) VALUES %L",
+          questionIdsWithLessonId
+        );
+        await client.query(lessonQuestionString);
+      }
+
+      if (introString) {
+        const { rows } = await client.query(introString);
+        console.log(rows)
+        const introIdsWithLessonId = getIds(lessonId, rows);
+        const lessonIntroString = format(
+          "INSERT INTO lessons_introslides (lessonid, introslideid) VALUES %L",
+          introIdsWithLessonId
+        );
+        console.log(lessonIntroString);
+        await client.query(lessonIntroString);
+      }
+
       await client.query("COMMIT");
     }
   } catch (error) {

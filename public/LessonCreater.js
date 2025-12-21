@@ -1,4 +1,5 @@
 import "./FieldSet.js";
+import "./GroupNameSelector.js";
 class LessonCreater extends HTMLElement {
     constructor() {
         super();

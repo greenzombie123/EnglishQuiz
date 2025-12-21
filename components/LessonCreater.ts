@@ -1,5 +1,5 @@
 import "./FieldSet.ts";
-import { IntroFieldSet, QuestionFieldSet } from "./FieldSet.ts";
+import "./GroupNameSelector.ts"
 
 class LessonCreater extends HTMLElement {
   root;

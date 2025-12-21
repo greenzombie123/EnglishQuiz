@@ -48,6 +48,9 @@
                 Write the name of your lesson.
                 <input type="text" id="lessonName" placeholder="Lesson Name" name="lessonName" required>
             </label>
+
+            <groupname-selecter name="groupname"></groupname-selecter>
+
             <div class="slideSelecter">
                 <label for="select">Choose what type of slide to make.</label>
                 <select name="" id="slideSelecter">
@@ -59,6 +62,17 @@
             </div>
              <button>Create Lesson</button>
         </form>
+    </template>
+    <template id="groupname-selecter">
+        <style>
+
+        </style>
+        <label for="newGroupName">Create a group to put your lesson in</label>
+        <input type="text" id="newGroupName" name="newgroupname">
+        <label for="groupNames">Or choose a preexisting group</label>
+        <select name="oldgroupname" id="groupNames">
+            <option value="" selected>Choose a group name</option>
+        </select>
     </template>
 </body>
 
