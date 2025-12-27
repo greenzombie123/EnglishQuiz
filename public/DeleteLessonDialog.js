@@ -72,7 +72,6 @@ export class DeleteLessonDialog extends HTMLElement {
         this.dialog.appendChild(this.returnButton);
     }
     connectedCallback() {
-        // this.dialog.showModal()
     }
 }
 _DeleteLessonDialog_setData = new WeakMap(), _DeleteLessonDialog_showDialog = new WeakMap(), _DeleteLessonDialog_onYesButtonClicked = new WeakMap(), _DeleteLessonDialog_removeButtons = new WeakMap(), _DeleteLessonDialog_renderReturnButton = new WeakMap(), _DeleteLessonDialog_reset = new WeakMap();

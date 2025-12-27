@@ -45,7 +45,7 @@ export class DeleteLessonDialog extends HTMLElement {
   }
 
   connectedCallback() {
-    // this.dialog.showModal()
+
   }
 
   showDeleteDialog = (lessonname: string, href: string) => {

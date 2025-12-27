@@ -75,6 +75,7 @@ class DeleteLessonButton extends HTMLElement {
   };
 
   setLessonName = (lessonName: string) => {
+
     this.lessonName = lessonName;
   };
 }

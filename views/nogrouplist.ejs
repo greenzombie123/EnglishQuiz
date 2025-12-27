@@ -5,9 +5,12 @@
             <a class="icon">
                 <img src="/edit.png" alt="">
             </a>
-            <a class="icon" href="">
+            <!-- <a class="icon" href="">
                 <img src="/bin.png" alt="">
-            </a>
+            </a> -->
+            <deletelesson-button href="/lessons/<%= lesson.id %>" data-lessonname="<%= lesson.name %>">
+
+            </deletelesson-button>
         </li>
     <% }) %>
 </ul>
