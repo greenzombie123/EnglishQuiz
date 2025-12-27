@@ -6,6 +6,7 @@ const lessonsRouter = Router();
 
 lessonsRouter.delete('/:lessonId', deleteLesson)
 
+// lessonsRouter.get('/createlesson/:lessonId', )
 lessonsRouter.get('/createlesson', getCreateLessonPage)
 lessonsRouter.post('/createlesson', addLesson)
 lessonsRouter.get('/get/:lessonId', fetchLessonSlides)
