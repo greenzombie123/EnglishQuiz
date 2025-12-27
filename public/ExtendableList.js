@@ -1,7 +1,9 @@
+import "./DeleteLessonButton.js";
+import "./DeleteLessonDialog.js";
 export class ExtendableList extends HTMLElement {
     constructor() {
         super();
-        this.root = this.attachShadow({ mode: "closed" });
+        this.root = this.attachShadow({ mode: "open" });
         const template = document.getElementById("extendablelist");
         const templateContent = template.content;
         const clonedContent = templateContent.cloneNode(true);

@@ -2,6 +2,7 @@ import type { Request, Response, NextFunction } from "express";
 import { pool } from "../pool.ts";
 import type{ IntroSlideData } from "../components/IntroSlide.ts";
 import type{ QuestionSlideData } from "../components/QuestionSlide.ts";
+import { format } from "node-pg-format";
 
 type LessonData = {
     name:string,
@@ -102,10 +103,6 @@ export const getDashBoard = async (
   const lessonsData = await getLessons(userType, username)
   const lessonStore = sortLessons(lessonsData)
   
-  // for (const key in lessonStore) {
-  //   console.log()
-  // }
-
   res.locals = { username, userType, lessonStore };
   res.render("dashboard");
 };
@@ -155,4 +152,16 @@ const sortLessons = (lessons:LessonData[])=>{
   })
 
   return store
+}
+
+export const getEditLessonPage = (req:Request, res:Response, next:NextFunction)=>{
+  
+}
+
+export const deleteLesson = async (req:Request, res:Response, next:NextFunction)=>{
+  const {lessonId} = req.params as {lessonId:string}
+  const queryString = format("DELETE FROM lessons WHERE id = %L", lessonId)
+  //await pool.query(queryString)
+  console.log(queryString)
+  res.send("The lesson was deleted.")
 }

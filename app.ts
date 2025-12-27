@@ -33,11 +33,12 @@ server.use(express.json());
 
 // Serve static files from views directory.
 // First one create a vitual path that will point to the directory.
-// Also serve the ts files through the source maps for debuggin
+// Also serve the ts files through the source maps for debugging
 
 server.use(express.static("views"));
 server.use("/components", express.static("components"));
 server.use("/lessons", express.static("public"));
+server.use(express.static("public"));
 
 server.use(
   session({

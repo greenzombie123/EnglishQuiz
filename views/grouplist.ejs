@@ -4,7 +4,17 @@
     <ul>
     <% lessonStore[groupname].forEach(lesson=>{ %>
         <li>
-            <a href=<%= `/lessons/${lesson.id}?lessonname=${lesson.name}` %>><%= lesson.name %></a>   
+            <a class="lesson" href=<%= `/lessons/${lesson.id}?lessonname=${lesson.name}` %>><%= lesson.name %></a>   
+        
+            <a class="icon">
+                <img src="/edit.png" alt="">
+            </a>
+            <!-- <a class="icon" href="">
+                <img src="/bin.png" alt="">
+            </a> -->
+            <deletelesson-button href="/lessons/<%= lesson.id %>" data-lessonname=<%= lesson.name%>>
+                <!-- <img src="/bin.png" alt=""> -->
+            </deletelesson-button>
         </li>
     <%})%>
     </ul>

@@ -1,10 +1,13 @@
+import "./DeleteLessonButton.ts";
+import "./DeleteLessonDialog.ts";
+
 export class ExtendableList extends HTMLElement {
   root;
 
   constructor() {
     super();
 
-    this.root = this.attachShadow({ mode: "closed" });
+    this.root = this.attachShadow({ mode: "open" });
     const template = document.getElementById(
       "extendablelist"
     ) as HTMLTemplateElement;

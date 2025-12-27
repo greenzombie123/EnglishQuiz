@@ -1,4 +1,10 @@
-html *{
+:root {
+    --lessonLinkPadding: 7px 7px 7px 30px;
+    --lessonLinkFont: 1.5rem;
+    --width: 80vw
+}
+
+html * {
     padding: 0;
     margin: 0;
     box-sizing: border-box;
@@ -6,18 +12,18 @@ html *{
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-body{
+body {
     height: 100vh;
     display: flex;
     flex-direction: column;
 
-    header{
-          background-color: rgb(248, 248, 109);
-          padding: 5px;
-          font-size: 2rem;
+    header {
+        background-color: rgb(248, 248, 109);
+        padding: 5px;
+        font-size: 2rem;
     }
 
-    .mainContainer{
+    .mainContainer {
         flex: 1;
         display: flex;
         flex-direction: column;
@@ -25,95 +31,166 @@ body{
         overflow-y: auto;
         gap: 20px;
 
-        h1{
+        h1 {
             font-size: 1.5rem;
             text-align: center;
         }
 
-        a.createLessonButton{
+        a.createLessonButton {
             border: 1px black solid;
             border-radius: 5px;
             text-decoration: none;
-            background-color: grey;
+            background-color: yellow;
             color: black;
-            font-size: 1rem;
+            font-size: 1.3rem;
             padding: 6px;
+            box-shadow: 3px 3px 1px black;
         }
 
-        ul.nogroup{
-            width: 60vw;
+        ul.nogroup {
             display: flex;
-            flex-wrap: wrap;
-            gap: 20px;
+            flex-direction: column;
+            gap: 10px;
+            width: var(--width);
 
-            a{
+            li {
                 border: 1px black solid;
                 border-radius: 2px;
+                padding: var(--lessonLinkPadding);
+                list-style: none;
+                display: flex;
+                align-items: center;
+
+                &:hover {
+                    background-color: rgb(172, 244, 244);
+                }
+            }
+
+            a.lesson {
                 text-decoration: none;
                 color: black;
-                font-size: 1rem;
-                padding: 2px;
+                font-size: var(--lessonLinkFont);
+                margin-right: auto;
+                flex: 1;
+            }
+
+            a.icon {
+
+                img {
+                    width: 30px;
+                    height: 30px;
+                    margin-right: 20px;
+                    cursor: pointer;
+
+                    &:hover {
+                        background-color: rgb(255, 149, 0);
+                    }
+                }
             }
         }
 
-        extendable-list{
+        extendable-list {
+            width: var(--width);
 
-            /* p, ul{
-                margin-bottom: 2;
-            }
-             */
-            p{
+            p {
                 font-size: 1.4rem;
                 text-decoration: underline;
-                cursor:pointer;
+                cursor: pointer;
                 text-align: center;
-                 margin-top: 15px;
+                margin-top: 15px;
+
+                &:hover {
+                    color: red;
+                }
             }
 
-            ul{
+            ul {
                 list-style: none;
-                padding-left: 60px;
+                /* padding-left: 60px; */
 
-                li{
-                    
+                li {
+
                     border: 1px black solid;
                     border-radius: 2px;
-                    padding: 2px;
                     margin: 8px 0;
-                    
-                    a{
+                    padding: var(--lessonLinkPadding);
+                    cursor: pointer;
+                    display: flex;
+                    flex-wrap: wrap;
+
+                    &:hover {
+                        background-color: rgb(172, 244, 244);
+                    }
+
+                    a.lesson {
                         text-decoration: none;
-                        
+
                         color: black;
-                        font-size: 1rem;
-                       
+                        font-size: var(--lessonLinkFont);
+                        margin-right: auto;
+                        flex: 1;
+                    }
+
+                    a.icon {
+                        img {
+                            width: 30px;
+                            height: 30px;
+                            margin-right: 20px;
+                            cursor: pointer;
+
+                            &:hover {
+                                background-color:  rgb(255, 149, 0);
+                            }
+                        }
                     }
                 }
             }
         }
     }
 
-    footer{
+    footer {
         background-color: rgb(188, 188, 188);
         text-align: center;
     }
 }
 
-@media screen and (width <= 400px) {
-    body{
+@media screen and (width <=500px) {
+    body {
 
-    header{
-          
-          font-size: 1.5rem;
-          text-align: center;
-    }
+        header {
 
-    .mainContainer{
-     
-    }
+            font-size: 1.5rem;
+            text-align: center;
+        }
 
-    footer{
-      
+        .mainContainer {
+
+            ul.nogroup li a.lesson {
+                font-size: .9rem;
+            }
+
+            ul.nogroup li a.icon img{
+                 width: 15px;
+                height: 15px;
+            }
+
+            extendable-list {
+
+                p {
+                    font-size: 1.1rem;
+                }
+
+                ul li a.lesson {
+                    font-size: .9rem;
+                }
+
+                ul li a.icon img {
+                    width: 15px;
+                    height: 15px;
+                }
+            }
+        }
+
+        footer {}
     }
-}
 }
