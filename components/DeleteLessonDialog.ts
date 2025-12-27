@@ -21,27 +21,60 @@ export class DeleteLessonDialog extends HTMLElement {
     this.dialog.setAttribute("closedby", "any")
     this.root.appendChild(this.dialog);
 
+    const wrapper = document.createElement("div") as HTMLDivElement
+    this.dialog.appendChild(wrapper)
+
     this.topMessage = document.createElement("p") as HTMLParagraphElement;
     this.topMessage.textContent = "Do you want to delete this lesson?";
-    this.dialog.appendChild(this.topMessage);
+    this.topMessage.className = "top"
+    wrapper.appendChild(this.topMessage);
 
     this.bottomMessage = document.createElement("p") as HTMLParagraphElement;
-    this.dialog.appendChild(this.bottomMessage);
+    this.bottomMessage.className = "bottom"
+    wrapper.appendChild(this.bottomMessage);
 
     this.yesButton = document.createElement("button") as HTMLButtonElement;
     this.yesButton.textContent = "Yes";
     this.yesButton.addEventListener("click", this.#onYesButtonClicked);
-    this.dialog.appendChild(this.yesButton);
+    wrapper.appendChild(this.yesButton);
 
     this.noButton = document.createElement("button") as HTMLButtonElement;
     this.noButton.textContent = "No";
     this.noButton.addEventListener("click", () => this.dialog.close());
-    this.dialog.appendChild(this.noButton);
+    wrapper.appendChild(this.noButton);
 
     this.returnButton = document.createElement("a") as HTMLAnchorElement;
     this.returnButton.textContent = "Return to the dashboard";
     this.returnButton.href = "/lessons"
-    this.dialog.appendChild(this.returnButton);
+    wrapper.appendChild(this.returnButton);
+
+    
+    const style = document.createElement("style") as HTMLStyleElement
+    style.textContent = `
+        div{
+                font-size: 1.1rem;
+                display: flex;
+                flex-direction: row;
+                flex-wrap: wrap;
+                width: min-content;
+                justify-content: center;
+
+                p.top{
+                    width:max-content;
+                }
+
+                p.bottom{
+                    width:100%;
+                }
+
+                button{
+                    font-size:1rem;
+                    margin:0 20px;
+                    padding: 3px 6px;
+                }
+        }
+    `
+    this.root.appendChild(style)
   }
 
   connectedCallback() {

@@ -162,6 +162,5 @@ export const deleteLesson = async (req:Request, res:Response, next:NextFunction)
   const {lessonId} = req.params as {lessonId:string}
   const queryString = format("DELETE FROM lessons WHERE id = %L", lessonId)
   await pool.query(queryString)
-  // console.log(queryString)
   res.send("The lesson was deleted.")
 }
