@@ -11,6 +11,8 @@ export const getCreateLessonPage = (
   next: NextFunction
 ) => {
   if (!req.user) return res.redirect("/");
+  const { lessonId } = req.params as { lessonId: string };
+  res.locals.lessonId = lessonId || ""
   res.render("createLesson");
 };
 

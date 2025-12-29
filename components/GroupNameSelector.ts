@@ -29,7 +29,9 @@ export class GroupNameSelector extends HTMLElement {
     select.addEventListener("change", this.onSelectChange)
   }
 
-  connectedCallback() {}
+  connectedCallback() {
+    // console.log(1231)
+  }
 
   onInputChange = (e: Event) => {
     const input = e.currentTarget as HTMLInputElement;

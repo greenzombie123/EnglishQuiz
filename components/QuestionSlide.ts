@@ -1,5 +1,3 @@
-import { check } from "express-validator";
-
 export type QuestionSlideData = {
   // id: number;
   type: "question";
@@ -8,7 +6,7 @@ export type QuestionSlideData = {
   wrongAnswer1: string;
   wrongAnswer2: string;
   wrongAnswer3: string;
-  // sliderOrder: number;
+  sliderOrder: number;
 };
 
 export class QuestionSlide extends HTMLElement {

@@ -27,7 +27,9 @@ export class GroupNameSelector extends HTMLElement {
         input.addEventListener("change", this.onInputChange);
         select.addEventListener("change", this.onSelectChange);
     }
-    connectedCallback() { }
+    connectedCallback() {
+        // console.log(1231)
+    }
 }
 GroupNameSelector.formAssociated = true;
 customElements.define("groupname-selecter", GroupNameSelector);

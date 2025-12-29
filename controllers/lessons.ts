@@ -77,6 +77,7 @@ const transformLessonSlide = (slides: LessonSlide[]) => {
         targetWord: slide.targetword as string,
         definition: slide.definition as string,
         type: "intro",
+        sliderOrder:slide.slideorder
       };
     } else
       return {
@@ -86,6 +87,7 @@ const transformLessonSlide = (slides: LessonSlide[]) => {
         wrongAnswer2: slide.wronganswer2 as string,
         wrongAnswer3: slide.wronganswer3 as string,
         type: "question",
+        sliderOrder:slide.slideorder
       };
   });
   return newSlides;

@@ -2,6 +2,7 @@ export type IntroSlideData = {
     type: "intro";
     targetWord: string;
     definition: string;
+    sliderOrder: number;
 };
 export declare class IntroSlide extends HTMLElement {
     targetWord: string;

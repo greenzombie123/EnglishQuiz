@@ -6,12 +6,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
     <link rel="stylesheet" href="/createLesson.css" />
-    <script src="./lessonCreaterIndex.js" type="module" defer></script>
+    <script src="/lessonCreaterIndex.js" type="module" defer></script>
 </head>
 
 <body>
     <h1>Create Your Lesson</h1>
-    <lesson-creater></lesson-creater>
+    <lesson-creater data-lessonid="<%= lessonId %>" id="31"></lesson-creater>
     <template id="lesson-creater">
         <style>
             form {
@@ -76,60 +76,6 @@
     </template>
 </body>
 
-</html>
+</html>  
 
-        <style>
-            fieldset {
-                    width: 33%;
-                    margin: 25px 0;
-
-                    label {
-                        display: flex;
-                        flex-direction: column;
-                        margin-bottom: 20px;
-                    }
-                }
-        </style>
-        <fieldset class="question">
-            <legend>Question</legend>
-            <label>Enter question
-                <input type="text" name="question[1][question]" required />
-            </label>
-            <label>Enter the correct answer
-                <input type="text" name="question[1][correntanswer]" required />
-            </label>
-            <label>Enter the wrong answer
-                <input type="text" name="question[1][wronganswer1]" required />
-            </label>
-            <label>Enter the wrong answer
-                <input type="text" name="question[1][wronganswer2]" required />
-            </label>
-            <label>Enter the wrong answer
-                <input type="text" name="question[1][wronganswer3]" required />
-            </label>
-        </fieldset>
-    </template>
-
-    <template id="intro-fieldset">
-          <style>
-            fieldset {
-                    width: 33%;
-                    margin: 25px 0;
-
-                    label {
-                        display: flex;
-                        flex-direction: column;
-                        margin-bottom: 20px;
-                    }
-                }
-        </style>
-        <fieldset class="intro">
-            <legend>Introduction</legend>
-            <label>Enter the target word
-                <input type="text" name="intro[1][targetword]" required />
-            </label>
-            <label>Enter definition of target word
-                <input type="text" name="intro[1][definition]" required />
-            </label>
-        </fieldset>
-    </template> -->
+      

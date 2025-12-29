@@ -1,10 +1,16 @@
+var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (receiver, state, kind, f) {
+    if (kind === "a" && !f) throw new TypeError("Private accessor was defined without a getter");
+    if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot read private member from an object whose class did not declare it");
+    return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state.get(receiver);
+};
+var _LessonCreater_getLessonSlides, _LessonCreater_fillFieldSets;
 import "./FieldSet.js";
 import "./GroupNameSelector.js";
 class LessonCreater extends HTMLElement {
     constructor() {
         super();
         this.slideIndex = 0;
-        this.slideOrder = 1;
+        this.lessonId = null;
         this.changeSlideIndex = (index) => {
             this.slideIndex += index;
         };
@@ -22,7 +28,6 @@ class LessonCreater extends HTMLElement {
             this.insertNewFieldSet(fieldSet);
             this.handleAttachDeleteFieldSetHandler(fieldSet);
             this.handleAddMoveButtons();
-            this.handleSlideOrderAdjustment();
         };
         // Get value from the select in the slide selecter
         this.getSlideValue = () => {
@@ -34,7 +39,7 @@ class LessonCreater extends HTMLElement {
             const slideSelecter = this.root.querySelector(".slideSelecter");
             slideSelecter.before(fieldSet);
         };
-        this.createFieldSet = (index, fieldSetType) => {
+        this.createFieldSet = (index, fieldSetType, slideData) => {
             const fieldSet = document.createElement("div");
             if (fieldSetType === "intro") {
                 fieldSet.className = "slide-fieldSet";
@@ -42,12 +47,12 @@ class LessonCreater extends HTMLElement {
             <fieldset>
             <legend>Introduction</legend>
             <label>Enter the target word
-                <input type="text" name="intro[${index}][targetWord]" required />
+                <input type="text" name="intro[${index}][targetWord]" required ${(slideData === null || slideData === void 0 ? void 0 : slideData.type) === "intro" ? "value=" + slideData.targetWord : ""} />
             </label>
             <label>Enter definition of target word
-                <input type="text" name="intro[${index}][definition]" required />
+                <input type="text" name="intro[${index}][definition]" required ${(slideData === null || slideData === void 0 ? void 0 : slideData.type) === "intro" ? "value=" + slideData.definition : ""} />
             </label>
-            <input type="hidden" name="intro[${index}][slideorder]" id="slideOrderInput"/>
+            <input type="hidden" name="intro[${index}][slideorder]" id="slideOrderInput" ${(slideData === null || slideData === void 0 ? void 0 : slideData.type) === "intro" ? "value=" + slideData.sliderOrder : ""} />
         </fieldset>
         <div class="fieldSetButtons">
             <button class="deleteFieldSet" type="button">X</button>
@@ -61,21 +66,21 @@ class LessonCreater extends HTMLElement {
              <fieldset class="question">
             <legend>Question</legend>
             <label>Enter question
-                <input type="text" name="question[${index}][question]" required />
+                <input type="text" name="question[${index}][question]" required ${(slideData === null || slideData === void 0 ? void 0 : slideData.type) === "question" ? "value=" + slideData.question : ""}/>
             </label>
             <label>Enter the correct answer
-                <input type="text" name="question[${index}][correctAnswer]" required />
+                <input type="text" name="question[${index}][correctAnswer]" required  ${(slideData === null || slideData === void 0 ? void 0 : slideData.type) === "question" ? "value=" + slideData.correctAnswer : ""}/>
             </label>
             <label>Enter the wrong answer
-                <input type="text" name="question[${index}][wrongAnswer1]" required />
+                <input type="text" name="question[${index}][wrongAnswer1]" required ${(slideData === null || slideData === void 0 ? void 0 : slideData.type) === "question" ? "value=" + slideData.wrongAnswer1 : ""} />
             </label>
             <label>Enter the wrong answer (Optional)
-                <input type="text" name="question[${index}][wrongAnswer2]" value="" />
+                <input type="text" name="question[${index}][wrongAnswer2]" ${(slideData === null || slideData === void 0 ? void 0 : slideData.type) === "question" ? "value=" + slideData.wrongAnswer2 : ""} />
             </label>
             <label>Enter the wrong answer (Optional)
-                <input type="text" name="question[${index}][wrongAnswer3]" value="" />
+                <input type="text" name="question[${index}][wrongAnswer3]" ${(slideData === null || slideData === void 0 ? void 0 : slideData.type) === "question" ? "value=" + slideData.wrongAnswer3 : ""} />
             </label>
-            <input type="hidden" name="question[${index}][slideorder]" id="slideOrderInput"/>
+            <input type="hidden" name="question[${index}][slideorder]" id="slideOrderInput" ${(slideData === null || slideData === void 0 ? void 0 : slideData.type) === "question" ? "value=" + slideData.sliderOrder : ""}/>
         </fieldset>
         <div class="fieldSetButtons">
             <button class="deleteFieldSet" type="button">X</button>
@@ -104,7 +109,7 @@ class LessonCreater extends HTMLElement {
                 else if (index === 0) {
                     this.attachMoveDownButton(fieldButtons);
                 }
-                else if (index === (numOfFieldSets - 1)) {
+                else if (index === numOfFieldSets - 1) {
                     this.attachMoveUpButton(fieldButtons);
                 }
                 else {
@@ -130,14 +135,14 @@ class LessonCreater extends HTMLElement {
             fieldSetButtons.appendChild(downButton);
         };
         this.resetMoveButtons = (fieldSetButtonsContainers) => {
-            fieldSetButtonsContainers.forEach(fieldSetButtons => {
+            fieldSetButtonsContainers.forEach((fieldSetButtons) => {
                 var _a, _b;
                 (_a = fieldSetButtons.querySelector(".up")) === null || _a === void 0 ? void 0 : _a.remove();
                 (_b = fieldSetButtons.querySelector(".down")) === null || _b === void 0 ? void 0 : _b.remove();
             });
         };
         this.handleAttachDeleteFieldSetHandler = (fieldSet) => {
-            const deleteFieldSetButton = fieldSet.querySelector('.deleteFieldSet');
+            const deleteFieldSetButton = fieldSet.querySelector(".deleteFieldSet");
             deleteFieldSetButton.addEventListener("click", this.deleteFieldSet);
         };
         // Delete a fieldset and rearrange move buttons
@@ -172,22 +177,44 @@ class LessonCreater extends HTMLElement {
             this.adjustSlideOrderInputs(inputs);
         };
         this.getAllSlideOrderInputs = () => {
-            return Array.from(this.root.querySelectorAll('#slideOrderInput'));
+            return Array.from(this.root.querySelectorAll("#slideOrderInput"));
         };
         this.adjustSlideOrderInputs = (inputs) => {
             inputs.forEach((input, index) => {
                 input.value = `${index + 1}`;
             });
         };
-        this.connectedCallback = () => { };
-        this.disconnectedCallback = () => { };
-        this.connectedMoveCallback = () => { };
-        this.root = this.attachShadow({ mode: "open" });
+        _LessonCreater_getLessonSlides.set(this, async (lessonId) => {
+            const response = await fetch(`/lessons/get/${lessonId}`);
+            return response.json();
+        });
+        _LessonCreater_fillFieldSets.set(this, (slides) => {
+            slides.forEach((slide) => {
+                this.changeSlideIndex(1);
+                const fieldSet = this.createFieldSet(this.slideIndex, slide.type);
+                this.insertNewFieldSet(fieldSet);
+                this.handleAttachDeleteFieldSetHandler(fieldSet);
+            });
+            this.handleAddMoveButtons();
+        });
+        this.root = this.attachShadow({ mode: "closed" });
         const template = document.getElementById("lesson-creater");
         this.root.appendChild(template.content.cloneNode(true));
         const selecterButton = this.root.getElementById("slide-selecterButton");
         selecterButton.addEventListener("click", this.handleSelecterButtonClicked);
     }
+    connectedCallback() { }
+    async attributeChangedCallback(name, oldValue, newValue) {
+        if (name === "data-lessonid") {
+            this.lessonId = newValue;
+            const slides = await __classPrivateFieldGet(this, _LessonCreater_getLessonSlides, "f").call(this, this.lessonId);
+            console.log(slides);
+        }
+    }
+    disconnectedCallback() { }
+    connectedMoveCallback() { }
 }
+_LessonCreater_getLessonSlides = new WeakMap(), _LessonCreater_fillFieldSets = new WeakMap();
+LessonCreater.observedAttributes = ["data-lessonid"];
 customElements.define("lesson-creater", LessonCreater);
 //# sourceMappingURL=LessonCreater.js.map
