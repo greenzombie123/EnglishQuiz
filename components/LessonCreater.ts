@@ -35,6 +35,7 @@ class LessonCreater extends HTMLElement {
     if (name === "data-lessonid") {
       this.lessonId = newValue;
       const slides = await this.#getLessonSlides(this.lessonId);
+      this.#fillFieldSets(slides)
       console.log(slides);
     }
   }
@@ -87,10 +88,10 @@ class LessonCreater extends HTMLElement {
             <fieldset>
             <legend>Introduction</legend>
             <label>Enter the target word
-                <input type="text" name="intro[${index}][targetWord]" required ${slideData?.type === "intro" ? "value=" + slideData.targetWord : ""} />
+                <input type="text" name="intro[${index}][targetWord]" required ${slideData?.type === "intro" ? "value=" + (slideData.targetWord) : ""} />
             </label>
             <label>Enter definition of target word
-                <input type="text" name="intro[${index}][definition]" required ${slideData?.type === "intro" ? "value=" + slideData.definition : ""} />
+                <input type="text" name="intro[${index}][definition]" required ${slideData?.type === "intro" ? "value=" + (slideData.definition) : ""} />
             </label>
             <input type="hidden" name="intro[${index}][slideorder]" id="slideOrderInput" ${slideData?.type === "intro" ? "value=" + slideData.sliderOrder : ""} />
         </fieldset>
@@ -105,21 +106,21 @@ class LessonCreater extends HTMLElement {
              <fieldset class="question">
             <legend>Question</legend>
             <label>Enter question
-                <input type="text" name="question[${index}][question]" required ${slideData?.type === "question" ? "value=" + slideData.question : ""}/>
+                <input type="text" name="question[${index}][question]" required ${slideData?.type === "question" ? "value=" + slideData.question : ""} />
             </label>
             <label>Enter the correct answer
-                <input type="text" name="question[${index}][correctAnswer]" required  ${slideData?.type === "question" ? "value=" + slideData.correctAnswer : ""}/>
+                <input type="text" name="question[${index}][correctAnswer]" required  ${slideData?.type === "question" ? "value=" + slideData.correctAnswer : ""} />
             </label>
             <label>Enter the wrong answer
-                <input type="text" name="question[${index}][wrongAnswer1]" required ${slideData?.type === "question" ? "value=" + slideData.wrongAnswer1 : ""} />
+                <input type="text" name="question[${index}][wrongAnswer1]" required ${slideData?.type === "question" ? "value=" + (slideData.wrongAnswer1) : ""} />
             </label>
             <label>Enter the wrong answer (Optional)
-                <input type="text" name="question[${index}][wrongAnswer2]" ${slideData?.type === "question" ? "value=" + slideData.wrongAnswer2 : ""} />
+                <input type="text" name="question[${index}][wrongAnswer2]" ${slideData?.type === "question" && slideData.wrongAnswer2 ? "value=" + (slideData.wrongAnswer2) : ""} />
             </label>
             <label>Enter the wrong answer (Optional)
-                <input type="text" name="question[${index}][wrongAnswer3]" ${slideData?.type === "question" ? "value=" + slideData.wrongAnswer3 : ""} />
+                <input type="text" name="question[${index}][wrongAnswer3]" ${slideData?.type === "question" && slideData.wrongAnswer3 ? "value=" + (slideData.wrongAnswer3) : ""} />
             </label>
-            <input type="hidden" name="question[${index}][slideorder]" id="slideOrderInput" ${slideData?.type === "question" ? "value=" + slideData.sliderOrder : ""}/>
+            <input type="hidden" name="question[${index}][slideorder]" id="slideOrderInput" ${slideData?.type === "question" ? "value=" + slideData.sliderOrder : ""} />
         </fieldset>
         <div class="fieldSetButtons">
             <button class="deleteFieldSet" type="button">X</button>
@@ -249,7 +250,7 @@ class LessonCreater extends HTMLElement {
 
   #getLessonSlides = async (
     lessonId: string
-  ): Promise<IntroSlideData | QuestionSlideData[]> => {
+  ): Promise<(IntroSlideData | QuestionSlideData)[]> => {
     const response = await fetch(`/lessons/get/${lessonId}`);
     return response.json();
   };
@@ -257,7 +258,7 @@ class LessonCreater extends HTMLElement {
   #fillFieldSets = (slides: (IntroSlideData | QuestionSlideData)[]) => {
     slides.forEach((slide) => {
       this.changeSlideIndex(1);
-      const fieldSet = this.createFieldSet(this.slideIndex, slide.type);
+      const fieldSet = this.createFieldSet(this.slideIndex, slide.type, slide);
       this.insertNewFieldSet(fieldSet);
       this.handleAttachDeleteFieldSetHandler(fieldSet);
     });
