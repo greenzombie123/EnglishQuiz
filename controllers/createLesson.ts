@@ -31,11 +31,12 @@ export const addLesson = async (
 ) => {
   if (!req.user) return res.redirect("/");
   const { username: teacherName } = req.user as { username: string };
-  const { question, intro, lessonName, groupname } = req.body as {
+  const { question, intro, lessonName, groupname, lessonId } = req.body as {
     question: QuestionSlide[] | undefined;
     intro: IntroSlide[] | undefined;
     lessonName: string;
     groupname: string;
+    lessonId:string
   };
 
 
@@ -47,7 +48,8 @@ export const addLesson = async (
     questionString,
     lessonName,
     teacherName,
-    groupname
+    groupname,
+    lessonId
   );
 
   res.redirect("/lessons");
@@ -110,7 +112,8 @@ const insertLesson = async (
   questionString: string,
   lessonName: string,
   teacherName: string,
-  groupName: string
+  groupName: string,
+  oldLessonId:string
 ) => {
   const client = await pool.connect();
   try {
@@ -122,6 +125,11 @@ const insertLesson = async (
     const teacherId = rows[0]!.id;
 
     if (teacherId) {
+
+      // If the id of the lesson being edited is passed, erase it and its slides and replace them with a new lesson and its slides
+      if(oldLessonId){
+        await client.query(`DELETE FROM lessons WHERE id=$1`, [oldLessonId])
+      }
 
       const { rows } = await client.query(
         `INSERT INTO lessons (name, teacherid, groupname) VALUES('${lessonName}', '${teacherId}', '${groupName}') RETURNING id`

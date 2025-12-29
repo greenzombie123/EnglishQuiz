@@ -32,12 +32,14 @@ class LessonCreater extends HTMLElement {
     oldValue: string,
     newValue: string
   ) {
-    if (name === "data-lessonid") {
+    if (name === "data-lessonid" && newValue) {
       this.lessonId = newValue;
       const slides = await this.#getLessonSlides(this.lessonId);
       this.#fillFieldSets(slides)
-      console.log(slides);
+      return
+      // console.log(slides);
     }
+    console.log("nothing!")
   }
 
   changeSlideIndex = (index: number) => {

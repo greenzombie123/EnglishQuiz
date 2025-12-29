@@ -4,7 +4,7 @@
     <ul>
     <% lessonStore[groupname].forEach(lesson=>{ %>
         <li>
-            <a class="lesson" href=<%= `/lessons/${lesson.id}?lessonname=${lesson.name}` %>><%= lesson.name %></a>   
+            <a class="lesson" href="/lessons/<%=lesson.id%>?lessonname=<%=lesson.name%>" ><%= lesson.name %></a>   
         
             <a class="icon" href="./createlesson/<%= lesson.id %>">
                 <img src="/edit.png" alt="">

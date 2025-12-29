@@ -205,12 +205,14 @@ class LessonCreater extends HTMLElement {
     }
     connectedCallback() { }
     async attributeChangedCallback(name, oldValue, newValue) {
-        if (name === "data-lessonid") {
+        if (name === "data-lessonid" && newValue) {
             this.lessonId = newValue;
             const slides = await __classPrivateFieldGet(this, _LessonCreater_getLessonSlides, "f").call(this, this.lessonId);
             __classPrivateFieldGet(this, _LessonCreater_fillFieldSets, "f").call(this, slides);
-            console.log(slides);
+            return;
+            // console.log(slides);
         }
+        console.log("nothing!");
     }
     disconnectedCallback() { }
     connectedMoveCallback() { }
