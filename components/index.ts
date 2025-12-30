@@ -1,6 +1,6 @@
 import "./Lesson.ts";
 import type { Lesson, LessonSlider } from "./Lesson.ts";
-import { Slide } from "./SlideState.ts";
+import type { Slide } from "./SlideState.ts";
 import type { IntroSlideData } from "./IntroSlide.ts";
 import type { QuestionSlideData } from "./QuestionSlide.ts";
 
@@ -11,11 +11,11 @@ const startLesson = async () => {
   const lessonSlider = getLessonSlider();
 
   // call getLesson to get slides
-  const lessons = await getLesson(lessonId);
+  const lesson = await getLesson(lessonId);
   //   const { slides } = lessons;
 
   // pass slides to component
-  lessonSlider.setSlides(lessons);
+  lessonSlider.setSlides(lesson.slides);
 
   // render slides
   lessonSlider.render();
@@ -24,7 +24,7 @@ const startLesson = async () => {
 const getLessonSlider = () =>
   document.querySelector("lesson-slider") as LessonSlider; 
 
-const getLesson = async (lessonId: number): Promise<Slide[]> => {
+const getLesson = async (lessonId: number): Promise<Lesson> => {
   return await fetchLesson(lessonId);
  
 };

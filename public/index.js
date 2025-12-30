@@ -3,10 +3,10 @@ const startLesson = async () => {
     // get reference for lesson component
     const lessonSlider = getLessonSlider();
     // call getLesson to get slides
-    const lessons = await getLesson(lessonId);
+    const lesson = await getLesson(lessonId);
     //   const { slides } = lessons;
     // pass slides to component
-    lessonSlider.setSlides(lessons);
+    lessonSlider.setSlides(lesson.slides);
     // render slides
     lessonSlider.render();
 };

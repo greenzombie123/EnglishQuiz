@@ -4,6 +4,12 @@ import type { IntroSlideData } from "../components/IntroSlide.ts";
 import type { QuestionSlideData } from "../components/QuestionSlide.ts";
 import { format } from "node-pg-format";
 
+export type Lesson = {
+  name:string,
+  groupname:string,
+  slides:(IntroSlideData|QuestionSlideData)[]
+}
+
 type LessonData = {
   name: string;
   id: number;
@@ -28,12 +34,15 @@ export const fetchLessonSlides = async (
   next: NextFunction
 ) => {
   const { lessonId } = req.params as { lessonId: string };
-  const { rows: lessonslides } = await pool.query<LessonSlide>(
-    queryLessonSlideString,
-    [lessonId]
-  );
+  const { rows: lessonslides } = await pool.query<LessonSlide>(queryLessonSlideString,[lessonId]);
+  const {rows} = await pool.query<{name:string, groupname:string}>("SELECT name FROM lessons WHERE id=$1", [lessonId])
   const slides = transformLessonSlide(lessonslides);
-  res.send(slides);
+  const lesson = {
+    name:rows[0]?.name,
+    groupname:rows[0]?.groupname,
+    slides
+  } as Lesson
+  res.send(lesson);
 };
 const queryLessonSlideString = `
 SELECT 
