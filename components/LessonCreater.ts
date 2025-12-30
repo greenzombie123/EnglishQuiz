@@ -1,7 +1,14 @@
 import "./FieldSet.ts";
 import "./GroupNameSelector.ts";
+import { GroupNameSelector } from "./GroupNameSelector.ts";
 import type { IntroSlideData } from "./IntroSlide.ts";
 import type { QuestionSlideData } from "./QuestionSlide.ts";
+
+export type LessonInfo = {
+  name:string,
+  groupname:string,
+  slides:(IntroSlideData|QuestionSlideData)[]
+} 
 
 class LessonCreater extends HTMLElement {
   root;
@@ -34,10 +41,9 @@ class LessonCreater extends HTMLElement {
   ) {
     if (name === "data-lessonid" && newValue) {
       this.lessonId = newValue;
-      const slides = await this.#getLessonSlides(this.lessonId);
-      this.#fillFieldSets(slides)
+      const lesson = await this.#getLessonSlides(this.lessonId);
+      this.#fillFieldSets(lesson)
       return
-      // console.log(slides);
     }
     console.log("nothing!")
   }
@@ -252,12 +258,19 @@ class LessonCreater extends HTMLElement {
 
   #getLessonSlides = async (
     lessonId: string
-  ): Promise<(IntroSlideData | QuestionSlideData)[]> => {
+  ): Promise<LessonInfo> => {
     const response = await fetch(`/lessons/get/${lessonId}`);
     return response.json();
   };
 
-  #fillFieldSets = (slides: (IntroSlideData | QuestionSlideData)[]) => {
+  #fillFieldSets = ({name, groupname, slides}:LessonInfo) => {
+    const nameInput = this.root.getElementById("lessonName") as HTMLInputElement
+    const groupNameInput = this.root.querySelector("groupname-selecter") as GroupNameSelector
+
+    nameInput.value = name
+    groupNameInput.setGroupName(groupname || "")
+
+
     slides.forEach((slide) => {
       this.changeSlideIndex(1);
       const fieldSet = this.createFieldSet(this.slideIndex, slide.type, slide);

@@ -3,7 +3,6 @@ export class GroupNameSelector extends HTMLElement {
 
   internals;
   root;
-  value = "";
 
   constructor() {
     super();
@@ -47,6 +46,12 @@ export class GroupNameSelector extends HTMLElement {
     if(selecter.value){
       this.internals.setFormValue(selecter.value)
     }
+  }
+
+  setGroupName = (groupname:string)=>{
+    this.internals.setFormValue(groupname);
+    const input = this.root.querySelector("input") as HTMLInputElement
+    input.value = groupname
   }
 }
 

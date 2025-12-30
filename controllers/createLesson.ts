@@ -157,7 +157,7 @@ const insertLesson = async (
           "INSERT INTO lessons_introslides (lessonid, introslideid) VALUES %L",
           introIdsWithLessonId
         );
-        console.log(lessonIntroString);
+        // console.log(lessonIntroString);
         await client.query(lessonIntroString);
       }
 

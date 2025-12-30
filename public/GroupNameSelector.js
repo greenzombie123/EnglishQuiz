@@ -1,7 +1,6 @@
 export class GroupNameSelector extends HTMLElement {
     constructor() {
         super();
-        this.value = "";
         this.onInputChange = (e) => {
             const input = e.currentTarget;
             const inputValue = input.value;
@@ -14,6 +13,11 @@ export class GroupNameSelector extends HTMLElement {
             if (selecter.value) {
                 this.internals.setFormValue(selecter.value);
             }
+        };
+        this.setGroupName = (groupname) => {
+            this.internals.setFormValue(groupname);
+            const input = this.root.querySelector("input");
+            input.value = groupname;
         };
         this.root = this.attachShadow({ mode: "closed" });
         const template = document.getElementById("groupname-selecter");

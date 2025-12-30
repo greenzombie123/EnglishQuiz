@@ -1,8 +1,6 @@
 import "./Lesson.ts";
-import type { Lesson, LessonSlider } from "./Lesson.ts";
-import type { Slide } from "./SlideState.ts";
-import type { IntroSlideData } from "./IntroSlide.ts";
-import type { QuestionSlideData } from "./QuestionSlide.ts";
+import type { LessonSlider } from "./Lesson.ts";
+import type { LessonInfo } from "./LessonCreater.ts";
 
 declare const lessonId: number;
 
@@ -24,7 +22,7 @@ const startLesson = async () => {
 const getLessonSlider = () =>
   document.querySelector("lesson-slider") as LessonSlider; 
 
-const getLesson = async (lessonId: number): Promise<Lesson> => {
+const getLesson = async (lessonId: number): Promise<LessonInfo> => {
   return await fetchLesson(lessonId);
  
 };

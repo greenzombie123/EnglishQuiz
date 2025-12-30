@@ -188,7 +188,11 @@ class LessonCreater extends HTMLElement {
             const response = await fetch(`/lessons/get/${lessonId}`);
             return response.json();
         });
-        _LessonCreater_fillFieldSets.set(this, (slides) => {
+        _LessonCreater_fillFieldSets.set(this, ({ name, groupname, slides }) => {
+            const nameInput = this.root.getElementById("lessonName");
+            const groupNameInput = this.root.querySelector("groupname-selecter");
+            nameInput.value = name;
+            groupNameInput.setGroupName(groupname || "");
             slides.forEach((slide) => {
                 this.changeSlideIndex(1);
                 const fieldSet = this.createFieldSet(this.slideIndex, slide.type, slide);
@@ -207,10 +211,9 @@ class LessonCreater extends HTMLElement {
     async attributeChangedCallback(name, oldValue, newValue) {
         if (name === "data-lessonid" && newValue) {
             this.lessonId = newValue;
-            const slides = await __classPrivateFieldGet(this, _LessonCreater_getLessonSlides, "f").call(this, this.lessonId);
-            __classPrivateFieldGet(this, _LessonCreater_fillFieldSets, "f").call(this, slides);
+            const lesson = await __classPrivateFieldGet(this, _LessonCreater_getLessonSlides, "f").call(this, this.lessonId);
+            __classPrivateFieldGet(this, _LessonCreater_fillFieldSets, "f").call(this, lesson);
             return;
-            // console.log(slides);
         }
         console.log("nothing!");
     }
