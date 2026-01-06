@@ -10,11 +10,37 @@
 </head>
 
 <body>
-    <h1>Create Your Lesson</h1>
     <lesson-creater data-lessonid="<%= lessonId %>"></lesson-creater>
     <template id="lesson-creater">
         <style>
+            h1{
+                text-align: center;
+                border-bottom: 1px black solid;
+                padding: 10px;
+                background-color: rgb(248, 248, 109);
+                margin: 0;
+            }
+
             form {
+                --itemWidth:33vw;
+                --fontSize:1.1rem;
+                --inputPadding:5px;
+
+                padding: 20px;
+
+                .lessonNameLabel{
+                    display: flex;
+                    flex-direction: column;
+                    width: 450px;
+                    font-size: var(--fontSize);
+                    gap: 10px;
+                    margin-bottom: 10px;
+
+                    input{
+                        font-size: var(--fontSize);
+                        padding: var(--inputPadding);
+                    }
+                }
 
                 .slideSelecter {
                     display: flex;
@@ -25,9 +51,15 @@
                     margin: 25px 0;
                     padding: 10px;
 
-                    label {}
+                    label {
+                        font-size: var(--fontSize)
+                    }
 
-                    select {}
+                    select {
+                        font-size: var(--fontSize)
+                    }
+
+                    button{}
                 }
 
 
@@ -35,22 +67,33 @@
                     width: 33%;
                     margin: 25px 0;
 
+                    label,input {
+                        font-size: var(--fontSize);
+                    }
+
                     label {
                         display: flex;
                         flex-direction: column;
                         margin-bottom: 20px;
                     }
+
+                    input{
+                        padding: var(--inputPadding);
+                    }
                 }
             }
         </style>
+        
+        <h1>Create Your Lesson</h1>
         <form action="/lessons/createlesson" method="post">
+
             <label for="lessonName" class="lessonNameLabel">
                 Write the name of your lesson.
                 <input type="text" id="lessonName" placeholder="Lesson Name" name="lessonName" required>
                 <input type="hidden" name="lessonId" value=<%= lessonId %> >
             </label>
 
-            <groupname-selecter name="groupname"></groupname-selecter>
+            <groupname-selecter name="groupname" class="x"></groupname-selecter>
 
             <div class="slideSelecter">
                 <label for="select">Choose what type of slide to make.</label>
@@ -67,6 +110,28 @@
     <template id="groupname-selecter">
         <style>
 
+            :host{
+                display: flex;
+                flex-direction: column;
+                width: 100%;
+                gap: 10px;
+                padding-bottom: 20px;
+                border-bottom: 2px solid black;
+
+                label{
+                    display: flex;
+                    flex-direction: column;
+                    width: 450px;
+                    font-size: 1.1rem;
+                    gap: 10px;
+                }
+
+                input, select{
+                        font-size: 1.1rem;
+                        padding: 5px;
+                        width: 450px;
+                    }
+            }
         </style>
         <label for="newGroupName">Create a group to put your lesson in</label>
         <input type="text" id="newGroupName" name="newgroupname">
