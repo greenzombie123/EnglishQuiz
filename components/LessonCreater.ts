@@ -5,10 +5,10 @@ import type { IntroSlideData } from "./IntroSlide.ts";
 import type { QuestionSlideData } from "./QuestionSlide.ts";
 
 export type LessonInfo = {
-  name:string,
-  groupname:string,
-  slides:(IntroSlideData|QuestionSlideData)[]
-} 
+  name: string;
+  groupname: string;
+  slides: (IntroSlideData | QuestionSlideData)[];
+};
 
 class LessonCreater extends HTMLElement {
   root;
@@ -42,10 +42,10 @@ class LessonCreater extends HTMLElement {
     if (name === "data-lessonid" && newValue) {
       this.lessonId = newValue;
       const lesson = await this.#getLessonSlides(this.lessonId);
-      this.#fillFieldSets(lesson)
-      return
+      this.#fillFieldSets(lesson);
+      return;
     }
-    console.log("nothing!")
+    console.log("nothing!");
   }
 
   changeSlideIndex = (index: number) => {
@@ -96,12 +96,18 @@ class LessonCreater extends HTMLElement {
             <fieldset>
             <legend>Introduction</legend>
             <label>Enter the target word
-                <input type="text" name="intro[${index}][targetWord]" required ${slideData?.type === "intro" ? "value=" + (slideData.targetWord) : ""} />
+                <input type="text" name="intro[${index}][targetWord]" required ${
+        slideData?.type === "intro" ? "value=" + slideData.targetWord : ""
+      } />
             </label>
             <label>Enter definition of target word
-                <input type="text" name="intro[${index}][definition]" required ${slideData?.type === "intro" ? "value=" + (slideData.definition) : ""} />
+                <input type="text" name="intro[${index}][definition]" required ${
+        slideData?.type === "intro" ? "value=" + slideData.definition : ""
+      } />
             </label>
-            <input type="hidden" name="intro[${index}][slideorder]" id="slideOrderInput" ${slideData?.type === "intro" ? "value=" + slideData.sliderOrder : ""} />
+            <input type="hidden" name="intro[${index}][slideorder]" id="slideOrderInput" ${
+        slideData?.type === "intro" ? "value=" + slideData.sliderOrder : ""
+      } />
         </fieldset>
         <div class="fieldSetButtons">
             <button class="deleteFieldSet" type="button">X</button>
@@ -114,21 +120,37 @@ class LessonCreater extends HTMLElement {
              <fieldset class="question">
             <legend>Question</legend>
             <label>Enter question
-                <input type="text" name="question[${index}][question]" required ${slideData?.type === "question" ? "value=" + slideData.question : ""} />
+                <input type="text" name="question[${index}][question]" required ${
+        slideData?.type === "question" ? "value=" + slideData.question : ""
+      } />
             </label>
             <label>Enter the correct answer
-                <input type="text" name="question[${index}][correctAnswer]" required  ${slideData?.type === "question" ? "value=" + slideData.correctAnswer : ""} />
+                <input type="text" name="question[${index}][correctAnswer]" required  ${
+        slideData?.type === "question" ? "value=" + slideData.correctAnswer : ""
+      } />
             </label>
             <label>Enter the wrong answer
-                <input type="text" name="question[${index}][wrongAnswer1]" required ${slideData?.type === "question" ? "value=" + (slideData.wrongAnswer1) : ""} />
+                <input type="text" name="question[${index}][wrongAnswer1]" required ${
+        slideData?.type === "question" ? "value=" + slideData.wrongAnswer1 : ""
+      } />
             </label>
             <label>Enter the wrong answer (Optional)
-                <input type="text" name="question[${index}][wrongAnswer2]" ${slideData?.type === "question" && slideData.wrongAnswer2 ? "value=" + (slideData.wrongAnswer2) : ""} />
+                <input type="text" name="question[${index}][wrongAnswer2]" ${
+        slideData?.type === "question" && slideData.wrongAnswer2
+          ? "value=" + slideData.wrongAnswer2
+          : ""
+      } />
             </label>
             <label>Enter the wrong answer (Optional)
-                <input type="text" name="question[${index}][wrongAnswer3]" ${slideData?.type === "question" && slideData.wrongAnswer3 ? "value=" + (slideData.wrongAnswer3) : ""} />
+                <input type="text" name="question[${index}][wrongAnswer3]" ${
+        slideData?.type === "question" && slideData.wrongAnswer3
+          ? "value=" + slideData.wrongAnswer3
+          : ""
+      } />
             </label>
-            <input type="hidden" name="question[${index}][slideorder]" id="slideOrderInput" ${slideData?.type === "question" ? "value=" + slideData.sliderOrder : ""} />
+            <input type="hidden" name="question[${index}][slideorder]" id="slideOrderInput" ${
+        slideData?.type === "question" ? "value=" + slideData.sliderOrder : ""
+      } />
         </fieldset>
         <div class="fieldSetButtons">
             <button class="deleteFieldSet" type="button">X</button>
@@ -160,32 +182,32 @@ class LessonCreater extends HTMLElement {
     fieldButtonContainers.forEach((fieldButtons, index) => {
       if (numOfFieldSets === 1) return;
       else if (index === 0) {
-        this.attachMoveDownButton(fieldButtons);
+        const downButton = this.createMoveButton("down");
+        this.appendMoveButtons(fieldButtons, [downButton])
       } else if (index === numOfFieldSets - 1) {
-        this.attachMoveUpButton(fieldButtons);
+        const upButton = this.createMoveButton("up");
+         this.appendMoveButtons(fieldButtons, [upButton])
       } else {
-        this.attachMoveUpButton(fieldButtons);
-        this.attachMoveDownButton(fieldButtons);
+        const upButton = this.createMoveButton("up");
+        const downButton = this.createMoveButton("down");
+         this.appendMoveButtons(fieldButtons, [upButton, downButton])
       }
     });
   };
 
-  attachMoveUpButton = (fieldSetButtons: HTMLDivElement) => {
-    const upButton = document.createElement("button") as HTMLButtonElement;
-    upButton.className = "up";
-    upButton.textContent = "up";
-    upButton.type = "button";
-    upButton.addEventListener("click", this.handleMoveFieldSet);
-    fieldSetButtons.appendChild(upButton);
+  createMoveButton = (buttonType:string) => {
+    const button = document.createElement("button") as HTMLButtonElement;
+    button.className = buttonType
+    button.textContent = buttonType
+    button.type = "button";
+    button.addEventListener("click", this.handleMoveFieldSet);
+    return button
   };
 
-  attachMoveDownButton = (fieldSetButtons: HTMLDivElement) => {
-    const downButton = document.createElement("button") as HTMLButtonElement;
-    downButton.className = "down";
-    downButton.textContent = "down";
-    downButton.type = "button";
-    downButton.addEventListener("click", this.handleMoveFieldSet);
-    fieldSetButtons.appendChild(downButton);
+  appendMoveButtons = (fieldSetButtons: HTMLDivElement, moveButtons:HTMLButtonElement[]) => {
+    moveButtons.forEach(moveButton=>{
+      fieldSetButtons.appendChild(moveButton)
+    })
   };
 
   resetMoveButtons = (fieldSetButtonsContainers: HTMLElement[]) => {
@@ -256,20 +278,21 @@ class LessonCreater extends HTMLElement {
     });
   };
 
-  #getLessonSlides = async (
-    lessonId: string
-  ): Promise<LessonInfo> => {
+  #getLessonSlides = async (lessonId: string): Promise<LessonInfo> => {
     const response = await fetch(`/lessons/get/${lessonId}`);
     return response.json();
   };
 
-  #fillFieldSets = ({name, groupname, slides}:LessonInfo) => {
-    const nameInput = this.root.getElementById("lessonName") as HTMLInputElement
-    const groupNameInput = this.root.querySelector("groupname-selecter") as GroupNameSelector
+  #fillFieldSets = ({ name, groupname, slides }: LessonInfo) => {
+    const nameInput = this.root.getElementById(
+      "lessonName"
+    ) as HTMLInputElement;
+    const groupNameInput = this.root.querySelector(
+      "groupname-selecter"
+    ) as GroupNameSelector;
 
-    nameInput.value = name
-    groupNameInput.setGroupName(groupname || "")
-
+    nameInput.value = name;
+    groupNameInput.setGroupName(groupname || "");
 
     slides.forEach((slide) => {
       this.changeSlideIndex(1);

@@ -47,10 +47,10 @@ class LessonCreater extends HTMLElement {
             <fieldset>
             <legend>Introduction</legend>
             <label>Enter the target word
-                <input type="text" name="intro[${index}][targetWord]" required ${(slideData === null || slideData === void 0 ? void 0 : slideData.type) === "intro" ? "value=" + (slideData.targetWord) : ""} />
+                <input type="text" name="intro[${index}][targetWord]" required ${(slideData === null || slideData === void 0 ? void 0 : slideData.type) === "intro" ? "value=" + slideData.targetWord : ""} />
             </label>
             <label>Enter definition of target word
-                <input type="text" name="intro[${index}][definition]" required ${(slideData === null || slideData === void 0 ? void 0 : slideData.type) === "intro" ? "value=" + (slideData.definition) : ""} />
+                <input type="text" name="intro[${index}][definition]" required ${(slideData === null || slideData === void 0 ? void 0 : slideData.type) === "intro" ? "value=" + slideData.definition : ""} />
             </label>
             <input type="hidden" name="intro[${index}][slideorder]" id="slideOrderInput" ${(slideData === null || slideData === void 0 ? void 0 : slideData.type) === "intro" ? "value=" + slideData.sliderOrder : ""} />
         </fieldset>
@@ -72,13 +72,17 @@ class LessonCreater extends HTMLElement {
                 <input type="text" name="question[${index}][correctAnswer]" required  ${(slideData === null || slideData === void 0 ? void 0 : slideData.type) === "question" ? "value=" + slideData.correctAnswer : ""} />
             </label>
             <label>Enter the wrong answer
-                <input type="text" name="question[${index}][wrongAnswer1]" required ${(slideData === null || slideData === void 0 ? void 0 : slideData.type) === "question" ? "value=" + (slideData.wrongAnswer1) : ""} />
+                <input type="text" name="question[${index}][wrongAnswer1]" required ${(slideData === null || slideData === void 0 ? void 0 : slideData.type) === "question" ? "value=" + slideData.wrongAnswer1 : ""} />
             </label>
             <label>Enter the wrong answer (Optional)
-                <input type="text" name="question[${index}][wrongAnswer2]" ${(slideData === null || slideData === void 0 ? void 0 : slideData.type) === "question" && slideData.wrongAnswer2 ? "value=" + (slideData.wrongAnswer2) : ""} />
+                <input type="text" name="question[${index}][wrongAnswer2]" ${(slideData === null || slideData === void 0 ? void 0 : slideData.type) === "question" && slideData.wrongAnswer2
+                    ? "value=" + slideData.wrongAnswer2
+                    : ""} />
             </label>
             <label>Enter the wrong answer (Optional)
-                <input type="text" name="question[${index}][wrongAnswer3]" ${(slideData === null || slideData === void 0 ? void 0 : slideData.type) === "question" && slideData.wrongAnswer3 ? "value=" + (slideData.wrongAnswer3) : ""} />
+                <input type="text" name="question[${index}][wrongAnswer3]" ${(slideData === null || slideData === void 0 ? void 0 : slideData.type) === "question" && slideData.wrongAnswer3
+                    ? "value=" + slideData.wrongAnswer3
+                    : ""} />
             </label>
             <input type="hidden" name="question[${index}][slideorder]" id="slideOrderInput" ${(slideData === null || slideData === void 0 ? void 0 : slideData.type) === "question" ? "value=" + slideData.sliderOrder : ""} />
         </fieldset>
@@ -107,32 +111,32 @@ class LessonCreater extends HTMLElement {
                 if (numOfFieldSets === 1)
                     return;
                 else if (index === 0) {
-                    this.attachMoveDownButton(fieldButtons);
+                    const downButton = this.createMoveButton("down");
+                    this.appendMoveButtons(fieldButtons, [downButton]);
                 }
                 else if (index === numOfFieldSets - 1) {
-                    this.attachMoveUpButton(fieldButtons);
+                    const upButton = this.createMoveButton("up");
+                    this.appendMoveButtons(fieldButtons, [upButton]);
                 }
                 else {
-                    this.attachMoveUpButton(fieldButtons);
-                    this.attachMoveDownButton(fieldButtons);
+                    const upButton = this.createMoveButton("up");
+                    const downButton = this.createMoveButton("down");
+                    this.appendMoveButtons(fieldButtons, [upButton, downButton]);
                 }
             });
         };
-        this.attachMoveUpButton = (fieldSetButtons) => {
-            const upButton = document.createElement("button");
-            upButton.className = "up";
-            upButton.textContent = "up";
-            upButton.type = "button";
-            upButton.addEventListener("click", this.handleMoveFieldSet);
-            fieldSetButtons.appendChild(upButton);
+        this.createMoveButton = (buttonType) => {
+            const button = document.createElement("button");
+            button.className = buttonType;
+            button.textContent = buttonType;
+            button.type = "button";
+            button.addEventListener("click", this.handleMoveFieldSet);
+            return button;
         };
-        this.attachMoveDownButton = (fieldSetButtons) => {
-            const downButton = document.createElement("button");
-            downButton.className = "down";
-            downButton.textContent = "down";
-            downButton.type = "button";
-            downButton.addEventListener("click", this.handleMoveFieldSet);
-            fieldSetButtons.appendChild(downButton);
+        this.appendMoveButtons = (fieldSetButtons, moveButtons) => {
+            moveButtons.forEach(moveButton => {
+                fieldSetButtons.appendChild(moveButton);
+            });
         };
         this.resetMoveButtons = (fieldSetButtonsContainers) => {
             fieldSetButtonsContainers.forEach((fieldSetButtons) => {
