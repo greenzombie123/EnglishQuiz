@@ -32,7 +32,7 @@ class LessonCreater extends HTMLElement {
     selecterButton.addEventListener("click", this.handleSelecterButtonClicked);
   }
 
-  connectedCallback() {}
+  connectedCallback() { }
 
   async attributeChangedCallback(
     name: string,
@@ -96,18 +96,15 @@ class LessonCreater extends HTMLElement {
             <fieldset>
             <legend>Introduction</legend>
             <label>Enter the target word
-                <input type="text" name="intro[${index}][targetWord]" required ${
-        slideData?.type === "intro" ? "value=" + slideData.targetWord : ""
-      } />
+                <input type="text" name="intro[${index}][targetWord]" required ${slideData?.type === "intro" ? "value=" + slideData.targetWord : ""
+        } />
             </label>
             <label>Enter definition of target word
-                <input type="text" name="intro[${index}][definition]" required ${
-        slideData?.type === "intro" ? "value=" + slideData.definition : ""
-      } />
+                <input type="text" name="intro[${index}][definition]" required ${slideData?.type === "intro" ? "value=" + slideData.definition : ""
+        } />
             </label>
-            <input type="hidden" name="intro[${index}][slideorder]" id="slideOrderInput" ${
-        slideData?.type === "intro" ? "value=" + slideData.sliderOrder : ""
-      } />
+            <input type="hidden" name="intro[${index}][slideorder]" id="slideOrderInput" ${slideData?.type === "intro" ? "value=" + slideData.sliderOrder : ""
+        } />
         </fieldset>
         <div class="fieldSetButtons">
             <button class="deleteFieldSet" type="button">X</button>
@@ -120,37 +117,31 @@ class LessonCreater extends HTMLElement {
              <fieldset class="question">
             <legend>Question</legend>
             <label>Enter question
-                <input type="text" name="question[${index}][question]" required ${
-        slideData?.type === "question" ? "value=" + slideData.question : ""
-      } />
+                <input type="text" name="question[${index}][question]" required ${slideData?.type === "question" ? "value=" + slideData.question : ""
+        } />
             </label>
             <label>Enter the correct answer
-                <input type="text" name="question[${index}][correctAnswer]" required  ${
-        slideData?.type === "question" ? "value=" + slideData.correctAnswer : ""
-      } />
+                <input type="text" name="question[${index}][correctAnswer]" required  ${slideData?.type === "question" ? "value=" + slideData.correctAnswer : ""
+        } />
             </label>
             <label>Enter the wrong answer
-                <input type="text" name="question[${index}][wrongAnswer1]" required ${
-        slideData?.type === "question" ? "value=" + slideData.wrongAnswer1 : ""
-      } />
+                <input type="text" name="question[${index}][wrongAnswer1]" required ${slideData?.type === "question" ? "value=" + slideData.wrongAnswer1 : ""
+        } />
             </label>
             <label>Enter the wrong answer (Optional)
-                <input type="text" name="question[${index}][wrongAnswer2]" ${
-        slideData?.type === "question" && slideData.wrongAnswer2
+                <input type="text" name="question[${index}][wrongAnswer2]" ${slideData?.type === "question" && slideData.wrongAnswer2
           ? "value=" + slideData.wrongAnswer2
           : ""
-      } />
+        } />
             </label>
             <label>Enter the wrong answer (Optional)
-                <input type="text" name="question[${index}][wrongAnswer3]" ${
-        slideData?.type === "question" && slideData.wrongAnswer3
+                <input type="text" name="question[${index}][wrongAnswer3]" ${slideData?.type === "question" && slideData.wrongAnswer3
           ? "value=" + slideData.wrongAnswer3
           : ""
-      } />
+        } />
             </label>
-            <input type="hidden" name="question[${index}][slideorder]" id="slideOrderInput" ${
-        slideData?.type === "question" ? "value=" + slideData.sliderOrder : ""
-      } />
+            <input type="hidden" name="question[${index}][slideorder]" id="slideOrderInput" ${slideData?.type === "question" ? "value=" + slideData.sliderOrder : ""
+        } />
         </fieldset>
         <div class="fieldSetButtons">
             <button class="deleteFieldSet" type="button">X</button>
@@ -183,31 +174,46 @@ class LessonCreater extends HTMLElement {
       if (numOfFieldSets === 1) return;
       else if (index === 0) {
         const downButton = this.createMoveButton("down");
-        this.appendMoveButtons(fieldButtons, [downButton])
+        this.appendMoveButtons(fieldButtons, [downButton]);
       } else if (index === numOfFieldSets - 1) {
         const upButton = this.createMoveButton("up");
-         this.appendMoveButtons(fieldButtons, [upButton])
+        this.appendMoveButtons(fieldButtons, [upButton]);
       } else {
         const upButton = this.createMoveButton("up");
         const downButton = this.createMoveButton("down");
-         this.appendMoveButtons(fieldButtons, [upButton, downButton])
+        this.appendMoveButtons(fieldButtons, [upButton, downButton]);
       }
     });
   };
 
-  createMoveButton = (buttonType:string) => {
+  createMoveButton = (buttonType: string) => {
     const button = document.createElement("button") as HTMLButtonElement;
-    button.className = buttonType
-    button.textContent = buttonType
+    button.className = buttonType;
+    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg")
+    svg.setAttribute("width", "30px")
+    svg.setAttribute("height", "30px")
+    svg.setAttribute("viewBox", "0 0 15 15")
+    svg.setAttribute("fill", "none")
+    button.appendChild(svg)
+    const path = document.createElementNS("http://www.w3.org/2000/svg", "path")
+    path.setAttribute("d",  `${buttonType === "up" ? "M7.5 3L15 11H0L7.5 3Z" : "M7.49988 12L-0.00012207 4L14.9999 4L7.49988 12Z"}`)
+    path.setAttribute("fill", "#000000")
+    svg.appendChild(path)
+    //   <svg width="30px" height="30px" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+    //     <path d="M7.5 3L15 11H0L7.5 3Z" fill="#000000"/>
+    //   </svg>`;
     button.type = "button";
     button.addEventListener("click", this.handleMoveFieldSet);
-    return button
+    return button;
   };
 
-  appendMoveButtons = (fieldSetButtons: HTMLDivElement, moveButtons:HTMLButtonElement[]) => {
-    moveButtons.forEach(moveButton=>{
-      fieldSetButtons.appendChild(moveButton)
-    })
+  appendMoveButtons = (
+    fieldSetButtons: HTMLDivElement,
+    moveButtons: HTMLButtonElement[]
+  ) => {
+    moveButtons.forEach((moveButton) => {
+      fieldSetButtons.appendChild(moveButton);
+    });
   };
 
   resetMoveButtons = (fieldSetButtonsContainers: HTMLElement[]) => {
@@ -304,9 +310,9 @@ class LessonCreater extends HTMLElement {
     this.handleAddMoveButtons();
   };
 
-  disconnectedCallback() {}
+  disconnectedCallback() { }
 
-  connectedMoveCallback() {}
+  connectedMoveCallback() { }
 }
 
 customElements.define("lesson-creater", LessonCreater);

@@ -13,7 +13,7 @@
     <lesson-creater data-lessonid="<%= lessonId %>"></lesson-creater>
     <template id="lesson-creater">
         <style>
-            h1{
+            h1 {
                 text-align: center;
                 border-bottom: 1px black solid;
                 padding: 10px;
@@ -22,13 +22,13 @@
             }
 
             form {
-                --itemWidth:33vw;
-                --fontSize:1.1rem;
-                --inputPadding:5px;
+                --itemWidth: 33vw;
+                --fontSize: 1.1rem;
+                --inputPadding: 5px;
 
                 padding: 20px;
 
-                .lessonNameLabel{
+                .lessonNameLabel {
                     display: flex;
                     flex-direction: column;
                     width: 450px;
@@ -36,7 +36,7 @@
                     gap: 10px;
                     margin-bottom: 10px;
 
-                    input{
+                    input {
                         font-size: var(--fontSize);
                         padding: var(--inputPadding);
                     }
@@ -59,41 +59,107 @@
                         font-size: var(--fontSize)
                     }
 
-                    button{}
+                    button {}
                 }
 
+                .slide-fieldSet {
+                    display: flex;
+                    gap: 15px;
+                    background-color: #f1f1f1;
+                    width: fit-content;
+                    margin: 15px 0;
 
-                fieldset {
-                    width: 33%;
-                    margin: 25px 0;
+                    fieldset {
+                        width: 500px;
+                        margin: 25px 0;
+                        border: none;
+                        border-radius: 5px;
 
-                    label,input {
+                        legend {
+                            font-size: 1.2rem;
+                            position: relative;
+                            top: -15px;
+                            font-weight: bold;
+                        }
+
+                        label,
+                        input {
+                            font-size: var(--fontSize);
+                        }
+
+                        label {
+                            display: flex;
+                            flex-direction: column;
+                            margin-bottom: 20px;
+                            gap: 5px;
+                        }
+
+                        input {
+                            padding: var(--inputPadding);
+                        }
+                    }
+
+                    .fieldSetButtons {
+                        display: flex;
+                        flex-direction: column;
+                        gap: 15px;
+
+                        .deleteFieldSet{
+                            margin-bottom: auto;
+                        }
+
+                        button {
+                            height: 30px;
+                            width: 30px;
+                            padding: 0;
+                            cursor: pointer;
+
+                            svg {
+                                width: 15px;
+                                height: 15px;
+                            }
+                        }
+                    }
+                }
+
+                .submit{
+                    font-size: 1.1rem;
+                }
+            }
+
+            @media screen and (width <= 600px) {
+                form{
+                    --fontSize: 1rem;
+                    --inputPadding: 5px;
+                    --inputWidth:100%;
+
+                    label, input{
                         font-size: var(--fontSize);
                     }
 
-                    label {
-                        display: flex;
-                        flex-direction: column;
-                        margin-bottom: 20px;
+                    .lessonNameLabel, groupname-selecter, .slide-fieldSet{
+                        width: var(--inputWidth);
                     }
 
-                    input{
-                        padding: var(--inputPadding);
+                    groupname-selecter{
+                        font-size: var(--fontSize);
                     }
                 }
             }
         </style>
-        
+
         <h1>Create Your Lesson</h1>
         <form action="/lessons/createlesson" method="post">
 
             <label for="lessonName" class="lessonNameLabel">
                 Write the name of your lesson.
                 <input type="text" id="lessonName" placeholder="Lesson Name" name="lessonName" required>
-                <input type="hidden" name="lessonId" value=<%= lessonId %> >
+                <input type="hidden" name="lessonId" value=<%=lessonId %> >
             </label>
 
             <groupname-selecter name="groupname" class="x"></groupname-selecter>
+
+            <div class="breakLine" style="width: 100%; border: 2px solid black;"></div>
 
             <div class="slideSelecter">
                 <label for="select">Choose what type of slide to make.</label>
@@ -104,33 +170,33 @@
                 </select>
                 <button type="button" id="slide-selecterButton">Add New Slide</button>
             </div>
-             <button>Create Lesson</button>
+            <button class="submit">Create Lesson</button>
         </form>
     </template>
     <template id="groupname-selecter">
         <style>
+            :host {
 
-            :host{
+                font-size: 1.1rem;
+
                 display: flex;
                 flex-direction: column;
-                width: 100%;
+                width: 450px;
                 gap: 10px;
                 padding-bottom: 20px;
-                border-bottom: 2px solid black;
 
-                label{
+                label {
                     display: flex;
                     flex-direction: column;
-                    width: 450px;
-                    font-size: 1.1rem;
+                    font-size: inherit;
                     gap: 10px;
                 }
 
-                input, select{
-                        font-size: 1.1rem;
-                        padding: 5px;
-                        width: 450px;
-                    }
+                input,
+                select {
+                    font-size: inherit;
+                    padding: 5px;
+                }
             }
         </style>
         <label for="newGroupName">Create a group to put your lesson in</label>
@@ -142,6 +208,4 @@
     </template>
 </body>
 
-</html>  
-
-      
+</html>

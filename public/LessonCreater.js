@@ -128,13 +128,25 @@ class LessonCreater extends HTMLElement {
         this.createMoveButton = (buttonType) => {
             const button = document.createElement("button");
             button.className = buttonType;
-            button.textContent = buttonType;
+            const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+            svg.setAttribute("width", "30px");
+            svg.setAttribute("height", "30px");
+            svg.setAttribute("viewBox", "0 0 15 15");
+            svg.setAttribute("fill", "none");
+            button.appendChild(svg);
+            const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+            path.setAttribute("d", `${buttonType === "up" ? "M7.5 3L15 11H0L7.5 3Z" : "M7.49988 12L-0.00012207 4L14.9999 4L7.49988 12Z"}`);
+            path.setAttribute("fill", "#000000");
+            svg.appendChild(path);
+            //   <svg width="30px" height="30px" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+            //     <path d="M7.5 3L15 11H0L7.5 3Z" fill="#000000"/>
+            //   </svg>`;
             button.type = "button";
             button.addEventListener("click", this.handleMoveFieldSet);
             return button;
         };
         this.appendMoveButtons = (fieldSetButtons, moveButtons) => {
-            moveButtons.forEach(moveButton => {
+            moveButtons.forEach((moveButton) => {
                 fieldSetButtons.appendChild(moveButton);
             });
         };
