@@ -1,5 +1,4 @@
 import type { NextFunction, Request, Response } from "express";
-import { body, validationResult } from "express-validator";
 import { pool } from "../pool.ts";
 import type { QuestionSlideData } from "../components/QuestionSlide.ts";
 import type {IntroSlideData } from "../components/IntroSlide.ts";

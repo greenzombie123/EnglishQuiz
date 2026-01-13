@@ -55,7 +55,7 @@ export class LessonSlider extends HTMLElement {
     const { type } = currentSlide;
     if (type === "intro") {
       return this.createIntroSlide(currentSlide);
-    } //if (type === "question") {
+    } 
     else return this.createQuestionSlide(currentSlide);
   };
 
