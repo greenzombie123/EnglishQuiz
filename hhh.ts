@@ -1,3 +1,8 @@
-const k = [1,3,10,66]
+declare namespace stuff {
+    function doStuff(a:string):boolean
+}
 
-const j = k.map<{a:number}>(a=>({a:a}))
+
+let o = stuff
+
+o.doStuff()

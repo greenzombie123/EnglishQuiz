@@ -47,7 +47,7 @@ class LessonCreater extends HTMLElement {
             <fieldset>
             <legend>Introduction</legend>
             <label>Enter the target word
-                <input type="text" name="intro[${index}][targetWord]" required ${(slideData === null || slideData === void 0 ? void 0 : slideData.type) === "intro" ? "value=" + slideData.targetWord : ""} />
+                <input type="text" name="intro[${index}][targetword]" required ${(slideData === null || slideData === void 0 ? void 0 : slideData.type) === "intro" ? "value=" + slideData.targetWord : ""} />
             </label>
             <label>Enter definition of target word
                 <input type="text" name="intro[${index}][definition]" required ${(slideData === null || slideData === void 0 ? void 0 : slideData.type) === "intro" ? "value=" + slideData.definition : ""} />
@@ -69,18 +69,18 @@ class LessonCreater extends HTMLElement {
                 <input type="text" name="question[${index}][question]" required ${(slideData === null || slideData === void 0 ? void 0 : slideData.type) === "question" ? "value=" + slideData.question : ""} />
             </label>
             <label>Enter the correct answer
-                <input type="text" name="question[${index}][correctAnswer]" required  ${(slideData === null || slideData === void 0 ? void 0 : slideData.type) === "question" ? "value=" + slideData.correctAnswer : ""} />
+                <input type="text" name="question[${index}][correctanswer]" required  ${(slideData === null || slideData === void 0 ? void 0 : slideData.type) === "question" ? "value=" + slideData.correctAnswer : ""} />
             </label>
             <label>Enter the wrong answer
-                <input type="text" name="question[${index}][wrongAnswer1]" required ${(slideData === null || slideData === void 0 ? void 0 : slideData.type) === "question" ? "value=" + slideData.wrongAnswer1 : ""} />
+                <input type="text" name="question[${index}][wronganswer1]" required ${(slideData === null || slideData === void 0 ? void 0 : slideData.type) === "question" ? "value=" + slideData.wrongAnswer1 : ""} />
             </label>
             <label>Enter the wrong answer (Optional)
-                <input type="text" name="question[${index}][wrongAnswer2]" ${(slideData === null || slideData === void 0 ? void 0 : slideData.type) === "question" && slideData.wrongAnswer2
+                <input type="text" name="question[${index}][wronganswer2]" ${(slideData === null || slideData === void 0 ? void 0 : slideData.type) === "question" && slideData.wrongAnswer2
                     ? "value=" + slideData.wrongAnswer2
                     : ""} />
             </label>
             <label>Enter the wrong answer (Optional)
-                <input type="text" name="question[${index}][wrongAnswer3]" ${(slideData === null || slideData === void 0 ? void 0 : slideData.type) === "question" && slideData.wrongAnswer3
+                <input type="text" name="question[${index}][wronganswer3]" ${(slideData === null || slideData === void 0 ? void 0 : slideData.type) === "question" && slideData.wrongAnswer3
                     ? "value=" + slideData.wrongAnswer3
                     : ""} />
             </label>
@@ -138,9 +138,6 @@ class LessonCreater extends HTMLElement {
             path.setAttribute("d", `${buttonType === "up" ? "M7.5 3L15 11H0L7.5 3Z" : "M7.49988 12L-0.00012207 4L14.9999 4L7.49988 12Z"}`);
             path.setAttribute("fill", "#000000");
             svg.appendChild(path);
-            //   <svg width="30px" height="30px" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg">
-            //     <path d="M7.5 3L15 11H0L7.5 3Z" fill="#000000"/>
-            //   </svg>`;
             button.type = "button";
             button.addEventListener("click", this.handleMoveFieldSet);
             return button;

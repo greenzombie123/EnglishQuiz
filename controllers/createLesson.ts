@@ -3,14 +3,16 @@ import { pool } from "../pool.ts";
 import type { QuestionSlideData } from "../components/QuestionSlide.ts";
 import type {IntroSlideData } from "../components/IntroSlide.ts";
 import { format } from "node-pg-format";
+import { createIntroSQLString, createQuestionSQLString } from "../querystrings.ts";
+import type { AddLessonBody, LessonIdParams } from "../shared.types.ts";
 
 export const getCreateLessonPage = (
-  req: Request,
+  req: Request<LessonIdParams>,
   res: Response,
   next: NextFunction
 ) => {
   if (!req.user) return res.redirect("/");
-  const { lessonId } = req.params as { lessonId: string };
+  const { lessonId } = req.params //as { lessonId: string };
   res.locals.lessonId = lessonId || ""
   res.render("createLesson");
 };
@@ -23,20 +25,20 @@ type IntroSlide = Omit<IntroSlideData, "type"> & {
   slideorder: number;
 };
 
+//TODO Validate the values of the body in the request for adding lessons
+
+export const validateAddLesson = (req:Request, res:Response, next:NextFunction)=>{
+
+}
+
 export const addLesson = async (
-  req: Request,
+  req: Request<{}, {}, AddLessonBody>,
   res: Response,
   next: NextFunction
 ) => {
   if (!req.user) return res.redirect("/");
   const { username: teacherName } = req.user as { username: string };
-  const { question, intro, lessonName, groupname, lessonId } = req.body as {
-    question: QuestionSlide[] | undefined;
-    intro: IntroSlide[] | undefined;
-    lessonName: string;
-    groupname: string;
-    lessonId:string
-  };
+  const { question, intro, lessonName, groupname, lessonId } = req.body
 
 
   const introString = createIntroSQLString(intro);
@@ -52,53 +54,6 @@ export const addLesson = async (
   );
 
   res.redirect("/lessons");
-};
-
-// Create a query string
-const createIntroSQLString = (slides: IntroSlide[] | undefined) => {
-  if (!slides) return "";
-
-  const introSlides = slides.map((slide) => [
-    slide.targetWord,
-    slide.definition,
-    slide.slideorder,
-  ]);
-
-  const introColumns = ["targetword", "definition", "slideorder"];
-
-  return format(
-    "INSERT INTO introslides (%I) VALUES %L RETURNING id",
-    introColumns,
-    introSlides
-  );
-};
-
-const createQuestionSQLString = (slides: QuestionSlide[] | undefined) => {
-  if (!slides) return "";
-
-  const questionslides = slides.map((slide) => [
-    slide.question,
-    slide.correctAnswer,
-    slide.wrongAnswer1,
-    slide.wrongAnswer2,
-    slide.wrongAnswer3,
-    slide.slideorder,
-  ]);
-
-  const questionColumns = [
-    "question",
-    "correctanswer",
-    "wronganswer1",
-    "wronganswer2",
-    "wronganswer3",
-    "slideorder",
-  ];
-
-  return format(
-    "INSERT INTO questionslides (%I) VALUES %L RETURNING id",
-    questionColumns,
-    questionslides
-  );
 };
 
 // Extract id values from each row in the rows prop. Used for bridging tables
