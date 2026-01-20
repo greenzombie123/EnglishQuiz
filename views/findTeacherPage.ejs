@@ -11,7 +11,7 @@
         <% if (!isTeacherFound) { %>
             <form action="/findTeacher" method="post" class="findTeacher">
                 <label for="username">Enter your teacher's username</label>
-                <input type="text" id="username" name="username">
+                <input type="text" id="username" name="teacher">
                 <% if (username) { %>
                 <p>Couldn't find <%= username %>.</p>
                 <%}%>

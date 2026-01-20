@@ -44,16 +44,23 @@ export interface AddLessonBody {
   lessonId: string;
 }
 
+
 export interface LessonIdParams {
     lessonId:string
+}
+
+export interface AddStudentToTeacherBody {
+    teacher:string
+}
+
+export interface AuthenticatedUser {
+    
 }
 
 // declare global {
 //     namespace Express {
 //         interface Request {
-//             body:{
-//                 question:
-//             }
+//             user:string
 //         }
 //     }
 // }

@@ -3,6 +3,7 @@ import { pool } from "../pool.ts";
 import type { IntroSlideData } from "../components/IntroSlide.ts";
 import type { QuestionSlideData } from "../components/QuestionSlide.ts";
 import { format } from "node-pg-format";
+import type { LessonIdParams } from "../shared.types.ts";
 
 
 type LessonInfo = {
@@ -30,11 +31,11 @@ type LessonSlide = {
 };
 
 export const fetchLessonSlides = async (
-  req: Request,
+  req: Request<LessonIdParams>,
   res: Response,
   next: NextFunction
 ) => {
-  const { lessonId } = req.params as { lessonId: string };
+  const { lessonId } = req.params 
   const { rows: lessonslides } = await pool.query<LessonSlide>(queryLessonSlideString,[lessonId]);
   const {rows} = await pool.query<{name:string, groupname:string}>("SELECT name, groupname FROM lessons WHERE id=$1", [lessonId])
   const slides = transformLessonSlide(lessonslides);

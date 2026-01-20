@@ -50,3 +50,53 @@ export const createQuestionSQLString = (slides: QuestionSlideRecord[] | undefine
     questionslides
   );
 };
+
+export const queryIntroSlideRecords = `
+    SELECT targetword, definition, slideorder, type FROM introslides
+    INNER JOIN lessons_introslides
+    ON lessons_introslides.introslideid = introslides.id
+    WHERE lessons_introslides.lessonid = $1
+`
+
+export const queryQuestionSlideRecords = `
+    SELECT question, correctanswer,  wronganswer1, wronganswer2, wronganswer3, slideorder, type FROM questionslides 
+    INNER JOIN lessons_questionslides 
+    ON lessons_questionslides.questionslideid = questionslides.id
+    WHERE lessons_questionslides.lessonid = $1
+    ORDER BY slideorder;
+`
+
+const queryLessonSlideString = `
+SELECT 
+targetword, 
+definition, 
+NULL AS question, 
+NULL AS correctanswer, 
+NULL AS wronganswer1, 
+NULL AS wronganswer2,
+NULL AS wronganswer3,
+slideorder,
+type
+FROM introslides 
+INNER JOIN lessons_introslides 
+ON lessons_introslides.introslideid = introslides.id
+WHERE lessons_introslides.lessonid = $1
+
+UNION
+
+SELECT 
+NULL AS targetword, 
+NULL AS definition, 
+question, 
+correctanswer, 
+wronganswer1, 
+wronganswer2,
+wronganswer3,
+slideorder,
+type
+FROM questionslides 
+INNER JOIN lessons_questionslides 
+ON lessons_questionslides.questionslideid = questionslides.id
+WHERE lessons_questionslides.lessonid = $1
+ORDER BY slideorder;
+`;

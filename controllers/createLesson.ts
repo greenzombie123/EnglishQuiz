@@ -12,24 +12,14 @@ export const getCreateLessonPage = (
   next: NextFunction
 ) => {
   if (!req.user) return res.redirect("/");
-  const { lessonId } = req.params //as { lessonId: string };
+  const { lessonId } = req.params 
   res.locals.lessonId = lessonId || ""
   res.render("createLesson");
 };
 
-type QuestionSlide = Omit<QuestionSlideData, "type"> & {
-  slideorder: number;
-};
-
-type IntroSlide = Omit<IntroSlideData, "type"> & {
-  slideorder: number;
-};
-
 //TODO Validate the values of the body in the request for adding lessons
 
-export const validateAddLesson = (req:Request, res:Response, next:NextFunction)=>{
-
-}
+export const validateAddLesson = (req:Request, res:Response, next:NextFunction)=>{}
 
 export const addLesson = async (
   req: Request<{}, {}, AddLessonBody>,
@@ -37,7 +27,7 @@ export const addLesson = async (
   next: NextFunction
 ) => {
   if (!req.user) return res.redirect("/");
-  const { username: teacherName } = req.user as { username: string };
+  const { username: teacherName } = req.user //as { username: string };
   const { question, intro, lessonName, groupname, lessonId } = req.body
 
 
