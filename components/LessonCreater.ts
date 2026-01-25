@@ -1,13 +1,12 @@
+import { IntroSlideRecord, QuestionSlideRecord, SlideRecord } from "../shared.types.ts";
 import "./FieldSet.ts";
 import "./GroupNameSelector.ts";
 import { GroupNameSelector } from "./GroupNameSelector.ts";
-import type { IntroSlideData } from "./IntroSlide.ts";
-import type { QuestionSlideData } from "./QuestionSlide.ts";
 
 export type LessonInfo = {
   name: string;
   groupname: string;
-  slides: (IntroSlideData | QuestionSlideData)[];
+  slides: (IntroSlideRecord | QuestionSlideRecord)[];
 };
 
 class LessonCreater extends HTMLElement {
@@ -87,7 +86,7 @@ class LessonCreater extends HTMLElement {
   createFieldSet = (
     index: number,
     fieldSetType: string,
-    slideData?: IntroSlideData | QuestionSlideData
+    slideData?:SlideRecord
   ) => {
     const fieldSet = document.createElement("div") as HTMLDivElement;
     if (fieldSetType === "intro") {
@@ -96,14 +95,14 @@ class LessonCreater extends HTMLElement {
             <fieldset>
             <legend>Introduction</legend>
             <label>Enter the target word
-                <input type="text" name="intro[${index}][targetword]" required ${slideData?.type === "intro" ? "value=" + slideData.targetWord : ""
+                <input type="text" name="intro[${index}][targetword]" required ${slideData?.type === "intro" ? "value=" + slideData.targetword : ""
         } />
             </label>
             <label>Enter definition of target word
                 <input type="text" name="intro[${index}][definition]" required ${slideData?.type === "intro" ? "value=" + slideData.definition : ""
         } />
             </label>
-            <input type="hidden" name="intro[${index}][slideorder]" id="slideOrderInput" ${slideData?.type === "intro" ? "value=" + slideData.sliderOrder : ""
+            <input type="hidden" name="intro[${index}][slideorder]" id="slideOrderInput" ${slideData?.type === "intro" ? "value=" + slideData.slideorder : ""
         } />
         </fieldset>
         <div class="fieldSetButtons">
@@ -121,26 +120,26 @@ class LessonCreater extends HTMLElement {
         } />
             </label>
             <label>Enter the correct answer
-                <input type="text" name="question[${index}][correctanswer]" required  ${slideData?.type === "question" ? "value=" + slideData.correctAnswer : ""
+                <input type="text" name="question[${index}][correctanswer]" required  ${slideData?.type === "question" ? "value=" + slideData.correctanswer : ""
         } />
             </label>
             <label>Enter the wrong answer
-                <input type="text" name="question[${index}][wronganswer1]" required ${slideData?.type === "question" ? "value=" + slideData.wrongAnswer1 : ""
+                <input type="text" name="question[${index}][wronganswer1]" required ${slideData?.type === "question" ? "value=" + slideData.wronganswer1 : ""
         } />
             </label>
             <label>Enter the wrong answer (Optional)
-                <input type="text" name="question[${index}][wronganswer2]" ${slideData?.type === "question" && slideData.wrongAnswer2
-          ? "value=" + slideData.wrongAnswer2
+                <input type="text" name="question[${index}][wronganswer2]" ${slideData?.type === "question" && slideData.wronganswer2
+          ? "value=" + slideData.wronganswer2
           : ""
         } />
             </label>
             <label>Enter the wrong answer (Optional)
-                <input type="text" name="question[${index}][wronganswer3]" ${slideData?.type === "question" && slideData.wrongAnswer3
-          ? "value=" + slideData.wrongAnswer3
+                <input type="text" name="question[${index}][wronganswer3]" ${slideData?.type === "question" && slideData.wronganswer3
+          ? "value=" + slideData.wronganswer3
           : ""
         } />
             </label>
-            <input type="hidden" name="question[${index}][slideorder]" id="slideOrderInput" ${slideData?.type === "question" ? "value=" + slideData.sliderOrder : ""
+            <input type="hidden" name="question[${index}][slideorder]" id="slideOrderInput" ${slideData?.type === "question" ? "value=" + slideData.slideorder : ""
         } />
         </fieldset>
         <div class="fieldSetButtons">

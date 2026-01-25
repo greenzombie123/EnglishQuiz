@@ -53,22 +53,11 @@ export interface AddStudentToTeacherBody {
     teacher:string
 }
 
-export interface AuthenticatedUser {
-    
-}
+export type LessonData = {
+  name: string;
+  groupname: string;
+  slides:SlideRecord[]
+};
 
-// declare global {
-//     namespace Express {
-//         interface Request {
-//             user:string
-//         }
-//     }
-// }
+export type LessonSlideData = Record<SlideRecord["type"], SlideRecord[] | []>
 
-// req.body as {
-//     question: QuestionSlide[] | undefined;
-//     intro: IntroSlide[] | undefined;
-//     lessonName: string;
-//     groupname: string;
-//     lessonId:string
-//   };

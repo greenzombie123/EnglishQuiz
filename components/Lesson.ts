@@ -1,15 +1,14 @@
 import "./IntroSlide.ts";
-import type { IntroSlide, IntroSlideData } from "./IntroSlide.ts";
+import type { IntroSlide } from "./IntroSlide.ts";
 import "./QuestionSlide.ts";
 import "./EndSlide.ts";
-import type { QuestionSlide, QuestionSlideData } from "./QuestionSlide.ts";
-import type { Slide } from "./SlideState.ts";
+import type { QuestionSlide } from "./QuestionSlide.ts";
 import { slideState, type SlideState } from "./SlideState.ts";
+import type { IntroSlideRecord, QuestionSlideRecord, SlideRecord } from "../shared.types.ts";
 
 export type Lesson = {
   id: number;
   name: string;
-  slides: Slide[];
 };
 
 export type LessonData = {};
@@ -46,7 +45,7 @@ export class LessonSlider extends HTMLElement {
 
   disconnectedCallback() {}
 
-  setSlides(slides: Slide[]): void {
+  setSlides(slides: SlideRecord[]): void {
     this.slideState.setSlides(slides);
   }
 
@@ -59,14 +58,14 @@ export class LessonSlider extends HTMLElement {
     else return this.createQuestionSlide(currentSlide);
   };
 
-  createIntroSlide = (introSlideData: IntroSlideData) => {
+  createIntroSlide = (introSlideData: IntroSlideRecord) => {
     const slide = document.createElement(`intro-slide`) as IntroSlide;
     const isFirstSlide = this.slideState.isFirstSlide();
     slide.setData(introSlideData, isFirstSlide);
     return slide;
   };
 
-  createQuestionSlide = (questionSlideData: QuestionSlideData) => {
+  createQuestionSlide = (questionSlideData: QuestionSlideRecord) => {
     const slide = document.createElement(`question-slide`) as QuestionSlide;
     slide.setData(questionSlideData);
     return slide;

@@ -1,50 +1,47 @@
 import type { Request, Response, NextFunction } from "express";
 import { pool } from "../pool.ts";
-import type { IntroSlideData } from "../components/IntroSlide.ts";
-import type { QuestionSlideData } from "../components/QuestionSlide.ts";
 import { format } from "node-pg-format";
-import type { LessonIdParams } from "../shared.types.ts";
-
-
-type LessonInfo = {
-  name:string,
-  groupname:string,
-  slides:(IntroSlideData|QuestionSlideData)[]
-} 
-
-type LessonData = {
-  name: string;
-  id: number;
-  groupname: string;
-};
-
-type LessonSlide = {
-  targetword: string | null;
-  definition: string | null;
-  question: string | null;
-  correctanswer: string | null;
-  wronganswer1: string | null;
-  wronganswer2: string | null;
-  wronganswer3: string | null;
-  slideorder: number;
-  type: string;
-};
+import type {
+  IntroSlideRecord,
+  LessonData,
+  LessonIdParams,
+  LessonSlideData,
+  QuestionSlideRecord,
+  SlideRecord,
+} from "../shared.types.ts";
 
 export const fetchLessonSlides = async (
   req: Request<LessonIdParams>,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
-  const { lessonId } = req.params 
-  const { rows: lessonslides } = await pool.query<LessonSlide>(queryLessonSlideString,[lessonId]);
-  const {rows} = await pool.query<{name:string, groupname:string}>("SELECT name, groupname FROM lessons WHERE id=$1", [lessonId])
-  const slides = transformLessonSlide(lessonslides);
-  const lesson = {
-    name:rows[0]?.name,
-    groupname:rows[0]?.groupname,
-    slides
-  } as LessonInfo
-  res.send(lesson);
+
+  try {
+    const { lessonId } = req.params;
+
+    const { rows } = await pool.query<{ name: string; groupname: string }>(
+    "SELECT name, groupname FROM lessons WHERE id=$1",
+    [lessonId],
+    );
+
+    if(!rows[0]) throw Error("Lesson doesn't exist")
+
+    // Grab all types of slides for the requested lesson
+    const lessonSlideData:LessonSlideData = await getLessonSlideData(lessonId)
+
+    const sortedSlides = sortSlides(lessonSlideData)
+
+    const lesson:LessonData = {
+      name:rows[0].name,
+      groupname:rows[0].groupname,
+      slides:sortedSlides
+    }
+
+    res.send(lesson);
+
+  } catch (error) {
+    res.send(error)
+  }
 };
 const queryLessonSlideString = `
 SELECT 
@@ -81,33 +78,66 @@ WHERE lessons_questionslides.lessonid = $1
 ORDER BY slideorder;
 `;
 
-const transformLessonSlide = (slides: LessonSlide[]) => {
-  const newSlides = slides.map<IntroSlideData | QuestionSlideData>((slide) => {
-    if (slide.type === "intro") {
-      return {
-        targetWord: slide.targetword as string,
-        definition: slide.definition as string,
-        type: "intro",
-        sliderOrder:slide.slideorder
-      };
-    } else
-      return {
-        question: slide.question as string,
-        correctAnswer: slide.correctanswer as string,
-        wrongAnswer1: slide.wronganswer1 as string,
-        wrongAnswer2: slide.wronganswer2 as string,
-        wrongAnswer3: slide.wronganswer3 as string,
-        type: "question",
-        sliderOrder:slide.slideorder
-      };
-  });
-  return newSlides;
+// Return slides for a lesson. TypeScript will complain if new slide types are added but not implemented
+const getLessonSlideData = async (lessonId:string): Promise<LessonSlideData> => {
+  return {
+    intro: await getIntroSlides(lessonId),
+    question: await getQuestionSlides(lessonId)
+  }
+};
+
+const getIntroSlides = async (lessonId:string): Promise<IntroSlideRecord[] | []> => {
+  const { rows } = await pool.query<IntroSlideRecord>(`
+    SELECT 
+    targetword, 
+    definition,
+    slideorder,
+    type
+    FROM introslides
+    INNER JOIN lessons_introslides 
+    ON lessons_introslides.introslideid = introslides.id
+    WHERE lessons_introslides.lessonid = $1
+    `, [lessonId]);
+  return rows.length ? rows : [];
+};
+
+const getQuestionSlides = async (lessonId:string): Promise<QuestionSlideRecord[] | []> => {
+  const { rows } = await pool.query<QuestionSlideRecord>(`
+    SELECT 
+    question, 
+    correctanswer, 
+    wronganswer1, 
+    wronganswer2,
+    wronganswer3,
+    slideorder,
+    type
+    FROM questionslides
+    INNER JOIN lessons_questionslides
+    ON lessons_questionslides.lessonid = questionslides.id
+    WHERE lessons_questionslides.lessonid = $1
+    `, [lessonId]);
+  return rows.length ? rows : [];
+};
+
+// Spread all slide arrays into one
+const sortSlides = (lessonSlideData: LessonSlideData) => {
+
+  let slides:SlideRecord[] = []
+  let keys:keyof LessonSlideData
+
+  for (keys in lessonSlideData) {
+    slides = [...slides, ...lessonSlideData[keys]]
+  }
+
+  return slides.sort(
+    (currentSlide, nextSlide) => currentSlide.slideorder - nextSlide.slideorder,
+  );
 };
 
 export const getLessonPage = (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   const { lessonId } = req.params as { lessonId: string };
   res.locals.lessonId = parseInt(lessonId);
@@ -118,7 +148,7 @@ export const getLessonPage = (
 export const getDashBoard = async (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   if (!req.user) return res.redirect("/");
   const { username, userType } = req.user;
@@ -129,6 +159,7 @@ export const getDashBoard = async (
   res.render("dashboard");
 };
 
+// TODO Make change
 const getLessons = async (userType: string, userName: string) => {
   const queryString = getQueryString(userType);
 
@@ -216,23 +247,10 @@ ORDER BY slideorder;
 export const deleteLesson = async (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   const { lessonId } = req.params as { lessonId: string };
   const queryString = format("DELETE FROM lessons WHERE id = %L", lessonId);
   await pool.query(queryString);
   res.send("The lesson was deleted.");
-};
-
-export const getEditLessonPage = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  const { lessonId } = req.params as { lessonId: string };
-  const { rows: lessonslides } = await pool.query<LessonSlide>(
-    queryLessonSlideString,
-    [lessonId]
-  );
-  const slides = transformLessonSlide(lessonslides);
 };

@@ -1,19 +1,16 @@
-import type { IntroSlideData } from "./IntroSlide.ts";
-import type { QuestionSlideData } from "./QuestionSlide.ts";
-
-export type Slide = IntroSlideData | QuestionSlideData;
+import type { SlideRecord } from "../shared.types.ts";
 
 export type SlideState = {
   changeSlide(nextIndex: number): void;
-  setSlides(slides: Slide[]): void;
-  getCurrentSlide(): Slide;
+  setSlides(slides: SlideRecord[]): void;
+  getCurrentSlide(): SlideRecord;
   isLastSlide(): boolean;
   getCurrentSlideIndex():number
   isFirstSlide():boolean
 };
 
 export const slideState = (): SlideState => {
-  let slides: Slide[];
+  let slides: SlideRecord[];
   let currentSlideIndex: number = 0;
 
   const isFirstSlide = ()=> currentSlideIndex === 0
@@ -25,7 +22,7 @@ export const slideState = (): SlideState => {
     if(currentSlideIndex < 0) currentSlideIndex = 0
   };
 
-  const setSlides = (newSlides: Slide[]) => {
+  const setSlides = (newSlides: SlideRecord[]) => {
     slides = newSlides;
   };
 

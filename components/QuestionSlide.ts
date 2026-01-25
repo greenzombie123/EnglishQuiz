@@ -1,13 +1,4 @@
-export type QuestionSlideData = {
-  // id: number;
-  type: "question";
-  question: string;
-  correctAnswer: string;
-  wrongAnswer1: string;
-  wrongAnswer2: string;
-  wrongAnswer3: string;
-  sliderOrder: number;
-};
+import type { QuestionSlideRecord } from "../shared.types.ts";
 
 export class QuestionSlide extends HTMLElement {
   question: string = "";
@@ -82,11 +73,11 @@ export class QuestionSlide extends HTMLElement {
 
   disconnectedCallback() {}
 
-  setData = (questionSlideData: QuestionSlideData) => {
-    this.correctAnswer = questionSlideData.correctAnswer;
-    this.wrongAnswer1 = questionSlideData.wrongAnswer1;
-    this.wrongAnswer2 = questionSlideData.wrongAnswer2;
-    this.wrongAnswer3 = questionSlideData.wrongAnswer3;
+  setData = (questionSlideData: QuestionSlideRecord) => {
+    this.correctAnswer = questionSlideData.correctanswer;
+    this.wrongAnswer1 = questionSlideData.wronganswer1;
+    this.wrongAnswer2 = questionSlideData.wronganswer2;
+    this.wrongAnswer3 = questionSlideData.wronganswer3;
     this.question = questionSlideData.question;
   };
 

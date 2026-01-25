@@ -36,8 +36,9 @@ server.use(express.json());
 // Also serve the ts files through the source maps for debugging
 
 server.use(express.static("views"));
+// For the generated source map files
 server.use("/components", express.static("components"));
-server.use("/lessons", express.static("public"));
+server.use("/lessons", express.static("public/components"));
 server.use(express.static("public"));
 
 server.use(

@@ -1,7 +1,5 @@
 import type { NextFunction, Request, Response } from "express";
 import { pool } from "../pool.ts";
-import type { QuestionSlideData } from "../components/QuestionSlide.ts";
-import type {IntroSlideData } from "../components/IntroSlide.ts";
 import { format } from "node-pg-format";
 import { createIntroSQLString, createQuestionSQLString } from "../querystrings.ts";
 import type { AddLessonBody, LessonIdParams } from "../shared.types.ts";

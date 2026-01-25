@@ -1,10 +1,4 @@
-export type IntroSlideData = {
-//   id: number;
-  type: "intro";
-  targetWord: string;
-  definition: string;
-  sliderOrder: number;
-};
+import type { IntroSlideRecord } from "../shared.types.ts";
 
 export class IntroSlide extends HTMLElement {
   targetWord = "";
@@ -76,8 +70,8 @@ export class IntroSlide extends HTMLElement {
 
   disconnectedCallback() {}
 
-  setData = (introSlideData: IntroSlideData, isFirstSlide: boolean) => {
-    this.targetWord = introSlideData.targetWord;
+  setData = (introSlideData: IntroSlideRecord, isFirstSlide: boolean) => {
+    this.targetWord = introSlideData.targetword;
     this.definition = introSlideData.definition;
     this.isFirstSlide = isFirstSlide;
   };
