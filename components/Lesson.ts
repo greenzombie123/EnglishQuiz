@@ -6,13 +6,6 @@ import type { QuestionSlide } from "./QuestionSlide.ts";
 import { slideState, type SlideState } from "./SlideState.ts";
 import type { IntroSlideRecord, QuestionSlideRecord, SlideRecord } from "../shared.types.ts";
 
-export type Lesson = {
-  id: number;
-  name: string;
-};
-
-export type LessonData = {};
-
 export class LessonSlider extends HTMLElement {
   slideState: SlideState;
   root: ShadowRoot | null = null;

@@ -1,7 +1,7 @@
 import type { NextFunction, Request, Response } from "express";
 import { body, validationResult } from "express-validator";
 import { pool } from "../pool.ts";
-import type { Teacher } from "../app.ts";
+import type { Teacher } from "../shared.types.ts"
 import type { AddStudentToTeacherBody } from "../shared.types.ts";
 
 

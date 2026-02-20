@@ -10,6 +10,7 @@ import { Strategy } from "passport-local";
 import logInRouter from "./routes/login.ts";
 import lessonsRouter from "./routes/lessons.ts";
 import findTeacherRouter from "./routes/findTeacher.ts";
+import type { Student, Teacher, User } from "./shared.types.ts";
 
 // Set up Pool to query Postgres through node
 export const pool = new Pool({
@@ -35,10 +36,17 @@ server.use(express.json());
 // First one create a vitual path that will point to the directory.
 // Also serve the ts files through the source maps for debugging
 
+// For html ejs files
 server.use(express.static("views"));
 // For the generated source map files
 server.use("/components", express.static("components"));
+// For lesson page
 server.use("/lessons", express.static("public/components"));
+
+// For Lesson Creator Page
+server.use(express.static("public/components"));
+
+// For everything in the public folder
 server.use(express.static("public"));
 
 server.use(
@@ -55,20 +63,6 @@ server.use(session({ secret: process.env.SECRET! }));
 
 // Allows you to authenticate a session wheneve a request comes in
 server.use(passport.session());
-
-// Type for Students and Teachers
-export type User = {
-  username: string;
-  password: string;
-};
-
-export type Teacher = User & {
-  userType: "teacher";
-};
-
-export type Student = User & {
-  userType: "student";
-};
 
 //Configure the strategy in how passport verifies and authenticate the user
 const strategy = new Strategy(async function verify(username, password, done) {

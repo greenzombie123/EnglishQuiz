@@ -28,19 +28,30 @@
 
                 padding: 20px;
 
-                .lessonNameLabel {
+                .top {
                     display: flex;
-                    flex-direction: column;
-                    width: 450px;
-                    font-size: var(--fontSize);
-                    gap: 10px;
-                    margin-bottom: 10px;
+                    flex-direction: row;
+                    justify-content: space-between;
+                    padding-bottom: 20px;
 
-                    input {
-                        font-size: var(--fontSize);
-                        padding: var(--inputPadding);
+                    .nameContainer {
+
+                        .lessonNameLabel {
+                            display: flex;
+                            flex-direction: column;
+                            width: 450px;
+                            font-size: var(--fontSize);
+                            gap: 10px;
+                            margin-bottom: 10px;
+
+                            input {
+                                font-size: var(--fontSize);
+                                padding: var(--inputPadding);
+                            }
+                        }
                     }
                 }
+
 
                 .slideSelecter {
                     display: flex;
@@ -104,7 +115,7 @@
                         flex-direction: column;
                         gap: 15px;
 
-                        .deleteFieldSet{
+                        .deleteFieldSet {
                             margin-bottom: auto;
                         }
 
@@ -122,26 +133,29 @@
                     }
                 }
 
-                .submit{
+                .submit {
                     font-size: 1.1rem;
                 }
             }
 
-            @media screen and (width <= 600px) {
-                form{
+            @media screen and (width <=600px) {
+                form {
                     --fontSize: 1rem;
                     --inputPadding: 5px;
-                    --inputWidth:100%;
+                    --inputWidth: 100%;
 
-                    label, input{
+                    label,
+                    input {
                         font-size: var(--fontSize);
                     }
 
-                    .lessonNameLabel, groupname-selecter, .slide-fieldSet{
+                    .lessonNameLabel,
+                    groupname-selecter,
+                    .slide-fieldSet {
                         width: var(--inputWidth);
                     }
 
-                    groupname-selecter{
+                    groupname-selecter {
                         font-size: var(--fontSize);
                     }
                 }
@@ -151,13 +165,22 @@
         <h1>Create Your Lesson</h1>
         <form action="/lessons/createlesson" method="post">
 
-            <label for="lessonName" class="lessonNameLabel">
-                Write the name of your lesson.
-                <input type="text" id="lessonName" placeholder="Lesson Name" name="lessonName" required>
-                <input type="hidden" name="lessonId" value=<%=lessonId %> >
-            </label>
+            <div class="top">
+                <div class="nameContainer">
 
-            <groupname-selecter name="groupname" class="x"></groupname-selecter>
+                    <label for="lessonName" class="lessonNameLabel">
+                        Write the name of your lesson.
+                        <input type="text" id="lessonName" placeholder="Lesson Name" name="lessonName" required>
+                        <input type="hidden" name="lessonId" value=<%=lessonId %> >
+                    </label>
+
+                    <groupname-selecter name="groupname" class="x"></groupname-selecter>
+
+                </div>
+
+                <audio-input></audio-input>
+
+            </div>
 
             <div class="breakLine" style="width: 100%; border: 2px solid black;"></div>
 
@@ -183,7 +206,6 @@
                 flex-direction: column;
                 width: 450px;
                 gap: 10px;
-                padding-bottom: 20px;
 
                 label {
                     display: flex;
@@ -205,6 +227,65 @@
         <select name="oldgroupname" id="groupNames">
             <option value="" selected>Choose a group name</option>
         </select>
+    </template>
+
+    <template id="audio-input">
+        <style>
+            * {
+                box-sizing: border-box;
+            }
+
+            :host {
+                border: black 1px solid;
+                padding: 10px;
+
+                .buttons {
+                    display: flex;
+                    gap: 20px;
+
+                    button{
+                        background-image: url("/stop-button.png");
+                        background-size: 90%;
+                        background-repeat: no-repeat;
+                        background-position: center;
+                        background-color: white;
+                    }
+
+                    label{
+                        background-image: url("/upload-big-arrow.png");
+                        background-size: 90%;
+                        background-repeat: no-repeat;
+                        background-position: center;
+                    }
+
+                    button,
+                    label {
+                        border-radius: 4px;
+                        height: 30px;
+                        width: 30px;
+                        padding: 0;
+                        margin: 0;
+                        appearance: none;
+                        border: black solid 1px;
+                        cursor: pointer;
+                    }
+
+                    input#audio_file_input {
+                        display: none;
+                    }
+                }
+
+            }
+        </style>
+        <p>Add an audio file or record a new one.</p>
+        <div class="buttons">
+            <button id="audio_recorder_button" type="button"></button>
+            <label id="audio_file_input_button" for="audio_file_input">
+                <input type="file" name="audio" id="audio_file_input">
+            </label>
+        </div>
+
+        <p>No Files Added</p>
     </template>
 </body>
 

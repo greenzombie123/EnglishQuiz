@@ -1,18 +1,17 @@
-type BaseUser = {
+// Type for Students and Teachers
+export type User = {
   username: string;
   password: string;
-  id: string;
 };
 
-type Student = BaseUser & {
-  type: "student";
+export type Teacher = User & {
+  userType: "teacher";
 };
 
-type Teacher = BaseUser & {
-  type: "teacher";
+export type Student = User & {
+  userType: "student";
 };
 
-export type User = Student | Teacher;
 
 type BaseSlideRecord = {
   // soundurl:string,
@@ -60,4 +59,6 @@ export type LessonData = {
 };
 
 export type LessonSlideData = Record<SlideRecord["type"], SlideRecord[] | []>
+
+export type createBucketURL = (key:string, teacherId:string, lessonId:string)=>string
 

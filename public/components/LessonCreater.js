@@ -6,6 +6,7 @@ var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (
 var _LessonCreater_getLessonSlides, _LessonCreater_fillFieldSets;
 import "./FieldSet.js";
 import "./GroupNameSelector.js";
+import "./audio/AudioInput.js";
 class LessonCreater extends HTMLElement {
     constructor() {
         super();

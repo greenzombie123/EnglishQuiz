@@ -1,15 +1,13 @@
-type BaseUser = {
+export type User = {
     username: string;
     password: string;
-    id: string;
 };
-type Student = BaseUser & {
-    type: "student";
+export type Teacher = User & {
+    userType: "teacher";
 };
-type Teacher = BaseUser & {
-    type: "teacher";
+export type Student = User & {
+    userType: "student";
 };
-export type User = Student | Teacher;
 type BaseSlideRecord = {
     slideorder: number;
 };
@@ -46,5 +44,6 @@ export type LessonData = {
     slides: SlideRecord[];
 };
 export type LessonSlideData = Record<SlideRecord["type"], SlideRecord[] | []>;
+export type createBucketURL = (key: string, teacherId: string, lessonId: string) => string;
 export {};
 //# sourceMappingURL=shared.types.d.ts.map

@@ -2,6 +2,7 @@ import { IntroSlideRecord, QuestionSlideRecord, SlideRecord } from "../shared.ty
 import "./FieldSet.ts";
 import "./GroupNameSelector.ts";
 import { GroupNameSelector } from "./GroupNameSelector.ts";
+import "./audio/AudioInput.ts";
 
 export type LessonInfo = {
   name: string;
