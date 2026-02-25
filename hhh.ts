@@ -1,16 +1,7 @@
-// const f = {a:1}
-// const g = new Proxy(f, {
-//   get:(target, prop, value)=>{
-//     return "hello"
-//   }
-// })
+const p = {a:2}
+const j = {a:10}
+const g = p
 
-// const h = ({a})=>console.log(a)
-
-// h(g)
-
-// const ha = (...a:number[])=>{
-//   console.log(...a)
-// }
-
-// ha(1,23)
+if(p === g){
+    console.log(122)
+}

@@ -14,7 +14,13 @@ export default class Store <IState = Record<string, unknown>>  {
   }
 
   setState(name:keyof IState, value: IState[keyof IState]) {
+
     this.state[name] = value
+
+    if(!this.events.has(`${String(name)}Changed`)) this.events.set(`${String(name)}Changed`, [])
+    
+    this.events.get(`${String(name)}Changed`)?.forEach(subscriber=>subscriber(this.state))
+
     this.events.get("stateChanged")?.forEach(subscriber=>subscriber(this.state))
   }
 

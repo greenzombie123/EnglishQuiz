@@ -1,8 +1,13 @@
-import { IntroSlideRecord, QuestionSlideRecord, SlideRecord } from "../shared.types.ts";
+import {
+  IntroSlideRecord,
+  QuestionSlideRecord,
+  SlideRecord,
+} from "../shared.types.ts";
 import "./FieldSet.ts";
 import "./GroupNameSelector.ts";
 import { GroupNameSelector } from "./GroupNameSelector.ts";
 import "./audio/AudioInput.ts";
+import { lesssonCreaterStore } from "./store/LessonCreaterStore.ts";
 
 export type LessonInfo = {
   name: string;
@@ -14,35 +19,42 @@ class LessonCreater extends HTMLElement {
   root;
   slideIndex = 0;
   lessonId: string | null = null;
+  private store;
   static observedAttributes = ["data-lessonid"];
 
   constructor() {
     super();
     this.root = this.attachShadow({ mode: "closed" });
     const template = document.getElementById(
-      "lesson-creater"
+      "lesson-creater",
     ) as HTMLTemplateElement;
 
     this.root.appendChild(template.content.cloneNode(true));
 
     const selecterButton = this.root.getElementById(
-      "slide-selecterButton"
+      "slide-selecterButton",
     ) as HTMLButtonElement;
 
     selecterButton.addEventListener("click", this.handleSelecterButtonClicked);
+
+    this.store = lesssonCreaterStore;
+
+    // Subscribe to store events
+    this.store.subscribe("audioFilesChanged", this.handleSoundFilesChange);
   }
 
-  connectedCallback() { }
+  connectedCallback() {}
 
   async attributeChangedCallback(
     name: string,
     oldValue: string,
-    newValue: string
+    newValue: string,
   ) {
     if (name === "data-lessonid" && newValue) {
       this.lessonId = newValue;
       const lesson = await this.#getLessonSlides(this.lessonId);
       this.#fillFieldSets(lesson);
+      //TODO Check to see if there are any audio files
       return;
     }
     console.log("nothing!");
@@ -56,7 +68,7 @@ class LessonCreater extends HTMLElement {
   handleSelecterButtonClicked = (e: Event) => {
     // Search for node with the specified css selecter by tranversing the element and its parents
     const isSelecterButton = (e.currentTarget as HTMLButtonElement).closest(
-      "#slide-selecterButton"
+      "#slide-selecterButton",
     );
     if (!isSelecterButton) return;
     const slideValue = this.getSlideValue();
@@ -71,7 +83,7 @@ class LessonCreater extends HTMLElement {
   // Get value from the select in the slide selecter
   getSlideValue = () => {
     const select = this.root.getElementById(
-      "slideSelecter"
+      "slideSelecter",
     ) as HTMLSelectElement;
     return select.value;
   };
@@ -79,7 +91,7 @@ class LessonCreater extends HTMLElement {
   // Place new fieldset just before the slide selecter
   insertNewFieldSet = (fieldSet: HTMLElement) => {
     const slideSelecter = this.root.querySelector(
-      ".slideSelecter"
+      ".slideSelecter",
     ) as HTMLElement;
     slideSelecter.before(fieldSet);
   };
@@ -87,7 +99,7 @@ class LessonCreater extends HTMLElement {
   createFieldSet = (
     index: number,
     fieldSetType: string,
-    slideData?:SlideRecord
+    slideData?: SlideRecord,
   ) => {
     const fieldSet = document.createElement("div") as HTMLDivElement;
     if (fieldSetType === "intro") {
@@ -96,15 +108,22 @@ class LessonCreater extends HTMLElement {
             <fieldset>
             <legend>Introduction</legend>
             <label>Enter the target word
-                <input type="text" name="intro[${index}][targetword]" required ${slideData?.type === "intro" ? "value=" + slideData.targetword : ""
-        } />
+                <input type="text" name="intro[${index}][targetword]" required ${
+                  slideData?.type === "intro"
+                    ? "value=" + slideData.targetword
+                    : ""
+                } />
             </label>
             <label>Enter definition of target word
-                <input type="text" name="intro[${index}][definition]" required ${slideData?.type === "intro" ? "value=" + slideData.definition : ""
-        } />
+                <input type="text" name="intro[${index}][definition]" required ${
+                  slideData?.type === "intro"
+                    ? "value=" + slideData.definition
+                    : ""
+                } />
             </label>
-            <input type="hidden" name="intro[${index}][slideorder]" id="slideOrderInput" ${slideData?.type === "intro" ? "value=" + slideData.slideorder : ""
-        } />
+            <input type="hidden" name="intro[${index}][slideorder]" id="slideOrderInput" ${
+              slideData?.type === "intro" ? "value=" + slideData.slideorder : ""
+            } />
         </fieldset>
         <div class="fieldSetButtons">
             <button class="deleteFieldSet" type="button">X</button>
@@ -117,31 +136,45 @@ class LessonCreater extends HTMLElement {
              <fieldset class="question">
             <legend>Question</legend>
             <label>Enter question
-                <input type="text" name="question[${index}][question]" required ${slideData?.type === "question" ? "value=" + slideData.question : ""
-        } />
+                <input type="text" name="question[${index}][question]" required ${
+                  slideData?.type === "question"
+                    ? "value=" + slideData.question
+                    : ""
+                } />
             </label>
             <label>Enter the correct answer
-                <input type="text" name="question[${index}][correctanswer]" required  ${slideData?.type === "question" ? "value=" + slideData.correctanswer : ""
-        } />
+                <input type="text" name="question[${index}][correctanswer]" required  ${
+                  slideData?.type === "question"
+                    ? "value=" + slideData.correctanswer
+                    : ""
+                } />
             </label>
             <label>Enter the wrong answer
-                <input type="text" name="question[${index}][wronganswer1]" required ${slideData?.type === "question" ? "value=" + slideData.wronganswer1 : ""
-        } />
+                <input type="text" name="question[${index}][wronganswer1]" required ${
+                  slideData?.type === "question"
+                    ? "value=" + slideData.wronganswer1
+                    : ""
+                } />
             </label>
             <label>Enter the wrong answer (Optional)
-                <input type="text" name="question[${index}][wronganswer2]" ${slideData?.type === "question" && slideData.wronganswer2
-          ? "value=" + slideData.wronganswer2
-          : ""
-        } />
+                <input type="text" name="question[${index}][wronganswer2]" ${
+                  slideData?.type === "question" && slideData.wronganswer2
+                    ? "value=" + slideData.wronganswer2
+                    : ""
+                } />
             </label>
             <label>Enter the wrong answer (Optional)
-                <input type="text" name="question[${index}][wronganswer3]" ${slideData?.type === "question" && slideData.wronganswer3
-          ? "value=" + slideData.wronganswer3
-          : ""
-        } />
+                <input type="text" name="question[${index}][wronganswer3]" ${
+                  slideData?.type === "question" && slideData.wronganswer3
+                    ? "value=" + slideData.wronganswer3
+                    : ""
+                } />
             </label>
-            <input type="hidden" name="question[${index}][slideorder]" id="slideOrderInput" ${slideData?.type === "question" ? "value=" + slideData.slideorder : ""
-        } />
+            <input type="hidden" name="question[${index}][slideorder]" id="slideOrderInput" ${
+              slideData?.type === "question"
+                ? "value=" + slideData.slideorder
+                : ""
+            } />
         </fieldset>
         <div class="fieldSetButtons">
             <button class="deleteFieldSet" type="button">X</button>
@@ -163,7 +196,7 @@ class LessonCreater extends HTMLElement {
   // get all the fieldSetButtons divs from the fieldsets
   getAllFieldSetButtons = () => {
     return Array.from(
-      this.root.querySelectorAll(".fieldSetButtons")
+      this.root.querySelectorAll(".fieldSetButtons"),
     ) as HTMLDivElement[];
   };
 
@@ -189,17 +222,20 @@ class LessonCreater extends HTMLElement {
   createMoveButton = (buttonType: string) => {
     const button = document.createElement("button") as HTMLButtonElement;
     button.className = buttonType;
-    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg")
-    svg.setAttribute("width", "30px")
-    svg.setAttribute("height", "30px")
-    svg.setAttribute("viewBox", "0 0 15 15")
-    svg.setAttribute("fill", "none")
-    button.appendChild(svg)
-    const path = document.createElementNS("http://www.w3.org/2000/svg", "path")
-    path.setAttribute("d",  `${buttonType === "up" ? "M7.5 3L15 11H0L7.5 3Z" : "M7.49988 12L-0.00012207 4L14.9999 4L7.49988 12Z"}`)
-    path.setAttribute("fill", "#000000")
-    svg.appendChild(path)
-  
+    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    svg.setAttribute("width", "30px");
+    svg.setAttribute("height", "30px");
+    svg.setAttribute("viewBox", "0 0 15 15");
+    svg.setAttribute("fill", "none");
+    button.appendChild(svg);
+    const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+    path.setAttribute(
+      "d",
+      `${buttonType === "up" ? "M7.5 3L15 11H0L7.5 3Z" : "M7.49988 12L-0.00012207 4L14.9999 4L7.49988 12Z"}`,
+    );
+    path.setAttribute("fill", "#000000");
+    svg.appendChild(path);
+
     button.type = "button";
     button.addEventListener("click", this.handleMoveFieldSet);
     return button;
@@ -207,7 +243,7 @@ class LessonCreater extends HTMLElement {
 
   appendMoveButtons = (
     fieldSetButtons: HTMLDivElement,
-    moveButtons: HTMLButtonElement[]
+    moveButtons: HTMLButtonElement[],
   ) => {
     moveButtons.forEach((moveButton) => {
       fieldSetButtons.appendChild(moveButton);
@@ -223,7 +259,7 @@ class LessonCreater extends HTMLElement {
 
   handleAttachDeleteFieldSetHandler = (fieldSet: HTMLDivElement) => {
     const deleteFieldSetButton = fieldSet.querySelector(
-      ".deleteFieldSet"
+      ".deleteFieldSet",
     ) as HTMLButtonElement;
     deleteFieldSetButton.addEventListener("click", this.deleteFieldSet);
   };
@@ -247,14 +283,14 @@ class LessonCreater extends HTMLElement {
     const value = button.className;
     if (value === "up") {
       const currentFieldSet = button.closest(
-        ".slide-fieldSet"
+        ".slide-fieldSet",
       ) as HTMLDivElement;
       const previousFieldSet =
         currentFieldSet?.previousElementSibling as HTMLDivElement;
       previousFieldSet.before(currentFieldSet);
     } else if (value === "down") {
       const currentFieldSet = button.closest(
-        ".slide-fieldSet"
+        ".slide-fieldSet",
       ) as HTMLDivElement;
       const nextFieldSet =
         currentFieldSet?.nextElementSibling as HTMLDivElement;
@@ -272,7 +308,7 @@ class LessonCreater extends HTMLElement {
 
   getAllSlideOrderInputs = () => {
     return Array.from(
-      this.root.querySelectorAll("#slideOrderInput")
+      this.root.querySelectorAll("#slideOrderInput"),
     ) as HTMLInputElement[];
   };
 
@@ -289,10 +325,10 @@ class LessonCreater extends HTMLElement {
 
   #fillFieldSets = ({ name, groupname, slides }: LessonInfo) => {
     const nameInput = this.root.getElementById(
-      "lessonName"
+      "lessonName",
     ) as HTMLInputElement;
     const groupNameInput = this.root.querySelector(
-      "groupname-selecter"
+      "groupname-selecter",
     ) as GroupNameSelector;
 
     nameInput.value = name;
@@ -308,9 +344,46 @@ class LessonCreater extends HTMLElement {
     this.handleAddMoveButtons();
   };
 
-  disconnectedCallback() { }
+  handleSoundFilesChange = () => {
+    const audioFiles = this.store.getState("audioFiles");
 
-  connectedMoveCallback() { }
+    // Check if there are any audio files and no sound selects
+    if (!this.hasSoundSelects() && audioFiles.length) {
+      const fieldsets = Array.from(
+        this.root.querySelectorAll("fieldSet"),
+      ) as HTMLDivElement[];
+
+      fieldsets.forEach((fieldset) => {
+        const soundselect = this.createSoundSelect();
+        fieldset.appendChild(soundselect);
+      });
+    }
+  };
+
+  //addSoundSelect() {}
+
+  createSoundSelect() {
+    const select = document.createElement("select") as HTMLSelectElement;
+    select.classList.add("sound_select");
+    select.name = "soundurl";
+
+    const option = document.createElement("option") as HTMLOptionElement;
+    option.value = "";
+    option.textContent = "--- Select a sound file";
+
+    select.appendChild(option);
+
+    return select;
+  }
+
+  hasSoundSelects() {
+    console.log(this.root.querySelectorAll(".sound_select").length !== 0)
+    return this.root.querySelectorAll(".sound_select").length !== 0;
+  }
+
+  disconnectedCallback() {}
+
+  connectedMoveCallback() {}
 }
 
 customElements.define("lesson-creater", LessonCreater);

@@ -94,7 +94,8 @@
                         }
 
                         label,
-                        input {
+                        input,
+                        select {
                             font-size: var(--fontSize);
                         }
 
@@ -105,7 +106,8 @@
                             gap: 5px;
                         }
 
-                        input {
+                        input,
+                        select {
                             padding: var(--inputPadding);
                         }
                     }
@@ -239,11 +241,12 @@
                 border: black 1px solid;
                 padding: 10px;
 
+
                 .buttons {
                     display: flex;
                     gap: 20px;
 
-                    button{
+                    button {
                         background-image: url("/stop-button.png");
                         background-size: 90%;
                         background-repeat: no-repeat;
@@ -251,7 +254,7 @@
                         background-color: white;
                     }
 
-                    label{
+                    label {
                         background-image: url("/upload-big-arrow.png");
                         background-size: 90%;
                         background-repeat: no-repeat;
@@ -275,17 +278,58 @@
                     }
                 }
 
+                ul{
+                    /* margin: 0; */
+                    padding: 0;
+                }
+
             }
         </style>
         <p>Add an audio file or record a new one.</p>
         <div class="buttons">
             <button id="audio_recorder_button" type="button"></button>
             <label id="audio_file_input_button" for="audio_file_input">
-                <input type="file" name="audio" id="audio_file_input">
+                <input type="file" name="audio" id="audio_file_input" accept="audio/*">
             </label>
         </div>
 
-        <p>No Files Added</p>
+        <p class="soundFileNames">No Files Added</p>
+
+        <ul></ul>
+    </template>
+
+    <template id="audio-input-tab">
+        <style>
+            * {
+                box-sizing: border-box;
+            }
+
+
+            div {
+                display: flex;
+                padding: 5px;
+                gap: 10px;
+
+                border: 1px solid black;
+                
+                span{
+                    margin-right: auto;
+                }
+
+                button{
+                    width: 20px;
+                    height: 20px;
+                }
+            }
+
+        </style>
+
+        <div class="audio_input_tab">
+            <span></span>
+            <!-- Add images later -->
+            <button type="button">P</button>
+            <button type="button">D</button>
+        </div>
     </template>
 </body>
 

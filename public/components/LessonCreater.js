@@ -7,6 +7,7 @@ var _LessonCreater_getLessonSlides, _LessonCreater_fillFieldSets;
 import "./FieldSet.js";
 import "./GroupNameSelector.js";
 import "./audio/AudioInput.js";
+import { lesssonCreaterStore } from "./store/LessonCreaterStore.js";
 class LessonCreater extends HTMLElement {
     constructor() {
         super();
@@ -48,10 +49,14 @@ class LessonCreater extends HTMLElement {
             <fieldset>
             <legend>Introduction</legend>
             <label>Enter the target word
-                <input type="text" name="intro[${index}][targetword]" required ${(slideData === null || slideData === void 0 ? void 0 : slideData.type) === "intro" ? "value=" + slideData.targetword : ""} />
+                <input type="text" name="intro[${index}][targetword]" required ${(slideData === null || slideData === void 0 ? void 0 : slideData.type) === "intro"
+                    ? "value=" + slideData.targetword
+                    : ""} />
             </label>
             <label>Enter definition of target word
-                <input type="text" name="intro[${index}][definition]" required ${(slideData === null || slideData === void 0 ? void 0 : slideData.type) === "intro" ? "value=" + slideData.definition : ""} />
+                <input type="text" name="intro[${index}][definition]" required ${(slideData === null || slideData === void 0 ? void 0 : slideData.type) === "intro"
+                    ? "value=" + slideData.definition
+                    : ""} />
             </label>
             <input type="hidden" name="intro[${index}][slideorder]" id="slideOrderInput" ${(slideData === null || slideData === void 0 ? void 0 : slideData.type) === "intro" ? "value=" + slideData.slideorder : ""} />
         </fieldset>
@@ -67,13 +72,19 @@ class LessonCreater extends HTMLElement {
              <fieldset class="question">
             <legend>Question</legend>
             <label>Enter question
-                <input type="text" name="question[${index}][question]" required ${(slideData === null || slideData === void 0 ? void 0 : slideData.type) === "question" ? "value=" + slideData.question : ""} />
+                <input type="text" name="question[${index}][question]" required ${(slideData === null || slideData === void 0 ? void 0 : slideData.type) === "question"
+                    ? "value=" + slideData.question
+                    : ""} />
             </label>
             <label>Enter the correct answer
-                <input type="text" name="question[${index}][correctanswer]" required  ${(slideData === null || slideData === void 0 ? void 0 : slideData.type) === "question" ? "value=" + slideData.correctanswer : ""} />
+                <input type="text" name="question[${index}][correctanswer]" required  ${(slideData === null || slideData === void 0 ? void 0 : slideData.type) === "question"
+                    ? "value=" + slideData.correctanswer
+                    : ""} />
             </label>
             <label>Enter the wrong answer
-                <input type="text" name="question[${index}][wronganswer1]" required ${(slideData === null || slideData === void 0 ? void 0 : slideData.type) === "question" ? "value=" + slideData.wronganswer1 : ""} />
+                <input type="text" name="question[${index}][wronganswer1]" required ${(slideData === null || slideData === void 0 ? void 0 : slideData.type) === "question"
+                    ? "value=" + slideData.wronganswer1
+                    : ""} />
             </label>
             <label>Enter the wrong answer (Optional)
                 <input type="text" name="question[${index}][wronganswer2]" ${(slideData === null || slideData === void 0 ? void 0 : slideData.type) === "question" && slideData.wronganswer2
@@ -85,7 +96,9 @@ class LessonCreater extends HTMLElement {
                     ? "value=" + slideData.wronganswer3
                     : ""} />
             </label>
-            <input type="hidden" name="question[${index}][slideorder]" id="slideOrderInput" ${(slideData === null || slideData === void 0 ? void 0 : slideData.type) === "question" ? "value=" + slideData.slideorder : ""} />
+            <input type="hidden" name="question[${index}][slideorder]" id="slideOrderInput" ${(slideData === null || slideData === void 0 ? void 0 : slideData.type) === "question"
+                    ? "value=" + slideData.slideorder
+                    : ""} />
         </fieldset>
         <div class="fieldSetButtons">
             <button class="deleteFieldSet" type="button">X</button>
@@ -215,11 +228,25 @@ class LessonCreater extends HTMLElement {
             });
             this.handleAddMoveButtons();
         });
+        this.handleSoundFilesChange = () => {
+            const audioFiles = this.store.getState("audioFiles");
+            // Check if there are any audio files and no sound selects
+            if (!this.hasSoundSelects() && audioFiles.length) {
+                const fieldsets = Array.from(this.root.querySelectorAll("fieldSet"));
+                fieldsets.forEach((fieldset) => {
+                    const soundselect = this.createSoundSelect();
+                    fieldset.appendChild(soundselect);
+                });
+            }
+        };
         this.root = this.attachShadow({ mode: "closed" });
         const template = document.getElementById("lesson-creater");
         this.root.appendChild(template.content.cloneNode(true));
         const selecterButton = this.root.getElementById("slide-selecterButton");
         selecterButton.addEventListener("click", this.handleSelecterButtonClicked);
+        this.store = lesssonCreaterStore;
+        // Subscribe to store events
+        this.store.subscribe("audioFilesChanged", this.handleSoundFilesChange);
     }
     connectedCallback() { }
     async attributeChangedCallback(name, oldValue, newValue) {
@@ -227,9 +254,25 @@ class LessonCreater extends HTMLElement {
             this.lessonId = newValue;
             const lesson = await __classPrivateFieldGet(this, _LessonCreater_getLessonSlides, "f").call(this, this.lessonId);
             __classPrivateFieldGet(this, _LessonCreater_fillFieldSets, "f").call(this, lesson);
+            //TODO Check to see if there are any audio files
             return;
         }
         console.log("nothing!");
+    }
+    //addSoundSelect() {}
+    createSoundSelect() {
+        const select = document.createElement("select");
+        select.classList.add("sound_select");
+        select.name = "soundurl";
+        const option = document.createElement("option");
+        option.value = "";
+        option.textContent = "--- Select a sound file";
+        select.appendChild(option);
+        return select;
+    }
+    hasSoundSelects() {
+        console.log(this.root.querySelectorAll(".sound_select").length !== 0);
+        return this.root.querySelectorAll(".sound_select").length !== 0;
     }
     disconnectedCallback() { }
     connectedMoveCallback() { }
