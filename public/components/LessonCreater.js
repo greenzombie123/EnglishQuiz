@@ -3,7 +3,7 @@ var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (
     if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot read private member from an object whose class did not declare it");
     return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state.get(receiver);
 };
-var _LessonCreater_getLessonSlides, _LessonCreater_fillFieldSets;
+var _LessonCreater_instances, _LessonCreater_getLessonSlides, _LessonCreater_fillFieldSets, _LessonCreater_createSoundSelect, _LessonCreater_hasSoundSelects, _LessonCreater_attachSoundSelectToFieldSet;
 import "./FieldSet.js";
 import "./GroupNameSelector.js";
 import "./audio/AudioInput.js";
@@ -11,6 +11,7 @@ import { lesssonCreaterStore } from "./store/LessonCreaterStore.js";
 class LessonCreater extends HTMLElement {
     constructor() {
         super();
+        _LessonCreater_instances.add(this);
         this.slideIndex = 0;
         this.lessonId = null;
         this.changeSlideIndex = (index) => {
@@ -41,6 +42,7 @@ class LessonCreater extends HTMLElement {
             const slideSelecter = this.root.querySelector(".slideSelecter");
             slideSelecter.before(fieldSet);
         };
+        //TODO Add sound selecter later
         this.createFieldSet = (index, fieldSetType, slideData) => {
             const fieldSet = document.createElement("div");
             if (fieldSetType === "intro") {
@@ -59,6 +61,7 @@ class LessonCreater extends HTMLElement {
                     : ""} />
             </label>
             <input type="hidden" name="intro[${index}][slideorder]" id="slideOrderInput" ${(slideData === null || slideData === void 0 ? void 0 : slideData.type) === "intro" ? "value=" + slideData.slideorder : ""} />
+            ${this.store.getState("audioFiles").length !== 0 ? __classPrivateFieldGet(this, _LessonCreater_instances, "m", _LessonCreater_attachSoundSelectToFieldSet).call(this) : ""}
         </fieldset>
         <div class="fieldSetButtons">
             <button class="deleteFieldSet" type="button">X</button>
@@ -99,6 +102,7 @@ class LessonCreater extends HTMLElement {
             <input type="hidden" name="question[${index}][slideorder]" id="slideOrderInput" ${(slideData === null || slideData === void 0 ? void 0 : slideData.type) === "question"
                     ? "value=" + slideData.slideorder
                     : ""} />
+            ${this.store.getState("audioFiles").length !== 0 ? __classPrivateFieldGet(this, _LessonCreater_instances, "m", _LessonCreater_attachSoundSelectToFieldSet).call(this) : ""}
         </fieldset>
         <div class="fieldSetButtons">
             <button class="deleteFieldSet" type="button">X</button>
@@ -231,10 +235,10 @@ class LessonCreater extends HTMLElement {
         this.handleSoundFilesChange = () => {
             const audioFiles = this.store.getState("audioFiles");
             // Check if there are any audio files and no sound selects
-            if (!this.hasSoundSelects() && audioFiles.length) {
+            if (!__classPrivateFieldGet(this, _LessonCreater_instances, "m", _LessonCreater_hasSoundSelects).call(this) && audioFiles.length) {
                 const fieldsets = Array.from(this.root.querySelectorAll("fieldSet"));
                 fieldsets.forEach((fieldset) => {
-                    const soundselect = this.createSoundSelect();
+                    const soundselect = __classPrivateFieldGet(this, _LessonCreater_instances, "m", _LessonCreater_createSoundSelect).call(this);
                     fieldset.appendChild(soundselect);
                 });
             }
@@ -259,25 +263,37 @@ class LessonCreater extends HTMLElement {
         }
         console.log("nothing!");
     }
-    //addSoundSelect() {}
-    createSoundSelect() {
-        const select = document.createElement("select");
-        select.classList.add("sound_select");
-        select.name = "soundurl";
-        const option = document.createElement("option");
-        option.value = "";
-        option.textContent = "--- Select a sound file";
-        select.appendChild(option);
-        return select;
-    }
-    hasSoundSelects() {
-        console.log(this.root.querySelectorAll(".sound_select").length !== 0);
-        return this.root.querySelectorAll(".sound_select").length !== 0;
-    }
     disconnectedCallback() { }
     connectedMoveCallback() { }
 }
-_LessonCreater_getLessonSlides = new WeakMap(), _LessonCreater_fillFieldSets = new WeakMap();
+_LessonCreater_getLessonSlides = new WeakMap(), _LessonCreater_fillFieldSets = new WeakMap(), _LessonCreater_instances = new WeakSet(), _LessonCreater_createSoundSelect = function _LessonCreater_createSoundSelect() {
+    const select = document.createElement("select");
+    select.classList.add("sound_select");
+    select.name = "soundurl";
+    const option = document.createElement("option");
+    option.value = "";
+    option.textContent = "--- Select a sound file";
+    select.appendChild(option);
+    const audioFiles = this.store.getState("audioFiles");
+    audioFiles.forEach((audioFile) => {
+        const option = document.createElement("option");
+        option.value = audioFile.name;
+        option.textContent = audioFile.name.slice(0, -4);
+        select.appendChild(option);
+    });
+    return select;
+}, _LessonCreater_hasSoundSelects = function _LessonCreater_hasSoundSelects() {
+    return this.root.querySelectorAll(".sound_select").length !== 0;
+}, _LessonCreater_attachSoundSelectToFieldSet = function _LessonCreater_attachSoundSelectToFieldSet() {
+    const audioFiles = this.store.getState("audioFiles");
+    const options = audioFiles.map((audioFile) => {
+        return `<option value=${audioFile.name}>${audioFile.name.slice(0, -4)}</option>`;
+    });
+    return `<select class="sound_select" name="soundurl">
+      <option value="">--- Select a sound file</option>
+      ${options.join("")}
+    </select>`;
+};
 LessonCreater.observedAttributes = ["data-lessonid"];
 customElements.define("lesson-creater", LessonCreater);
 //# sourceMappingURL=LessonCreater.js.map

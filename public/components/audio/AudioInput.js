@@ -19,7 +19,7 @@ export default class AudioInput extends HTMLElement {
             soundFileNames.textContent = `There is ${audioFiles.length} files`;
             audioFiles.forEach((audioFile) => {
                 const audioInputTab = document.createElement("audio-input-tab");
-                audioInputTab.fileName = audioFile.name;
+                audioInputTab.setAudioUrl(audioFile);
                 ul.appendChild(audioInputTab);
             });
         };

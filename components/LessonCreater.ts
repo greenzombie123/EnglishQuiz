@@ -96,6 +96,7 @@ class LessonCreater extends HTMLElement {
     slideSelecter.before(fieldSet);
   };
 
+  //TODO Add sound selecter later
   createFieldSet = (
     index: number,
     fieldSetType: string,
@@ -124,6 +125,7 @@ class LessonCreater extends HTMLElement {
             <input type="hidden" name="intro[${index}][slideorder]" id="slideOrderInput" ${
               slideData?.type === "intro" ? "value=" + slideData.slideorder : ""
             } />
+            ${this.store.getState("audioFiles").length !== 0 ? this.#attachSoundSelectToFieldSet() : ""}
         </fieldset>
         <div class="fieldSetButtons">
             <button class="deleteFieldSet" type="button">X</button>
@@ -175,6 +177,7 @@ class LessonCreater extends HTMLElement {
                 ? "value=" + slideData.slideorder
                 : ""
             } />
+            ${this.store.getState("audioFiles").length !== 0 ? this.#attachSoundSelectToFieldSet() : ""}
         </fieldset>
         <div class="fieldSetButtons">
             <button class="deleteFieldSet" type="button">X</button>
@@ -348,13 +351,13 @@ class LessonCreater extends HTMLElement {
     const audioFiles = this.store.getState("audioFiles");
 
     // Check if there are any audio files and no sound selects
-    if (!this.hasSoundSelects() && audioFiles.length) {
+    if (!this.#hasSoundSelects() && audioFiles.length) {
       const fieldsets = Array.from(
         this.root.querySelectorAll("fieldSet"),
       ) as HTMLDivElement[];
 
       fieldsets.forEach((fieldset) => {
-        const soundselect = this.createSoundSelect();
+        const soundselect = this.#createSoundSelect();
         fieldset.appendChild(soundselect);
       });
     }
@@ -362,7 +365,7 @@ class LessonCreater extends HTMLElement {
 
   //addSoundSelect() {}
 
-  createSoundSelect() {
+  #createSoundSelect() {
     const select = document.createElement("select") as HTMLSelectElement;
     select.classList.add("sound_select");
     select.name = "soundurl";
@@ -373,12 +376,35 @@ class LessonCreater extends HTMLElement {
 
     select.appendChild(option);
 
+    const audioFiles = this.store.getState("audioFiles");
+
+    audioFiles.forEach((audioFile) => {
+      const option = document.createElement("option") as HTMLOptionElement;
+      option.value = audioFile.name;
+      option.textContent = audioFile.name.slice(0, -4);
+
+      select.appendChild(option);
+    });
+
     return select;
   }
 
-  hasSoundSelects() {
-    console.log(this.root.querySelectorAll(".sound_select").length !== 0)
+  #hasSoundSelects() {
     return this.root.querySelectorAll(".sound_select").length !== 0;
+  }
+
+  #attachSoundSelectToFieldSet() {
+
+    const audioFiles = this.store.getState("audioFiles");
+
+    const options = audioFiles.map((audioFile) => {
+      return `<option value=${audioFile.name}>${audioFile.name.slice(0, -4)}</option>`
+    });
+
+    return `<select class="sound_select" name="soundurl">
+      <option value="">--- Select a sound file</option>
+      ${options.join("")}
+    </select>`;
   }
 
   disconnectedCallback() {}

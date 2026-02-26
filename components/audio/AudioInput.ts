@@ -69,7 +69,7 @@ export default class AudioInput extends HTMLElement {
         "audio-input-tab",
       ) as AudioInputTab;
       
-      audioInputTab.fileName = audioFile.name;
+      audioInputTab.setAudioUrl(audioFile)
       
       ul.appendChild(audioInputTab);
     });
