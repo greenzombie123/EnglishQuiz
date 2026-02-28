@@ -40,7 +40,8 @@ class LessonCreater extends HTMLElement {
     this.store = lesssonCreaterStore;
 
     // Subscribe to store events
-    this.store.subscribe("audioFilesChanged", this.handleSoundFilesChange);
+    this.store.subscribe("audioFilesChanged", this.#handleAddSoundSelect);
+    this.store.subscribe("audioFilesChanged", this.#handleUpdateSoundSelect);
   }
 
   connectedCallback() {}
@@ -347,7 +348,7 @@ class LessonCreater extends HTMLElement {
     this.handleAddMoveButtons();
   };
 
-  handleSoundFilesChange = () => {
+  #handleAddSoundSelect = () => {
     const audioFiles = this.store.getState("audioFiles");
 
     // Check if there are any audio files and no sound selects
@@ -372,7 +373,9 @@ class LessonCreater extends HTMLElement {
 
     const option = document.createElement("option") as HTMLOptionElement;
     option.value = "";
-    option.textContent = "--- Select a sound file";
+    option.textContent = "--- No Sound Life is Chosen";
+    //TODO Might need to change once we can recieve audio files from server
+    option.selected = true;
 
     select.appendChild(option);
 
@@ -394,17 +397,59 @@ class LessonCreater extends HTMLElement {
   }
 
   #attachSoundSelectToFieldSet() {
-
     const audioFiles = this.store.getState("audioFiles");
 
     const options = audioFiles.map((audioFile) => {
-      return `<option value=${audioFile.name}>${audioFile.name.slice(0, -4)}</option>`
+      return `<option value=${audioFile.name}>${audioFile.name.slice(0, -4)}</option>`;
     });
 
     return `<select class="sound_select" name="soundurl">
-      <option value="">--- Select a sound file</option>
+      <option value="" selected>--- No Sound File Chosen</option>
       ${options.join("")}
     </select>`;
+  }
+
+  #handleUpdateSoundSelect=()=> {
+    const audioFiles = this.store.getState("audioFiles");
+
+    const soundSelects = Array.from(
+      this.root.querySelectorAll(".sound_select"),
+    ) as HTMLSelectElement[];
+
+    soundSelects.forEach((soundSelect) => {
+
+      const currentSoundFile = soundSelect.value 
+
+      while (soundSelect.firstChild) {
+        soundSelect.removeChild(soundSelect.firstChild);
+      }
+
+      const defaultOption = document.createElement(
+        "option",
+      ) as HTMLOptionElement;
+      defaultOption.value = "";
+      defaultOption.textContent = "--- No Sound Life is Chosen";
+
+      const hasSelectedFile = audioFiles.some(
+        (audioFile) => soundSelect.value === audioFile.name,
+      );
+
+      if (!hasSelectedFile) {
+        soundSelect.value = "";
+        defaultOption.selected = true;
+      }
+
+      soundSelect.appendChild(defaultOption)
+
+      audioFiles.forEach((audioFile) => {
+        const option = document.createElement("option") as HTMLOptionElement;
+        option.value = audioFile.name;
+        option.textContent = audioFile.name.slice(0, -4)
+        soundSelect.appendChild(option)
+        if(option.value === currentSoundFile) option.selected = true
+      });
+    });
+
   }
 
   disconnectedCallback() {}
