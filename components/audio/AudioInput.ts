@@ -1,11 +1,13 @@
 import { lesssonCreaterStore } from "../store/LessonCreaterStore.ts";
 import "./AudioInputTab.ts";
 import type AudioInputTab from "./AudioInputTab.ts";
-import Store from "../store/store.ts";
+import type AudioInputRecorder from "./AudioInputRecorder.ts";
+import "./AudioInputRecorder.ts";
 
 export default class AudioInput extends HTMLElement {
   private root;
   private inputFileButton: HTMLInputElement;
+  private recorderButton:HTMLButtonElement
   private store;
 
   constructor() {
@@ -22,9 +24,14 @@ export default class AudioInput extends HTMLElement {
       "#audio_file_input",
     ) as HTMLInputElement;
 
+    this.recorderButton = this.root.querySelector(
+      "#audio_recorder_button",
+    ) as HTMLButtonElement;
+
     this.addEventListener("change", this.handleChangeInputFile);
 
     this.inputFileButton.addEventListener("change", this.handleChangeInputFile);
+    this.recorderButton.addEventListener("click", this.handleAudioRecorderButtonClicked)
 
     this.store = lesssonCreaterStore;
 
@@ -74,6 +81,12 @@ export default class AudioInput extends HTMLElement {
       ul.appendChild(audioInputTab);
     });
   };
+
+  handleAudioRecorderButtonClicked = ()=>{
+    const audioInputRecorder = this.root.querySelector("audio-input-recorder") as AudioInputRecorder
+
+    audioInputRecorder.open()
+  }
 
 }
 

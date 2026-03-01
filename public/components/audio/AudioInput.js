@@ -1,5 +1,6 @@
 import { lesssonCreaterStore } from "../store/LessonCreaterStore.js";
 import "./AudioInputTab.js";
+import "./AudioInputRecorder.js";
 export default class AudioInput extends HTMLElement {
     constructor() {
         super();
@@ -23,12 +24,18 @@ export default class AudioInput extends HTMLElement {
                 ul.appendChild(audioInputTab);
             });
         };
+        this.handleAudioRecorderButtonClicked = () => {
+            const audioInputRecorder = this.root.querySelector("audio-input-recorder");
+            audioInputRecorder.open();
+        };
         this.root = this.attachShadow({ mode: "closed" });
         const template = document.getElementById("audio-input");
         this.root.appendChild(template.content.cloneNode(true));
         this.inputFileButton = this.root.querySelector("#audio_file_input");
+        this.recorderButton = this.root.querySelector("#audio_recorder_button");
         this.addEventListener("change", this.handleChangeInputFile);
         this.inputFileButton.addEventListener("change", this.handleChangeInputFile);
+        this.recorderButton.addEventListener("click", this.handleAudioRecorderButtonClicked);
         this.store = lesssonCreaterStore;
         // Subscribe to store events
         this.store.subscribe("audioFilesChanged", this.handleAudioFilesChanged);

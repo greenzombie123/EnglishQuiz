@@ -55,7 +55,7 @@ class LessonCreater extends HTMLElement {
       this.lessonId = newValue;
       const lesson = await this.#getLessonSlides(this.lessonId);
       this.#fillFieldSets(lesson);
-      //TODO Check to see if there are any audio files
+      //TODO Check to see if there are any audio files when receieve response from server
       return;
     }
     console.log("nothing!");
@@ -97,7 +97,6 @@ class LessonCreater extends HTMLElement {
     slideSelecter.before(fieldSet);
   };
 
-  //TODO Add sound selecter later
   createFieldSet = (
     index: number,
     fieldSetType: string,
@@ -373,7 +372,7 @@ class LessonCreater extends HTMLElement {
 
     const option = document.createElement("option") as HTMLOptionElement;
     option.value = "";
-    option.textContent = "--- No Sound Life is Chosen";
+    option.textContent = "--- No Sound File is Chosen";
     //TODO Might need to change once we can recieve audio files from server
     option.selected = true;
 

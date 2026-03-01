@@ -296,6 +296,8 @@
         <p class="soundFileNames">No Files Added</p>
 
         <ul></ul>
+
+        <audio-input-recorder></audio-input-recorder>
     </template>
 
     <template id="audio-input-tab">
@@ -331,6 +333,48 @@
             <button type="button" class="delete">D</button>
             <audio src=""></audio>
         </div>
+    </template>
+
+    <template id="audio-input-recorder">
+        <style>
+            * {
+                box-sizing: border-box;
+            }
+
+            dialog{
+                .container{
+
+                    .recorder-indicator{}
+
+                    .recorder-buttons{}
+
+                    input{}
+
+                    bottom-buttons{}
+                }
+            }
+        </style>
+
+        <dialog class="audio-input-recorder_dialog">
+            <div class="container">
+                <span class="recorder-indicator">
+
+                </span>
+                <div class="recorder-buttons">
+                    <button type="button" class="start">Start</button>
+                    <button type="button" class="stop">Stop</button>
+                    <button type="button" class="play">Play</button>
+                </div>
+                <label for="name">
+                    <input type="text" id="name">
+                </label>
+                <div class="bottom-buttons">
+                    <button type="button" class="finish">Finish</button>
+                    <button type="button" class="cancel">Cancel</button>
+                </div>
+                <span class="warning"></span>
+            </div>
+        </dialog>
     </template>
 </body>
 

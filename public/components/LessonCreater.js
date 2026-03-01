@@ -42,7 +42,6 @@ class LessonCreater extends HTMLElement {
             const slideSelecter = this.root.querySelector(".slideSelecter");
             slideSelecter.before(fieldSet);
         };
-        //TODO Add sound selecter later
         this.createFieldSet = (index, fieldSetType, slideData) => {
             const fieldSet = document.createElement("div");
             if (fieldSetType === "intro") {
@@ -286,7 +285,7 @@ class LessonCreater extends HTMLElement {
             this.lessonId = newValue;
             const lesson = await __classPrivateFieldGet(this, _LessonCreater_getLessonSlides, "f").call(this, this.lessonId);
             __classPrivateFieldGet(this, _LessonCreater_fillFieldSets, "f").call(this, lesson);
-            //TODO Check to see if there are any audio files
+            //TODO Check to see if there are any audio files when receieve response from server
             return;
         }
         console.log("nothing!");
@@ -300,7 +299,7 @@ _LessonCreater_getLessonSlides = new WeakMap(), _LessonCreater_fillFieldSets = n
     select.name = "soundurl";
     const option = document.createElement("option");
     option.value = "";
-    option.textContent = "--- No Sound Life is Chosen";
+    option.textContent = "--- No Sound File is Chosen";
     //TODO Might need to change once we can recieve audio files from server
     option.selected = true;
     select.appendChild(option);
