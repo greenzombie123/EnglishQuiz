@@ -1,16 +1,21 @@
 import express from "express";
 import views from "./dirNames.ts";
-import indexRouter from "./routes/index.ts";
-import signupRouter from "./routes/signup.ts";
+
 import "dotenv/config";
 import { Pool } from "pg";
+
 import passport from "passport";
 import session from "express-session";
 import { Strategy } from "passport-local";
+import type { Student, Teacher, User } from "./shared.types.ts";
+
+import indexRouter from "./routes/index.ts";
+import signupRouter from "./routes/signup.ts";
 import logInRouter from "./routes/login.ts";
 import lessonsRouter from "./routes/lessons.ts";
 import findTeacherRouter from "./routes/findTeacher.ts";
-import type { Student, Teacher, User } from "./shared.types.ts";
+import storageRouter from "./routes/storage.ts";
+
 
 // Set up Pool to query Postgres through node
 export const pool = new Pool({
@@ -61,7 +66,7 @@ server.use(
 // Set up session middleware
 server.use(session({ secret: process.env.SECRET! }));
 
-// Allows you to authenticate a session wheneve a request comes in
+// Allows you to authenticate a session whenever a request comes in
 server.use(passport.session());
 
 //Configure the strategy in how passport verifies and authenticate the user

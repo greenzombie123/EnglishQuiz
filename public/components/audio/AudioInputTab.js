@@ -32,7 +32,7 @@ class AudioInputTab extends HTMLElement {
         const url = URL.createObjectURL(this.audioFile);
         this.audio.src = url;
         const span = this.root.querySelector("span");
-        span.textContent = this.audioFile.name.slice(0, -4);
+        span.textContent = this.audioFile.name;
         const playButton = this.root.querySelector(".play");
         const deleteButton = this.root.querySelector(".delete");
         playButton.addEventListener("click", () => {

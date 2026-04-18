@@ -34,7 +34,7 @@ export default class AudioInputTab extends HTMLElement {
     this.audio.src = url;
 
     const span = this.root.querySelector("span") as HTMLSpanElement;
-    span.textContent = this.audioFile.name.slice(0, -4);
+    span.textContent = this.audioFile.name
 
     const playButton = this.root.querySelector(".play") as HTMLButtonElement;
     const deleteButton = this.root.querySelector(

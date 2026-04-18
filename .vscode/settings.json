@@ -6,7 +6,7 @@
             "server": "localhost",
             "port": 5432,
             "driver": "PostgreSQL",
-            "name": "lol",
+            "name": "tyt",
             "database": "englishquiz",
             "username": "greenzombie"
         }

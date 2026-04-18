@@ -6,12 +6,13 @@ import { format } from "node-pg-format";
 export const createIntroSQLString = (slides: IntroSlideRecord[] | undefined) => {
   if (!slides) return "";
 
-  const introColumns = ["targetword", "definition", "slideorder"]
+  const introColumns = ["targetword", "definition", "slideorder", "soundurl"]
   
   const introSlides = slides.map((slide) => [
     slide.targetword,
     slide.definition,
     slide.slideorder,
+    slide.soundurl
   ]);
 
   return format(
@@ -33,6 +34,7 @@ export const createQuestionSQLString = (slides: QuestionSlideRecord[] | undefine
     slide.wronganswer2,
     slide.wronganswer3,
     slide.slideorder,
+    slide.soundurl
   ]);
 
   const questionColumns = [
@@ -42,6 +44,7 @@ export const createQuestionSQLString = (slides: QuestionSlideRecord[] | undefine
     "wronganswer2",
     "wronganswer3",
     "slideorder",
+    "soundurl"
   ];
 
   return format(
@@ -66,37 +69,23 @@ export const queryQuestionSlideRecords = `
     ORDER BY slideorder;
 `
 
-const queryLessonSlideString = `
-SELECT 
-targetword, 
-definition, 
-NULL AS question, 
-NULL AS correctanswer, 
-NULL AS wronganswer1, 
-NULL AS wronganswer2,
-NULL AS wronganswer3,
-slideorder,
-type
-FROM introslides 
-INNER JOIN lessons_introslides 
-ON lessons_introslides.introslideid = introslides.id
-WHERE lessons_introslides.lessonid = $1
+const updateQSQueryString = `
+UPDATE questionslides
+SET question=$1, 
+    correctanswer=$2, 
+    wronganswer1=$3, 
+    wronganswer2=$4,
+    wronganswer3=$5,
+    slideorder=$6,
+    soundurl=$7
+WHERE id = $9
+`
 
-UNION
-
-SELECT 
-NULL AS targetword, 
-NULL AS definition, 
-question, 
-correctanswer, 
-wronganswer1, 
-wronganswer2,
-wronganswer3,
-slideorder,
-type
-FROM questionslides 
-INNER JOIN lessons_questionslides 
-ON lessons_questionslides.questionslideid = questionslides.id
-WHERE lessons_questionslides.lessonid = $1
-ORDER BY slideorder;
+const updateISQueryString = `
+UPDATE introslides, 
+SET targetword=$1, 
+    definition=$2, 
+    slideorder=$3,
+    soundurl=$4
+WHERE id = $5
 `;

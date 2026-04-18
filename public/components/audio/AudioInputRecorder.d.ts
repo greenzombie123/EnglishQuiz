@@ -1,7 +1,8 @@
 export default class AudioInputRecorder extends HTMLElement {
+    #private;
     private store;
     private root;
-    private stream;
+    private mediaRecorder;
     private dialog;
     private startButton;
     private stopButton;
@@ -9,6 +10,11 @@ export default class AudioInputRecorder extends HTMLElement {
     private name;
     private finishButton;
     private cancelButton;
+    private indicator;
+    private audio;
+    private warning;
+    private mimeType;
+    private audioFile;
     constructor();
     connectedCallback(): void;
     handleAudioFileCreated: () => void;

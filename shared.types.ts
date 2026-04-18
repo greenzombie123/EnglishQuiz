@@ -14,7 +14,7 @@ export type Student = User & {
 
 
 type BaseSlideRecord = {
-  // soundurl:string,
+  soundurl:string,
   slideorder: number;
 };
 
@@ -62,3 +62,10 @@ export type LessonSlideData = Record<SlideRecord["type"], SlideRecord[] | []>
 
 export type createBucketURL = (key:string, teacherId:string, lessonId:string)=>string
 
+// const j : IntroSlideRecord = {
+//   soundurl:"",
+//   slideorder:1,
+//   type:"intro",
+//   definition:"fee",
+//   targetword:"fee"
+// }

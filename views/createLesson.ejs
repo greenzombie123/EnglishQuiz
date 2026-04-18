@@ -344,9 +344,26 @@
             dialog{
                 .container{
 
-                    .recorder-indicator{}
+                    .recorder-indicator{
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        width: 20px;
+                        height: 20px;
+                        border: 1px black solid;
 
-                    .recorder-buttons{}
+                        .circle{
+                            width: 8px;
+                            height: 8px;
+                            border-radius: 5px;
+                            background-color: black;
+                        }
+                    }
+
+                    .recorder-buttons{
+
+                        
+                    }
 
                     input{}
 
@@ -358,7 +375,7 @@
         <dialog class="audio-input-recorder_dialog">
             <div class="container">
                 <span class="recorder-indicator">
-
+                    <span class="circle"></span>
                 </span>
                 <div class="recorder-buttons">
                     <button type="button" class="start">Start</button>
@@ -372,6 +389,7 @@
                     <button type="button" class="finish">Finish</button>
                     <button type="button" class="cancel">Cancel</button>
                 </div>
+                <audio></audio>
                 <span class="warning"></span>
             </div>
         </dialog>

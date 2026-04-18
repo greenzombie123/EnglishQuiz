@@ -3,7 +3,7 @@ var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (
     if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot read private member from an object whose class did not declare it");
     return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state.get(receiver);
 };
-var _LessonCreater_instances, _LessonCreater_getLessonSlides, _LessonCreater_fillFieldSets, _LessonCreater_handleAddSoundSelect, _LessonCreater_createSoundSelect, _LessonCreater_hasSoundSelects, _LessonCreater_attachSoundSelectToFieldSet, _LessonCreater_handleUpdateSoundSelect;
+var _LessonCreater_instances, _LessonCreater_getLessonSlides, _LessonCreater_fillFieldSets, _LessonCreater_handleAddSoundSelect, _LessonCreater_createSoundSelect, _LessonCreater_attachSoundSelectToFieldSet, _LessonCreater_handleUpdateSoundSelect, _LessonCreater_handleCreateLesson, _LessonCreater_getChosenSoundFiles;
 import "./FieldSet.js";
 import "./GroupNameSelector.js";
 import "./audio/AudioInput.js";
@@ -60,7 +60,7 @@ class LessonCreater extends HTMLElement {
                     : ""} />
             </label>
             <input type="hidden" name="intro[${index}][slideorder]" id="slideOrderInput" ${(slideData === null || slideData === void 0 ? void 0 : slideData.type) === "intro" ? "value=" + slideData.slideorder : ""} />
-            ${this.store.getState("audioFiles").length !== 0 ? __classPrivateFieldGet(this, _LessonCreater_instances, "m", _LessonCreater_attachSoundSelectToFieldSet).call(this) : ""}
+            ${__classPrivateFieldGet(this, _LessonCreater_instances, "m", _LessonCreater_attachSoundSelectToFieldSet).call(this, slideData === null || slideData === void 0 ? void 0 : slideData.soundurl, "intro", index)}
         </fieldset>
         <div class="fieldSetButtons">
             <button class="deleteFieldSet" type="button">X</button>
@@ -101,7 +101,7 @@ class LessonCreater extends HTMLElement {
             <input type="hidden" name="question[${index}][slideorder]" id="slideOrderInput" ${(slideData === null || slideData === void 0 ? void 0 : slideData.type) === "question"
                     ? "value=" + slideData.slideorder
                     : ""} />
-            ${this.store.getState("audioFiles").length !== 0 ? __classPrivateFieldGet(this, _LessonCreater_instances, "m", _LessonCreater_attachSoundSelectToFieldSet).call(this) : ""}
+            ${__classPrivateFieldGet(this, _LessonCreater_instances, "m", _LessonCreater_attachSoundSelectToFieldSet).call(this, slideData === null || slideData === void 0 ? void 0 : slideData.soundurl, "question", index)}
         </fieldset>
         <div class="fieldSetButtons">
             <button class="deleteFieldSet" type="button">X</button>
@@ -231,16 +231,15 @@ class LessonCreater extends HTMLElement {
             });
             this.handleAddMoveButtons();
         });
+        // Sound Select Functionality
         _LessonCreater_handleAddSoundSelect.set(this, () => {
             const audioFiles = this.store.getState("audioFiles");
             // Check if there are any audio files and no sound selects
-            if (!__classPrivateFieldGet(this, _LessonCreater_instances, "m", _LessonCreater_hasSoundSelects).call(this) && audioFiles.length) {
-                const fieldsets = Array.from(this.root.querySelectorAll("fieldSet"));
-                fieldsets.forEach((fieldset) => {
-                    const soundselect = __classPrivateFieldGet(this, _LessonCreater_instances, "m", _LessonCreater_createSoundSelect).call(this);
-                    fieldset.appendChild(soundselect);
-                });
-            }
+            const soundSelects = Array.from(this.root.querySelectorAll(".sound_select"));
+            if (audioFiles.length)
+                soundSelects.forEach((soundSelect) => (soundSelect.style.display = "block"));
+            else
+                soundSelects.forEach((soundSelect) => (soundSelect.style.display = "hidden"));
         });
         _LessonCreater_handleUpdateSoundSelect.set(this, () => {
             const audioFiles = this.store.getState("audioFiles");
@@ -252,7 +251,7 @@ class LessonCreater extends HTMLElement {
                 }
                 const defaultOption = document.createElement("option");
                 defaultOption.value = "";
-                defaultOption.textContent = "--- No Sound Life is Chosen";
+                defaultOption.textContent = "--- No Sound File is Chosen";
                 const hasSelectedFile = audioFiles.some((audioFile) => soundSelect.value === audioFile.name);
                 if (!hasSelectedFile) {
                     soundSelect.value = "";
@@ -262,18 +261,51 @@ class LessonCreater extends HTMLElement {
                 audioFiles.forEach((audioFile) => {
                     const option = document.createElement("option");
                     option.value = audioFile.name;
-                    option.textContent = audioFile.name.slice(0, -4);
+                    option.textContent = audioFile.name;
                     soundSelect.appendChild(option);
                     if (option.value === currentSoundFile)
                         option.selected = true;
                 });
             });
         });
+        _LessonCreater_handleCreateLesson.set(this, async (e) => {
+            e.preventDefault();
+            const formdata = new FormData(this.form);
+            const audioFiles = this.store.getState("audioFiles");
+            const audioFileNames = __classPrivateFieldGet(this, _LessonCreater_getChosenSoundFiles, "f").call(this);
+            const response = await fetch("/lessons/createlesson", {
+                method: "POST",
+                body: formdata,
+            });
+            const presignedUrls = await response.json();
+            console.log(presignedUrls);
+            const promises = presignedUrls.map((presignedUrl) => {
+                const isMatch = audioFiles.find((audioFile) => audioFile.name === presignedUrl.key);
+                console.log(isMatch);
+                if (isMatch) {
+                    return fetch(presignedUrl.url, {
+                        method: "PUT",
+                        body: isMatch,
+                    });
+                }
+            });
+            console.log(promises);
+            const results = await Promise.all(promises);
+            console.log(results);
+        });
+        _LessonCreater_getChosenSoundFiles.set(this, () => {
+            const soundSelects = Array.from(this.root.querySelectorAll(".sound_select"));
+            let values = soundSelects.map((soundSelect) => soundSelect.value);
+            values = values.filter((value) => (value ? true : false));
+            return values;
+        });
         this.root = this.attachShadow({ mode: "closed" });
         const template = document.getElementById("lesson-creater");
         this.root.appendChild(template.content.cloneNode(true));
         const selecterButton = this.root.getElementById("slide-selecterButton");
+        this.form = this.root.querySelector("form");
         selecterButton.addEventListener("click", this.handleSelecterButtonClicked);
+        this.form.addEventListener("submit", __classPrivateFieldGet(this, _LessonCreater_handleCreateLesson, "f"));
         this.store = lesssonCreaterStore;
         // Subscribe to store events
         this.store.subscribe("audioFilesChanged", __classPrivateFieldGet(this, _LessonCreater_handleAddSoundSelect, "f"));
@@ -293,7 +325,7 @@ class LessonCreater extends HTMLElement {
     disconnectedCallback() { }
     connectedMoveCallback() { }
 }
-_LessonCreater_getLessonSlides = new WeakMap(), _LessonCreater_fillFieldSets = new WeakMap(), _LessonCreater_handleAddSoundSelect = new WeakMap(), _LessonCreater_handleUpdateSoundSelect = new WeakMap(), _LessonCreater_instances = new WeakSet(), _LessonCreater_createSoundSelect = function _LessonCreater_createSoundSelect() {
+_LessonCreater_getLessonSlides = new WeakMap(), _LessonCreater_fillFieldSets = new WeakMap(), _LessonCreater_handleAddSoundSelect = new WeakMap(), _LessonCreater_handleUpdateSoundSelect = new WeakMap(), _LessonCreater_handleCreateLesson = new WeakMap(), _LessonCreater_getChosenSoundFiles = new WeakMap(), _LessonCreater_instances = new WeakSet(), _LessonCreater_createSoundSelect = function _LessonCreater_createSoundSelect() {
     const select = document.createElement("select");
     select.classList.add("sound_select");
     select.name = "soundurl";
@@ -307,18 +339,17 @@ _LessonCreater_getLessonSlides = new WeakMap(), _LessonCreater_fillFieldSets = n
     audioFiles.forEach((audioFile) => {
         const option = document.createElement("option");
         option.value = audioFile.name;
-        option.textContent = audioFile.name.slice(0, -4);
+        option.textContent = audioFile.name;
         select.appendChild(option);
     });
     return select;
-}, _LessonCreater_hasSoundSelects = function _LessonCreater_hasSoundSelects() {
-    return this.root.querySelectorAll(".sound_select").length !== 0;
-}, _LessonCreater_attachSoundSelectToFieldSet = function _LessonCreater_attachSoundSelectToFieldSet() {
+}, _LessonCreater_attachSoundSelectToFieldSet = function _LessonCreater_attachSoundSelectToFieldSet(soundurl, type, index) {
     const audioFiles = this.store.getState("audioFiles");
     const options = audioFiles.map((audioFile) => {
-        return `<option value=${audioFile.name}>${audioFile.name.slice(0, -4)}</option>`;
+        return `<option value=${audioFile.name} ${soundurl === audioFile.name ? "selected" : ""}>${audioFile.name}</option>`;
     });
-    return `<select class="sound_select" name="soundurl">
+    const isOptionSelected = audioFiles.some((audioFile) => audioFile.name === soundurl);
+    return `<select class="sound_select" name="${type}[${index}][soundurl]"} value=${isOptionSelected ? soundurl : ""} ${isOptionSelected ? 'style="display:block"' : 'style="display:none"'} >
       <option value="" selected>--- No Sound File Chosen</option>
       ${options.join("")}
     </select>`;

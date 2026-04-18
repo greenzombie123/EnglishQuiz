@@ -9,6 +9,7 @@ export type Student = User & {
     userType: "student";
 };
 type BaseSlideRecord = {
+    soundurl: string;
     slideorder: number;
 };
 export type QuestionSlideRecord = BaseSlideRecord & {
