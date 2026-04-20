@@ -2,7 +2,7 @@ import express from "express";
 import views from "./dirNames.ts";
 
 import "dotenv/config";
-import { Pool } from "pg";
+import { pool } from "./config/database.config.ts";
 
 import passport from "passport";
 import session from "express-session";
@@ -14,17 +14,6 @@ import signupRouter from "./routes/signup.ts";
 import logInRouter from "./routes/login.ts";
 import lessonsRouter from "./routes/lessons.ts";
 import findTeacherRouter from "./routes/findTeacher.ts";
-import storageRouter from "./routes/storage.ts";
-
-
-// Set up Pool to query Postgres through node
-export const pool = new Pool({
-  host: process.env.HOST,
-  user: process.env.USER,
-  database: process.env.DATABASE,
-  password: process.env.PASSWORD,
-  port: 5432,
-});
 
 // Create a server
 const server = express();
