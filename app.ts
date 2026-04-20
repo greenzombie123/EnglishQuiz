@@ -1,7 +1,7 @@
 import express from "express";
 import views from "./dirNames.ts";
 
-import "dotenv/config";
+
 import { pool } from "./config/database.config.ts";
 
 import passport from "passport";

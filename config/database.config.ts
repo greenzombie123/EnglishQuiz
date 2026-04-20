@@ -1,4 +1,5 @@
 import { Pool } from "pg";
+import "dotenv/config";
 
 // Set up Pool to query Postgres through node
 export const pool = new Pool({
