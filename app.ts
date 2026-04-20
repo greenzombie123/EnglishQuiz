@@ -1,13 +1,4 @@
-import express from "express";
-import views from "./dirNames.ts";
-
-
-import { pool } from "./config/database.config.ts";
-
-import passport from "passport";
-import session from "express-session";
-import { Strategy } from "passport-local";
-import type { Student, Teacher, User } from "./shared.types.ts";
+import server from "./index.ts"
 
 import indexRouter from "./routes/index.ts";
 import signupRouter from "./routes/signup.ts";
@@ -15,104 +6,6 @@ import logInRouter from "./routes/login.ts";
 import lessonsRouter from "./routes/lessons.ts";
 import findTeacherRouter from "./routes/findTeacher.ts";
 
-// Create a server
-const server = express();
-
-// Have Express get views from views directory and set view engine to ejs
-server.set("views", views);
-server.set("view engine", "ejs");
-
-// Set up Express to parse forms and JSON
-server.use(express.urlencoded({ extended: true }));
-server.use(express.json());
-
-// Serve static files from views directory.
-// First one create a vitual path that will point to the directory.
-// Also serve the ts files through the source maps for debugging
-
-// For html ejs files
-server.use(express.static("views"));
-// For the generated source map files
-server.use("/components", express.static("components"));
-// For lesson page
-server.use("/lessons", express.static("public/components"));
-
-// For Lesson Creator Page
-server.use(express.static("public/components"));
-
-// For everything in the public folder
-server.use(express.static("public"));
-
-server.use(
-  session({
-    secret: "keyboard cat",
-    resave: false,
-    saveUninitialized: false,
-   // cookie: { maxAge: 600000 },
-  })
-);
-
-// Set up session middleware
-server.use(session({ secret: process.env.SECRET! }));
-
-// Allows you to authenticate a session whenever a request comes in
-server.use(passport.session());
-
-//Configure the strategy in how passport verifies and authenticate the user
-const strategy = new Strategy(async function verify(username, password, done) {
-  try {
-    const { rows: studentRow } = await pool.query<User>(
-      "SELECT * FROM students WHERE username=$1",
-      [username]
-    );
-
-    const studentUser = studentRow[0];
-
-    const { rows: teacherRow } = await pool.query<User>(
-      "SELECT * FROM teachers WHERE username=$1",
-      [username]
-    );
-
-    const teacherUser = teacherRow[0];
-
-    if (studentUser) {
-      if (studentUser.password === password) {
-        const authenticatedStudent: Student = {
-          ...studentUser,
-          userType: "student",
-        };
-        return done(null, authenticatedStudent);
-      }
-    }
-
-    if (teacherUser) {
-      if (teacherUser.password === password) {
-        const authenticatedTeacher: Teacher = {
-          ...teacherUser,
-          userType: "teacher",
-        };
-        return done(null, authenticatedTeacher);
-      }
-    }
-
-    return done(null, false, { message: "Incorrect password" });
-  } catch (error) {
-    return done(error);
-  }
-});
-
-passport.serializeUser(function (user, done) {
-  return done(null, {
-    username: user.username,
-    userType: user.userType,
-  });
-});
-
-passport.deserializeUser<Student | Teacher>(function (user, done) {
-  return done(null, user);
-});
-
-passport.use(strategy);
 
 // Routers
 
