@@ -8,6 +8,12 @@ import session from "express-session";
 import { Strategy } from "passport-local";
 import type { Student, Teacher, User } from "./shared.types.ts";
 
+import indexRouter from "./routes/index.ts";
+import signupRouter from "./routes/signup.ts";
+import logInRouter from "./routes/login.ts";
+import lessonsRouter from "./routes/lessons.ts";
+import findTeacherRouter from "./routes/findTeacher.ts";
+
 // Create a server
 const server = express();
 
@@ -105,6 +111,15 @@ passport.deserializeUser<Student | Teacher>(function (user, done) {
   return done(null, user);
 });
 
-passport.use(strategy);
+passport.use(strategy)
+
+
+// Routers
+
+server.use("/findTeacher", findTeacherRouter);
+server.use("/lessons", lessonsRouter);
+server.use("/login", logInRouter);
+server.use("/signup", signupRouter);
+server.use("/", indexRouter);
 
 export default server
