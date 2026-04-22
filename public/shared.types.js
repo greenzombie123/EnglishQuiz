@@ -1,4 +1,5 @@
-export {};
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 // const j : IntroSlideRecord = {
 //   soundurl:"",
 //   slideorder:1,

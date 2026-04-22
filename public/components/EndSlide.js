@@ -1,4 +1,7 @@
-export class EndSlide extends HTMLElement {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.EndSlide = void 0;
+class EndSlide extends HTMLElement {
     constructor() {
         super();
         this.root = null;
@@ -15,5 +18,6 @@ export class EndSlide extends HTMLElement {
     }
     disconnectedCallback() { }
 }
+exports.EndSlide = EndSlide;
 customElements.define("end-slide", EndSlide);
 //# sourceMappingURL=EndSlide.js.map

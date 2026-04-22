@@ -1,4 +1,7 @@
-export class IntroSlide extends HTMLElement {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.IntroSlide = void 0;
+class IntroSlide extends HTMLElement {
     constructor() {
         super();
         this.targetWord = "";
@@ -47,5 +50,6 @@ export class IntroSlide extends HTMLElement {
     }
     disconnectedCallback() { }
 }
+exports.IntroSlide = IntroSlide;
 customElements.define("intro-slide", IntroSlide);
 //# sourceMappingURL=IntroSlide.js.map

@@ -1,4 +1,7 @@
-export const slideState = () => {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.slideState = void 0;
+const slideState = () => {
     let slides;
     let currentSlideIndex = 0;
     const isFirstSlide = () => currentSlideIndex === 0;
@@ -22,4 +25,5 @@ export const slideState = () => {
         isFirstSlide
     };
 };
+exports.slideState = slideState;
 //# sourceMappingURL=SlideState.js.map

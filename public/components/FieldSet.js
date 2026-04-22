@@ -1,4 +1,7 @@
-export class IntroFieldSet extends HTMLElement {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.QuestionFieldSet = exports.IntroFieldSet = void 0;
+class IntroFieldSet extends HTMLElement {
     constructor() {
         super();
         this.connectedCallback = () => {
@@ -13,8 +16,9 @@ export class IntroFieldSet extends HTMLElement {
         // this.setAttribute("name", "Squid")
     }
 }
+exports.IntroFieldSet = IntroFieldSet;
 IntroFieldSet.formAssociated = true;
-export class QuestionFieldSet extends HTMLElement {
+class QuestionFieldSet extends HTMLElement {
     constructor() {
         super();
         this.connectedCallback = () => { };
@@ -25,6 +29,7 @@ export class QuestionFieldSet extends HTMLElement {
         this.root.appendChild(template.content.cloneNode(true));
     }
 }
+exports.QuestionFieldSet = QuestionFieldSet;
 customElements.define("intro-fieldset", IntroFieldSet);
 customElements.define("question-fieldset", QuestionFieldSet);
 //# sourceMappingURL=FieldSet.js.map

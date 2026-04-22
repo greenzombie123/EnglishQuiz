@@ -1,10 +1,13 @@
+"use strict";
 var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (receiver, state, kind, f) {
     if (kind === "a" && !f) throw new TypeError("Private accessor was defined without a getter");
     if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot read private member from an object whose class did not declare it");
     return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state.get(receiver);
 };
 var _PopUpModal_setData, _PopUpModal_showDialog, _PopUpModal_onNoButtonClickedHandler;
-export class PopUpModal extends HTMLElement {
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.PopUpModal = void 0;
+class PopUpModal extends HTMLElement {
     constructor() {
         super();
         this.showPopUpModal = (topMessage, bottomMessage, onYesClickHandler) => {
@@ -81,6 +84,7 @@ export class PopUpModal extends HTMLElement {
     connectedCallback() {
     }
 }
+exports.PopUpModal = PopUpModal;
 _PopUpModal_setData = new WeakMap(), _PopUpModal_showDialog = new WeakMap(), _PopUpModal_onNoButtonClickedHandler = new WeakMap();
 customElements.define("pop-up-modal", PopUpModal);
 //# sourceMappingURL=PopUpModal.js.map

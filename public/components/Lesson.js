@@ -1,8 +1,11 @@
-import "./IntroSlide.js";
-import "./QuestionSlide.js";
-import "./EndSlide.js";
-import { slideState } from "./SlideState.js";
-export class LessonSlider extends HTMLElement {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.LessonSlider = void 0;
+require("./IntroSlide.js");
+require("./QuestionSlide.js");
+require("./EndSlide.js");
+const SlideState_ts_1 = require("./SlideState.js");
+class LessonSlider extends HTMLElement {
     constructor() {
         super();
         this.root = null;
@@ -63,7 +66,7 @@ export class LessonSlider extends HTMLElement {
             if (this.root)
                 this.root.appendChild(endSlide);
         };
-        this.slideState = slideState();
+        this.slideState = (0, SlideState_ts_1.slideState)();
     }
     connectedCallback() {
         this.root = this.attachShadow({ mode: "closed" });
@@ -90,6 +93,7 @@ export class LessonSlider extends HTMLElement {
         }
     }
 }
+exports.LessonSlider = LessonSlider;
 const style = `
   :host{
     flex:1;

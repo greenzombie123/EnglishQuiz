@@ -1,6 +1,6 @@
 import type { NextFunction, Request, Response } from "express";
 import { Router } from "express";
-import { getLogInPage, logInUser } from "../features/auth/auth.controller.ts"
+import { getLogInPage, logInUser } from "./auth.controller.ts"
 
 const logInRouter = Router();
 
@@ -15,4 +15,3 @@ logInRouter.post(
 );
 
 export default logInRouter
-

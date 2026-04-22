@@ -1,10 +1,12 @@
+"use strict";
 var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (receiver, state, kind, f) {
     if (kind === "a" && !f) throw new TypeError("Private accessor was defined without a getter");
     if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot read private member from an object whose class did not declare it");
     return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state.get(receiver);
 };
 var _AudioInputRecorder_handleStartRecording, _AudioInputRecorder_handleStopRecording, _AudioInputRecorder_handlePlayRecording, _AudioInputRecorder_handleUpdateAudioFiles, _AudioInputRecorder_handleCloseDialog, _AudioInputRecorder_handleSetAudioUrl, _AudioInputRecorder_changeIndicatorColor, _AudioInputRecorder_hasName, _AudioInputRecorder_hasNewName, _AudioInputRecorder_hasAudioFile, _AudioInputRecorder_giveWarning;
-import { lesssonCreaterStore } from "../store/LessonCreaterStore.js";
+Object.defineProperty(exports, "__esModule", { value: true });
+const LessonCreaterStore_ts_1 = require("../store/LessonCreaterStore.js");
 class AudioInputRecorder extends HTMLElement {
     constructor() {
         super();
@@ -114,7 +116,7 @@ class AudioInputRecorder extends HTMLElement {
         this.audio.addEventListener("ended", () => __classPrivateFieldGet(this, _AudioInputRecorder_changeIndicatorColor, "f").call(this, "inactive"));
         this.cancelButton.addEventListener("click", __classPrivateFieldGet(this, _AudioInputRecorder_handleCloseDialog, "f"));
         this.finishButton.addEventListener("click", __classPrivateFieldGet(this, _AudioInputRecorder_handleUpdateAudioFiles, "f"));
-        this.store = lesssonCreaterStore;
+        this.store = LessonCreaterStore_ts_1.lesssonCreaterStore;
         this.store.subscribe("audioFilesChanged", this.handleAudioFileCreated);
     }
     connectedCallback() { }
@@ -140,6 +142,6 @@ class AudioInputRecorder extends HTMLElement {
     }
 }
 _AudioInputRecorder_handleStartRecording = new WeakMap(), _AudioInputRecorder_handleStopRecording = new WeakMap(), _AudioInputRecorder_handlePlayRecording = new WeakMap(), _AudioInputRecorder_handleUpdateAudioFiles = new WeakMap(), _AudioInputRecorder_handleCloseDialog = new WeakMap(), _AudioInputRecorder_handleSetAudioUrl = new WeakMap(), _AudioInputRecorder_changeIndicatorColor = new WeakMap(), _AudioInputRecorder_hasName = new WeakMap(), _AudioInputRecorder_hasNewName = new WeakMap(), _AudioInputRecorder_hasAudioFile = new WeakMap(), _AudioInputRecorder_giveWarning = new WeakMap();
-export default AudioInputRecorder;
+exports.default = AudioInputRecorder;
 customElements.define("audio-input-recorder", AudioInputRecorder);
 //# sourceMappingURL=AudioInputRecorder.js.map

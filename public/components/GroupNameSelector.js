@@ -1,4 +1,7 @@
-export class GroupNameSelector extends HTMLElement {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.GroupNameSelector = void 0;
+class GroupNameSelector extends HTMLElement {
     constructor() {
         super();
         this.onInputChange = (e) => {
@@ -35,6 +38,7 @@ export class GroupNameSelector extends HTMLElement {
         // console.log(1231)
     }
 }
+exports.GroupNameSelector = GroupNameSelector;
 GroupNameSelector.formAssociated = true;
 customElements.define("groupname-selecter", GroupNameSelector);
 // Sets the value to be sent to the server

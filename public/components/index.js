@@ -1,4 +1,6 @@
-import "./Lesson.js";
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+require("./Lesson.js");
 const startLesson = async () => {
     // get reference for lesson component
     const lessonSlider = getLessonSlider();

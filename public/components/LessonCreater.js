@@ -1,13 +1,15 @@
+"use strict";
 var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (receiver, state, kind, f) {
     if (kind === "a" && !f) throw new TypeError("Private accessor was defined without a getter");
     if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot read private member from an object whose class did not declare it");
     return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state.get(receiver);
 };
 var _LessonCreater_instances, _LessonCreater_getLessonSlides, _LessonCreater_fillFieldSets, _LessonCreater_handleAddSoundSelect, _LessonCreater_createSoundSelect, _LessonCreater_attachSoundSelectToFieldSet, _LessonCreater_handleUpdateSoundSelect, _LessonCreater_handleCreateLesson, _LessonCreater_getChosenSoundFiles;
-import "./FieldSet.js";
-import "./GroupNameSelector.js";
-import "./audio/AudioInput.js";
-import { lesssonCreaterStore } from "./store/LessonCreaterStore.js";
+Object.defineProperty(exports, "__esModule", { value: true });
+require("./FieldSet.js");
+require("./GroupNameSelector.js");
+require("./audio/AudioInput.js");
+const LessonCreaterStore_ts_1 = require("./store/LessonCreaterStore.js");
 class LessonCreater extends HTMLElement {
     constructor() {
         super();
@@ -306,7 +308,7 @@ class LessonCreater extends HTMLElement {
         this.form = this.root.querySelector("form");
         selecterButton.addEventListener("click", this.handleSelecterButtonClicked);
         this.form.addEventListener("submit", __classPrivateFieldGet(this, _LessonCreater_handleCreateLesson, "f"));
-        this.store = lesssonCreaterStore;
+        this.store = LessonCreaterStore_ts_1.lesssonCreaterStore;
         // Subscribe to store events
         this.store.subscribe("audioFilesChanged", __classPrivateFieldGet(this, _LessonCreater_handleAddSoundSelect, "f"));
         this.store.subscribe("audioFilesChanged", __classPrivateFieldGet(this, _LessonCreater_handleUpdateSoundSelect, "f"));

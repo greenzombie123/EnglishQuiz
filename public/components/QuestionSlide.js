@@ -1,4 +1,7 @@
-export class QuestionSlide extends HTMLElement {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.QuestionSlide = void 0;
+class QuestionSlide extends HTMLElement {
     constructor() {
         super();
         this.question = "";
@@ -69,5 +72,6 @@ export class QuestionSlide extends HTMLElement {
     }
     disconnectedCallback() { }
 }
+exports.QuestionSlide = QuestionSlide;
 customElements.define("question-slide", QuestionSlide);
 //# sourceMappingURL=QuestionSlide.js.map

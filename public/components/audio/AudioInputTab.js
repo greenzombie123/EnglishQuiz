@@ -1,5 +1,7 @@
-import { lesssonCreaterStore } from "../store/LessonCreaterStore.js";
-import "../utility/PopUpModal.js";
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const LessonCreaterStore_ts_1 = require("../store/LessonCreaterStore.js");
+require("../utility/PopUpModal.js");
 class AudioInputTab extends HTMLElement {
     constructor() {
         super();
@@ -23,7 +25,7 @@ class AudioInputTab extends HTMLElement {
         const template = document.getElementById("audio-input-tab");
         this.root.appendChild(template.content.cloneNode(true));
         this.audio = this.root.querySelector("audio");
-        this.store = lesssonCreaterStore;
+        this.store = LessonCreaterStore_ts_1.lesssonCreaterStore;
     }
     attributeChangedCallback(name, oldValue, newValue) { }
     connectedCallback() {
@@ -45,6 +47,6 @@ class AudioInputTab extends HTMLElement {
     }
 }
 AudioInputTab.observedAttributes = ["fileName"];
-export default AudioInputTab;
+exports.default = AudioInputTab;
 customElements.define("audio-input-tab", AudioInputTab);
 //# sourceMappingURL=AudioInputTab.js.map
