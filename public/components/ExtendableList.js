@@ -4,6 +4,7 @@ exports.ExtendableList = void 0;
 require("./DeleteLessonButton.js");
 require("./DeleteLessonDialog.js");
 class ExtendableList extends HTMLElement {
+    root;
     constructor() {
         super();
         this.root = this.attachShadow({ mode: "open" });

@@ -10,7 +10,7 @@ import type { Student, Teacher, User } from "./shared.types.ts";
 
 import indexRouter from "./routes/index.ts";
 import signupRouter from "./routes/signup.ts";
-import logInRouter from "./routes/login.ts";
+import logInRouter from "./features/auth/auth.route.ts";
 import lessonsRouter from "./routes/lessons.ts";
 import findTeacherRouter from "./routes/findTeacher.ts";
 

@@ -4,32 +4,12 @@ const LessonCreaterStore_ts_1 = require("../store/LessonCreaterStore.js");
 require("./AudioInputTab.js");
 require("./AudioInputRecorder.js");
 class AudioInput extends HTMLElement {
+    root;
+    inputFileButton;
+    recorderButton;
+    store;
     constructor() {
         super();
-        this.handleChangeInputFile = (event) => {
-            const files = event.target.files;
-            if (files && files[0]) {
-                const audioFiles = this.store.getState("audioFiles");
-                const newAudioFiles = [...audioFiles, files[0]];
-                this.store.setState("audioFiles", newAudioFiles);
-            }
-        };
-        this.handleAudioFilesChanged = () => {
-            const audioFiles = this.store.getState("audioFiles");
-            const ul = this.root.querySelector("ul");
-            ul.replaceChildren();
-            const soundFileNames = this.root.querySelector(".soundFileNames");
-            soundFileNames.textContent = `There is ${audioFiles.length} files`;
-            audioFiles.forEach((audioFile) => {
-                const audioInputTab = document.createElement("audio-input-tab");
-                audioInputTab.setAudioUrl(audioFile);
-                ul.appendChild(audioInputTab);
-            });
-        };
-        this.handleAudioRecorderButtonClicked = () => {
-            const audioInputRecorder = this.root.querySelector("audio-input-recorder");
-            audioInputRecorder.open();
-        };
         this.root = this.attachShadow({ mode: "closed" });
         const template = document.getElementById("audio-input");
         this.root.appendChild(template.content.cloneNode(true));
@@ -45,6 +25,30 @@ class AudioInput extends HTMLElement {
     connectedCallback() { }
     disconnectedCallback() { }
     attributeChangedCallback() { }
+    handleChangeInputFile = (event) => {
+        const files = event.target.files;
+        if (files && files[0]) {
+            const audioFiles = this.store.getState("audioFiles");
+            const newAudioFiles = [...audioFiles, files[0]];
+            this.store.setState("audioFiles", newAudioFiles);
+        }
+    };
+    handleAudioFilesChanged = () => {
+        const audioFiles = this.store.getState("audioFiles");
+        const ul = this.root.querySelector("ul");
+        ul.replaceChildren();
+        const soundFileNames = this.root.querySelector(".soundFileNames");
+        soundFileNames.textContent = `There is ${audioFiles.length} files`;
+        audioFiles.forEach((audioFile) => {
+            const audioInputTab = document.createElement("audio-input-tab");
+            audioInputTab.setAudioUrl(audioFile);
+            ul.appendChild(audioInputTab);
+        });
+    };
+    handleAudioRecorderButtonClicked = () => {
+        const audioInputRecorder = this.root.querySelector("audio-input-recorder");
+        audioInputRecorder.open();
+    };
 }
 exports.default = AudioInput;
 customElements.define("audio-input", AudioInput);

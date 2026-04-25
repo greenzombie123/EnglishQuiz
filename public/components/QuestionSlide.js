@@ -2,39 +2,15 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.QuestionSlide = void 0;
 class QuestionSlide extends HTMLElement {
+    question = "";
+    correctAnswer = "";
+    wrongAnswer1 = "";
+    wrongAnswer2 = "";
+    wrongAnswer3 = "";
+    isFirstSlide = false;
+    root = null;
     constructor() {
         super();
-        this.question = "";
-        this.correctAnswer = "";
-        this.wrongAnswer1 = "";
-        this.wrongAnswer2 = "";
-        this.wrongAnswer3 = "";
-        this.isFirstSlide = false;
-        this.root = null;
-        this.setData = (questionSlideData) => {
-            this.correctAnswer = questionSlideData.correctanswer;
-            this.wrongAnswer1 = questionSlideData.wronganswer1;
-            this.wrongAnswer2 = questionSlideData.wronganswer2;
-            this.wrongAnswer3 = questionSlideData.wronganswer3;
-            this.question = questionSlideData.question;
-        };
-        this.onWrongAnswer = () => {
-            this.dispatchEvent(new CustomEvent("wrongAnswer", { bubbles: true, composed: true }));
-        };
-        this.onCorrectAnswer = () => {
-            this.dispatchEvent(new CustomEvent("correctAnswer", { bubbles: true, composed: true }));
-        };
-        this.onButtonClick = (e) => {
-            const button = e.currentTarget;
-            const answer = button.textContent;
-            const isCorrect = this.checkAnswer(answer);
-            if (isCorrect)
-                this.onCorrectAnswer();
-            else
-                this.onWrongAnswer();
-        };
-        this.checkAnswer = (answer) => this.correctAnswer === answer;
-        this.shuffle = (array) => array.sort(() => Math.random() - 0.5);
     }
     connectedCallback() {
         // Ref the template, clone content and attach to root
@@ -71,6 +47,30 @@ class QuestionSlide extends HTMLElement {
         this.root.appendChild(clonedContent);
     }
     disconnectedCallback() { }
+    setData = (questionSlideData) => {
+        this.correctAnswer = questionSlideData.correctanswer;
+        this.wrongAnswer1 = questionSlideData.wronganswer1;
+        this.wrongAnswer2 = questionSlideData.wronganswer2;
+        this.wrongAnswer3 = questionSlideData.wronganswer3;
+        this.question = questionSlideData.question;
+    };
+    onWrongAnswer = () => {
+        this.dispatchEvent(new CustomEvent("wrongAnswer", { bubbles: true, composed: true }));
+    };
+    onCorrectAnswer = () => {
+        this.dispatchEvent(new CustomEvent("correctAnswer", { bubbles: true, composed: true }));
+    };
+    onButtonClick = (e) => {
+        const button = e.currentTarget;
+        const answer = button.textContent;
+        const isCorrect = this.checkAnswer(answer);
+        if (isCorrect)
+            this.onCorrectAnswer();
+        else
+            this.onWrongAnswer();
+    };
+    checkAnswer = (answer) => this.correctAnswer === answer;
+    shuffle = (array) => array.sort(() => Math.random() - 0.5);
 }
 exports.QuestionSlide = QuestionSlide;
 customElements.define("question-slide", QuestionSlide);

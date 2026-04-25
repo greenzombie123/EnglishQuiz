@@ -2,26 +2,11 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.GroupNameSelector = void 0;
 class GroupNameSelector extends HTMLElement {
+    static formAssociated = true;
+    internals;
+    root;
     constructor() {
         super();
-        this.onInputChange = (e) => {
-            const input = e.currentTarget;
-            const inputValue = input.value;
-            if (inputValue) {
-                this.internals.setFormValue(inputValue);
-            }
-        };
-        this.onSelectChange = (e) => {
-            const selecter = e.currentTarget;
-            if (selecter.value) {
-                this.internals.setFormValue(selecter.value);
-            }
-        };
-        this.setGroupName = (groupname) => {
-            this.internals.setFormValue(groupname);
-            const input = this.root.querySelector("input");
-            input.value = groupname;
-        };
         this.root = this.attachShadow({ mode: "closed" });
         const template = document.getElementById("groupname-selecter");
         this.root.appendChild(template.content.cloneNode(true));
@@ -37,9 +22,26 @@ class GroupNameSelector extends HTMLElement {
     connectedCallback() {
         // console.log(1231)
     }
+    onInputChange = (e) => {
+        const input = e.currentTarget;
+        const inputValue = input.value;
+        if (inputValue) {
+            this.internals.setFormValue(inputValue);
+        }
+    };
+    onSelectChange = (e) => {
+        const selecter = e.currentTarget;
+        if (selecter.value) {
+            this.internals.setFormValue(selecter.value);
+        }
+    };
+    setGroupName = (groupname) => {
+        this.internals.setFormValue(groupname);
+        const input = this.root.querySelector("input");
+        input.value = groupname;
+    };
 }
 exports.GroupNameSelector = GroupNameSelector;
-GroupNameSelector.formAssociated = true;
 customElements.define("groupname-selecter", GroupNameSelector);
 // Sets the value to be sent to the server
 // this.internals.setFormValue("something here");

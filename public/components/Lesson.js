@@ -6,66 +6,11 @@ require("./QuestionSlide.js");
 require("./EndSlide.js");
 const SlideState_ts_1 = require("./SlideState.js");
 class LessonSlider extends HTMLElement {
+    slideState;
+    root = null;
+    currentSlide = null;
     constructor() {
         super();
-        this.root = null;
-        this.currentSlide = null;
-        this.createSlide = () => {
-            const currentSlide = this.slideState.getCurrentSlide();
-            const { type } = currentSlide;
-            if (type === "intro") {
-                return this.createIntroSlide(currentSlide);
-            }
-            else
-                return this.createQuestionSlide(currentSlide);
-        };
-        this.createIntroSlide = (introSlideData) => {
-            const slide = document.createElement(`intro-slide`);
-            const isFirstSlide = this.slideState.isFirstSlide();
-            slide.setData(introSlideData, isFirstSlide);
-            return slide;
-        };
-        this.createQuestionSlide = (questionSlideData) => {
-            const slide = document.createElement(`question-slide`);
-            slide.setData(questionSlideData);
-            return slide;
-        };
-        this.removeCurrentSlide = () => {
-            if (this.currentSlide) {
-                this.currentSlide.remove();
-                this.currentSlide = null;
-            }
-        };
-        this.handleWrongAnswer = () => {
-            this.slideState.changeSlide(-2);
-            this.removeCurrentSlide();
-            this.render();
-        };
-        this.handleCorrectAnswer = () => {
-            const isLastSlide = this.slideState.isLastSlide();
-            if (isLastSlide)
-                return this.handleLessonFinished();
-            this.slideState.changeSlide(1);
-            this.removeCurrentSlide();
-            this.render();
-        };
-        this.handleNextButtonClicked = () => {
-            const isLastSlide = this.slideState.isLastSlide();
-            if (isLastSlide)
-                return this.handleLessonFinished();
-            this.slideState.changeSlide(1);
-            this.removeCurrentSlide();
-            this.render();
-        };
-        this.handleLessonFinished = () => {
-            this.removeCurrentSlide();
-            this.renderEndSlide();
-        };
-        this.renderEndSlide = () => {
-            const endSlide = document.createElement("end-slide");
-            if (this.root)
-                this.root.appendChild(endSlide);
-        };
         this.slideState = (0, SlideState_ts_1.slideState)();
     }
     connectedCallback() {
@@ -86,12 +31,68 @@ class LessonSlider extends HTMLElement {
     setSlides(slides) {
         this.slideState.setSlides(slides);
     }
+    createSlide = () => {
+        const currentSlide = this.slideState.getCurrentSlide();
+        const { type } = currentSlide;
+        if (type === "intro") {
+            return this.createIntroSlide(currentSlide);
+        }
+        else
+            return this.createQuestionSlide(currentSlide);
+    };
+    createIntroSlide = (introSlideData) => {
+        const slide = document.createElement(`intro-slide`);
+        const isFirstSlide = this.slideState.isFirstSlide();
+        slide.setData(introSlideData, isFirstSlide);
+        return slide;
+    };
+    createQuestionSlide = (questionSlideData) => {
+        const slide = document.createElement(`question-slide`);
+        slide.setData(questionSlideData);
+        return slide;
+    };
+    removeCurrentSlide = () => {
+        if (this.currentSlide) {
+            this.currentSlide.remove();
+            this.currentSlide = null;
+        }
+    };
     render() {
         this.currentSlide = this.createSlide();
         if (this.root) {
             this.root.appendChild(this.currentSlide);
         }
     }
+    handleWrongAnswer = () => {
+        this.slideState.changeSlide(-2);
+        this.removeCurrentSlide();
+        this.render();
+    };
+    handleCorrectAnswer = () => {
+        const isLastSlide = this.slideState.isLastSlide();
+        if (isLastSlide)
+            return this.handleLessonFinished();
+        this.slideState.changeSlide(1);
+        this.removeCurrentSlide();
+        this.render();
+    };
+    handleNextButtonClicked = () => {
+        const isLastSlide = this.slideState.isLastSlide();
+        if (isLastSlide)
+            return this.handleLessonFinished();
+        this.slideState.changeSlide(1);
+        this.removeCurrentSlide();
+        this.render();
+    };
+    handleLessonFinished = () => {
+        this.removeCurrentSlide();
+        this.renderEndSlide();
+    };
+    renderEndSlide = () => {
+        const endSlide = document.createElement("end-slide");
+        if (this.root)
+            this.root.appendChild(endSlide);
+    };
 }
 exports.LessonSlider = LessonSlider;
 const style = `

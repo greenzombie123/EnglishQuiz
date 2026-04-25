@@ -4,7 +4,7 @@ import passport from "passport";
 export const getLogInPage = (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   res.render("login");
 };
@@ -14,3 +14,11 @@ export const logInUser = () =>
     failureRedirect: "/login",
     failureMessage: true,
   });
+
+export const redirectToDashBoard = (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  res.redirect('lessons')
+};

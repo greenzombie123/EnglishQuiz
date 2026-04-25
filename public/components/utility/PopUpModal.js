@@ -1,37 +1,15 @@
 "use strict";
-var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (receiver, state, kind, f) {
-    if (kind === "a" && !f) throw new TypeError("Private accessor was defined without a getter");
-    if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot read private member from an object whose class did not declare it");
-    return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state.get(receiver);
-};
-var _PopUpModal_setData, _PopUpModal_showDialog, _PopUpModal_onNoButtonClickedHandler;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PopUpModal = void 0;
 class PopUpModal extends HTMLElement {
+    root;
+    dialog;
+    topMessage;
+    bottomMessage;
+    yesButton;
+    noButton;
     constructor() {
         super();
-        this.showPopUpModal = (topMessage, bottomMessage, onYesClickHandler) => {
-            __classPrivateFieldGet(this, _PopUpModal_setData, "f").call(this, topMessage, bottomMessage, onYesClickHandler);
-            __classPrivateFieldGet(this, _PopUpModal_showDialog, "f").call(this);
-        };
-        _PopUpModal_setData.set(this, (topMessage, bottomMessage, onYesClickHandler) => {
-            this.topMessage.textContent = topMessage;
-            if (bottomMessage)
-                this.bottomMessage.textContent = bottomMessage;
-            if (onYesClickHandler)
-                this.yesButton.addEventListener("click", () => {
-                    onYesClickHandler();
-                    // Close the dialog right after 
-                    __classPrivateFieldGet(this, _PopUpModal_onNoButtonClickedHandler, "f").call(this);
-                });
-        });
-        _PopUpModal_showDialog.set(this, () => {
-            this.dialog.showModal();
-        });
-        _PopUpModal_onNoButtonClickedHandler.set(this, () => {
-            this.dialog.close();
-            this.remove();
-        });
         this.root = this.attachShadow({ mode: "closed" });
         this.dialog = document.createElement("dialog");
         this.dialog.setAttribute("closedby", "any");
@@ -50,7 +28,7 @@ class PopUpModal extends HTMLElement {
         wrapper.appendChild(this.yesButton);
         this.noButton = document.createElement("button");
         this.noButton.textContent = "No";
-        this.noButton.addEventListener("click", __classPrivateFieldGet(this, _PopUpModal_onNoButtonClickedHandler, "f"));
+        this.noButton.addEventListener("click", this.#onNoButtonClickedHandler);
         wrapper.appendChild(this.noButton);
         const style = document.createElement("style");
         style.textContent = `
@@ -83,8 +61,29 @@ class PopUpModal extends HTMLElement {
     }
     connectedCallback() {
     }
+    showPopUpModal = (topMessage, bottomMessage, onYesClickHandler) => {
+        this.#setData(topMessage, bottomMessage, onYesClickHandler);
+        this.#showDialog();
+    };
+    #setData = (topMessage, bottomMessage, onYesClickHandler) => {
+        this.topMessage.textContent = topMessage;
+        if (bottomMessage)
+            this.bottomMessage.textContent = bottomMessage;
+        if (onYesClickHandler)
+            this.yesButton.addEventListener("click", () => {
+                onYesClickHandler();
+                // Close the dialog right after 
+                this.#onNoButtonClickedHandler();
+            });
+    };
+    #showDialog = () => {
+        this.dialog.showModal();
+    };
+    #onNoButtonClickedHandler = () => {
+        this.dialog.close();
+        this.remove();
+    };
 }
 exports.PopUpModal = PopUpModal;
-_PopUpModal_setData = new WeakMap(), _PopUpModal_showDialog = new WeakMap(), _PopUpModal_onNoButtonClickedHandler = new WeakMap();
 customElements.define("pop-up-modal", PopUpModal);
 //# sourceMappingURL=PopUpModal.js.map

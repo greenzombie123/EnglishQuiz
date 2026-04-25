@@ -1,55 +1,18 @@
 "use strict";
-var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (receiver, state, kind, f) {
-    if (kind === "a" && !f) throw new TypeError("Private accessor was defined without a getter");
-    if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot read private member from an object whose class did not declare it");
-    return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state.get(receiver);
-};
-var _DeleteLessonDialog_setData, _DeleteLessonDialog_showDialog, _DeleteLessonDialog_onYesButtonClicked, _DeleteLessonDialog_removeButtons, _DeleteLessonDialog_renderReturnButton, _DeleteLessonDialog_reset;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DeleteLessonDialog = void 0;
 class DeleteLessonDialog extends HTMLElement {
+    root;
+    dialog;
+    topMessage;
+    bottomMessage;
+    yesButton;
+    noButton;
+    returnButton;
+    href;
+    lessonname;
     constructor() {
         super();
-        this.showDeleteDialog = (lessonname, href) => {
-            __classPrivateFieldGet(this, _DeleteLessonDialog_reset, "f").call(this);
-            __classPrivateFieldGet(this, _DeleteLessonDialog_setData, "f").call(this, lessonname, href);
-            __classPrivateFieldGet(this, _DeleteLessonDialog_showDialog, "f").call(this);
-        };
-        _DeleteLessonDialog_setData.set(this, (lessonname, href) => {
-            this.lessonname = lessonname;
-            this.href = href;
-        });
-        _DeleteLessonDialog_showDialog.set(this, () => {
-            this.topMessage.textContent = "Will you delete this lesson?";
-            this.bottomMessage.textContent = this.lessonname;
-            this.dialog.showModal();
-        });
-        _DeleteLessonDialog_onYesButtonClicked.set(this, async () => {
-            try {
-                const response = await fetch(this.href, { method: "delete" });
-                if (!response.ok)
-                    throw new Error("The error is this: " + response.status);
-                __classPrivateFieldGet(this, _DeleteLessonDialog_removeButtons, "f").call(this);
-                __classPrivateFieldGet(this, _DeleteLessonDialog_renderReturnButton, "f").call(this);
-                this.topMessage.textContent = "The lesson was deleted.";
-                this.bottomMessage.textContent = "";
-            }
-            catch (error) {
-                console.log(error.message);
-            }
-        });
-        _DeleteLessonDialog_removeButtons.set(this, () => {
-            const buttons = Array.from(this.dialog.querySelectorAll("button"));
-            buttons.forEach((button) => (button.style.display = "none"));
-        });
-        _DeleteLessonDialog_renderReturnButton.set(this, () => {
-            this.returnButton.style.display = "block";
-        });
-        _DeleteLessonDialog_reset.set(this, () => {
-            const buttons = Array.from(this.dialog.querySelectorAll("button"));
-            buttons.forEach((button) => (button.style.display = "block"));
-            this.returnButton.style.display = "none";
-        });
         this.href = "";
         this.lessonname = "";
         this.root = this.attachShadow({ mode: "closed" });
@@ -67,7 +30,7 @@ class DeleteLessonDialog extends HTMLElement {
         wrapper.appendChild(this.bottomMessage);
         this.yesButton = document.createElement("button");
         this.yesButton.textContent = "Yes";
-        this.yesButton.addEventListener("click", __classPrivateFieldGet(this, _DeleteLessonDialog_onYesButtonClicked, "f"));
+        this.yesButton.addEventListener("click", this.#onYesButtonClicked);
         wrapper.appendChild(this.yesButton);
         this.noButton = document.createElement("button");
         this.noButton.textContent = "No";
@@ -106,8 +69,47 @@ class DeleteLessonDialog extends HTMLElement {
     }
     connectedCallback() {
     }
+    showDeleteDialog = (lessonname, href) => {
+        this.#reset();
+        this.#setData(lessonname, href);
+        this.#showDialog();
+    };
+    #setData = (lessonname, href) => {
+        this.lessonname = lessonname;
+        this.href = href;
+    };
+    #showDialog = () => {
+        this.topMessage.textContent = "Will you delete this lesson?";
+        this.bottomMessage.textContent = this.lessonname;
+        this.dialog.showModal();
+    };
+    #onYesButtonClicked = async () => {
+        try {
+            const response = await fetch(this.href, { method: "delete" });
+            if (!response.ok)
+                throw new Error("The error is this: " + response.status);
+            this.#removeButtons();
+            this.#renderReturnButton();
+            this.topMessage.textContent = "The lesson was deleted.";
+            this.bottomMessage.textContent = "";
+        }
+        catch (error) {
+            console.log(error.message);
+        }
+    };
+    #removeButtons = () => {
+        const buttons = Array.from(this.dialog.querySelectorAll("button"));
+        buttons.forEach((button) => (button.style.display = "none"));
+    };
+    #renderReturnButton = () => {
+        this.returnButton.style.display = "block";
+    };
+    #reset = () => {
+        const buttons = Array.from(this.dialog.querySelectorAll("button"));
+        buttons.forEach((button) => (button.style.display = "block"));
+        this.returnButton.style.display = "none";
+    };
 }
 exports.DeleteLessonDialog = DeleteLessonDialog;
-_DeleteLessonDialog_setData = new WeakMap(), _DeleteLessonDialog_showDialog = new WeakMap(), _DeleteLessonDialog_onYesButtonClicked = new WeakMap(), _DeleteLessonDialog_removeButtons = new WeakMap(), _DeleteLessonDialog_renderReturnButton = new WeakMap(), _DeleteLessonDialog_reset = new WeakMap();
 customElements.define("deletelesson-dialog", DeleteLessonDialog);
 //# sourceMappingURL=DeleteLessonDialog.js.map

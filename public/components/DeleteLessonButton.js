@@ -1,20 +1,12 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 class DeleteLessonButton extends HTMLElement {
+    static observedAttributes = ["data-lessonname", "href"];
+    root;
+    href = "";
+    lessonName = "";
     constructor() {
         super();
-        this.href = "";
-        this.lessonName = "";
-        this.onDeleteLinkClicked = () => {
-            const dialog = document.querySelector("deletelesson-dialog");
-            dialog.showDeleteDialog(this.lessonName, this.href);
-        };
-        this.setURL = (url) => {
-            this.href = url;
-        };
-        this.setLessonName = (lessonName) => {
-            this.lessonName = lessonName;
-        };
         this.root = this.attachShadow({ mode: "closed" });
         const img = document.createElement("img");
         img.src = "/bin.png";
@@ -58,7 +50,16 @@ class DeleteLessonButton extends HTMLElement {
             this.setLessonName(newValue);
         }
     }
+    onDeleteLinkClicked = () => {
+        const dialog = document.querySelector("deletelesson-dialog");
+        dialog.showDeleteDialog(this.lessonName, this.href);
+    };
+    setURL = (url) => {
+        this.href = url;
+    };
+    setLessonName = (lessonName) => {
+        this.lessonName = lessonName;
+    };
 }
-DeleteLessonButton.observedAttributes = ["data-lessonname", "href"];
 customElements.define("deletelesson-button", DeleteLessonButton);
 //# sourceMappingURL=DeleteLessonButton.js.map
