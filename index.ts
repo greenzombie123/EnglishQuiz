@@ -1,12 +1,8 @@
 import express from "express";
 import views from "./dirNames.ts";
 
-import { pool } from "./config/database.config.ts";
-
-import passport from "passport";
+import passport from "./config/passport.config.ts"
 import session from "express-session";
-import { Strategy } from "passport-local";
-import type { Student, Teacher, User } from "./shared.types.ts";
 
 import indexRouter from "./routes/index.ts";
 import signupRouter from "./routes/signup.ts";
@@ -56,62 +52,6 @@ server.use(session({ secret: process.env.SECRET! }));
 
 // Allows you to authenticate a session whenever a request comes in
 server.use(passport.session());
-
-//Configure the strategy in how passport verifies and authenticate the user
-const strategy = new Strategy(async function verify(username, password, done) {
-  try {
-    const { rows: studentRow } = await pool.query<User>(
-      "SELECT * FROM students WHERE username=$1",
-      [username]
-    );
-
-    const studentUser = studentRow[0];
-
-    const { rows: teacherRow } = await pool.query<User>(
-      "SELECT * FROM teachers WHERE username=$1",
-      [username]
-    );
-
-    const teacherUser = teacherRow[0];
-
-    if (studentUser) {
-      if (studentUser.password === password) {
-        const authenticatedStudent: Student = {
-          ...studentUser,
-          userType: "student",
-        };
-        return done(null, authenticatedStudent);
-      }
-    }
-
-    if (teacherUser) {
-      if (teacherUser.password === password) {
-        const authenticatedTeacher: Teacher = {
-          ...teacherUser,
-          userType: "teacher",
-        };
-        return done(null, authenticatedTeacher);
-      }
-    }
-
-    return done(null, false, { message: "Incorrect password" });
-  } catch (error) {
-    return done(error);
-  }
-});
-
-passport.serializeUser(function (user, done) {
-  return done(null, {
-    username: user.username,
-    userType: user.userType,
-  });
-});
-
-passport.deserializeUser<Student | Teacher>(function (user, done) {
-  return done(null, user);
-});
-
-passport.use(strategy)
 
 
 // Routers

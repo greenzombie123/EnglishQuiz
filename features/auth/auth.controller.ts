@@ -9,7 +9,7 @@ export const getLogInPage = (
   res.render("login");
 };
 
-export const logInUser = () =>
+export const logInUser =
   passport.authenticate("local", {
     failureRedirect: "/login",
     failureMessage: true,

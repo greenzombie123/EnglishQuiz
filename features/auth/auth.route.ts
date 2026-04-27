@@ -8,7 +8,7 @@ logInRouter.get("/", getLogInPage);
 
 logInRouter.post(
   "/",
-  logInUser(),
+  logInUser,
   redirectToDashBoard
 );
 

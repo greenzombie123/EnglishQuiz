@@ -1,17 +1,3 @@
-// Type for Students and Teachers
-export type User = {
-  username: string;
-  password: string;
-};
-
-export type Teacher = User & {
-  userType: "teacher";
-};
-
-export type Student = User & {
-  userType: "student";
-};
-
 
 type BaseSlideRecord = {
   soundurl:string,
