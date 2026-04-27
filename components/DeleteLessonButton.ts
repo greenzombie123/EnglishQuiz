@@ -1,5 +1,5 @@
 import { DeleteLessonDialog } from "./DeleteLessonDialog.ts";
-
+let number = 2
 export interface DeleteLessonEvent {
   lesssonname:string,
   id:string

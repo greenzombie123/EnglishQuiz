@@ -1,6 +1,4 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-class Store {
+export default class Store {
     state;
     events = new Map();
     constructor(initialState) {
@@ -34,5 +32,4 @@ class Store {
         }
     }
 }
-exports.default = Store;
 //# sourceMappingURL=store.js.map

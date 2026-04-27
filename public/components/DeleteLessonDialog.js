@@ -1,7 +1,4 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.DeleteLessonDialog = void 0;
-class DeleteLessonDialog extends HTMLElement {
+export class DeleteLessonDialog extends HTMLElement {
     root;
     dialog;
     topMessage;
@@ -110,6 +107,5 @@ class DeleteLessonDialog extends HTMLElement {
         this.returnButton.style.display = "none";
     };
 }
-exports.DeleteLessonDialog = DeleteLessonDialog;
 customElements.define("deletelesson-dialog", DeleteLessonDialog);
 //# sourceMappingURL=DeleteLessonDialog.js.map

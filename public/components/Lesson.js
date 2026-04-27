@@ -1,17 +1,14 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.LessonSlider = void 0;
-require("./IntroSlide.js");
-require("./QuestionSlide.js");
-require("./EndSlide.js");
-const SlideState_ts_1 = require("./SlideState.js");
-class LessonSlider extends HTMLElement {
+import "./IntroSlide.js";
+import "./QuestionSlide.js";
+import "./EndSlide.js";
+import { slideState } from "./SlideState.js";
+export class LessonSlider extends HTMLElement {
     slideState;
     root = null;
     currentSlide = null;
     constructor() {
         super();
-        this.slideState = (0, SlideState_ts_1.slideState)();
+        this.slideState = slideState();
     }
     connectedCallback() {
         this.root = this.attachShadow({ mode: "closed" });
@@ -94,7 +91,6 @@ class LessonSlider extends HTMLElement {
             this.root.appendChild(endSlide);
     };
 }
-exports.LessonSlider = LessonSlider;
 const style = `
   :host{
     flex:1;

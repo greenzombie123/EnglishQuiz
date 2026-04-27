@@ -1,9 +1,7 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-const LessonCreaterStore_ts_1 = require("../store/LessonCreaterStore.js");
-require("./AudioInputTab.js");
-require("./AudioInputRecorder.js");
-class AudioInput extends HTMLElement {
+import { lesssonCreaterStore } from "../store/LessonCreaterStore.js";
+import "./AudioInputTab.js";
+import "./AudioInputRecorder.js";
+export default class AudioInput extends HTMLElement {
     root;
     inputFileButton;
     recorderButton;
@@ -18,7 +16,7 @@ class AudioInput extends HTMLElement {
         this.addEventListener("change", this.handleChangeInputFile);
         this.inputFileButton.addEventListener("change", this.handleChangeInputFile);
         this.recorderButton.addEventListener("click", this.handleAudioRecorderButtonClicked);
-        this.store = LessonCreaterStore_ts_1.lesssonCreaterStore;
+        this.store = lesssonCreaterStore;
         // Subscribe to store events
         this.store.subscribe("audioFilesChanged", this.handleAudioFilesChanged);
     }
@@ -50,6 +48,5 @@ class AudioInput extends HTMLElement {
         audioInputRecorder.open();
     };
 }
-exports.default = AudioInput;
 customElements.define("audio-input", AudioInput);
 //# sourceMappingURL=AudioInput.js.map

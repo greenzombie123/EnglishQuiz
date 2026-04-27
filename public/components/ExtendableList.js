@@ -1,9 +1,6 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.ExtendableList = void 0;
-require("./DeleteLessonButton.js");
-require("./DeleteLessonDialog.js");
-class ExtendableList extends HTMLElement {
+import "./DeleteLessonButton.js";
+import "./DeleteLessonDialog.js";
+export class ExtendableList extends HTMLElement {
     root;
     constructor() {
         super();
@@ -27,6 +24,5 @@ class ExtendableList extends HTMLElement {
         });
     }
 }
-exports.ExtendableList = ExtendableList;
 customElements.define("extendable-list", ExtendableList);
 //# sourceMappingURL=ExtendableList.js.map

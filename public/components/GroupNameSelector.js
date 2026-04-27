@@ -1,7 +1,4 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.GroupNameSelector = void 0;
-class GroupNameSelector extends HTMLElement {
+export class GroupNameSelector extends HTMLElement {
     static formAssociated = true;
     internals;
     root;
@@ -41,7 +38,6 @@ class GroupNameSelector extends HTMLElement {
         input.value = groupname;
     };
 }
-exports.GroupNameSelector = GroupNameSelector;
 customElements.define("groupname-selecter", GroupNameSelector);
 // Sets the value to be sent to the server
 // this.internals.setFormValue("something here");

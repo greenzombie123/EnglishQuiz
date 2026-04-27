@@ -1,9 +1,7 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-require("./FieldSet.js");
-require("./GroupNameSelector.js");
-require("./audio/AudioInput.js");
-const LessonCreaterStore_ts_1 = require("./store/LessonCreaterStore.js");
+import "./FieldSet.js";
+import "./GroupNameSelector.js";
+import "./audio/AudioInput.js";
+import { lesssonCreaterStore } from "./store/LessonCreaterStore.js";
 class LessonCreater extends HTMLElement {
     root;
     slideIndex = 0;
@@ -20,7 +18,7 @@ class LessonCreater extends HTMLElement {
         this.form = this.root.querySelector("form");
         selecterButton.addEventListener("click", this.handleSelecterButtonClicked);
         this.form.addEventListener("submit", this.#handleCreateLesson);
-        this.store = LessonCreaterStore_ts_1.lesssonCreaterStore;
+        this.store = lesssonCreaterStore;
         // Subscribe to store events
         this.store.subscribe("audioFilesChanged", this.#handleAddSoundSelect);
         this.store.subscribe("audioFilesChanged", this.#handleUpdateSoundSelect);

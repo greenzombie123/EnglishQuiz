@@ -1,7 +1,4 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.PopUpModal = void 0;
-class PopUpModal extends HTMLElement {
+export class PopUpModal extends HTMLElement {
     root;
     dialog;
     topMessage;
@@ -84,6 +81,5 @@ class PopUpModal extends HTMLElement {
         this.remove();
     };
 }
-exports.PopUpModal = PopUpModal;
 customElements.define("pop-up-modal", PopUpModal);
 //# sourceMappingURL=PopUpModal.js.map

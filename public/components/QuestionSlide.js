@@ -1,7 +1,4 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.QuestionSlide = void 0;
-class QuestionSlide extends HTMLElement {
+export class QuestionSlide extends HTMLElement {
     question = "";
     correctAnswer = "";
     wrongAnswer1 = "";
@@ -72,6 +69,5 @@ class QuestionSlide extends HTMLElement {
     checkAnswer = (answer) => this.correctAnswer === answer;
     shuffle = (array) => array.sort(() => Math.random() - 0.5);
 }
-exports.QuestionSlide = QuestionSlide;
 customElements.define("question-slide", QuestionSlide);
 //# sourceMappingURL=QuestionSlide.js.map

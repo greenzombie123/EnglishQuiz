@@ -1,7 +1,4 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.QuestionFieldSet = exports.IntroFieldSet = void 0;
-class IntroFieldSet extends HTMLElement {
+export class IntroFieldSet extends HTMLElement {
     static formAssociated = true;
     root;
     internals;
@@ -19,8 +16,7 @@ class IntroFieldSet extends HTMLElement {
     disconnectedCallback = () => { };
     connectedMoveCallback = () => { };
 }
-exports.IntroFieldSet = IntroFieldSet;
-class QuestionFieldSet extends HTMLElement {
+export class QuestionFieldSet extends HTMLElement {
     root;
     constructor() {
         super();
@@ -32,7 +28,6 @@ class QuestionFieldSet extends HTMLElement {
     disconnectedCallback = () => { };
     connectedMoveCallback = () => { };
 }
-exports.QuestionFieldSet = QuestionFieldSet;
 customElements.define("intro-fieldset", IntroFieldSet);
 customElements.define("question-fieldset", QuestionFieldSet);
 //# sourceMappingURL=FieldSet.js.map

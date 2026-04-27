@@ -1,5 +1,4 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
+let number = 2;
 class DeleteLessonButton extends HTMLElement {
     static observedAttributes = ["data-lessonname", "href"];
     root;
@@ -62,4 +61,5 @@ class DeleteLessonButton extends HTMLElement {
     };
 }
 customElements.define("deletelesson-button", DeleteLessonButton);
+export {};
 //# sourceMappingURL=DeleteLessonButton.js.map

@@ -5,3 +5,5 @@ server.listen(3000, (error) => {
 
   console.log("Running server on port 3000");
 });
+
+//  "dev:client": "npx tsc -p tsconfig.client.json --watch",

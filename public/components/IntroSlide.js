@@ -1,7 +1,4 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.IntroSlide = void 0;
-class IntroSlide extends HTMLElement {
+export class IntroSlide extends HTMLElement {
     targetWord = "";
     definition = "";
     isFirstSlide = false;
@@ -50,6 +47,5 @@ class IntroSlide extends HTMLElement {
         this.isFirstSlide = isFirstSlide;
     };
 }
-exports.IntroSlide = IntroSlide;
 customElements.define("intro-slide", IntroSlide);
 //# sourceMappingURL=IntroSlide.js.map
