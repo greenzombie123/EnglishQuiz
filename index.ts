@@ -5,10 +5,9 @@ import passport from "./config/passport.config.ts"
 import session from "express-session";
 
 import indexRouter from "./routes/index.ts";
-import signupRouter from "./routes/signup.ts";
-import logInRouter from "./features/auth/auth.route.ts";
 import lessonsRouter from "./routes/lessons.ts";
 import findTeacherRouter from "./routes/findTeacher.ts";
+import {signupRouter, logInRouter} from "./features/auth/auth.route.ts"
 
 // Create a server
 const server = express();
@@ -52,7 +51,6 @@ server.use(session({ secret: process.env.SECRET! }));
 
 // Allows you to authenticate a session whenever a request comes in
 server.use(passport.session());
-
 
 // Routers
 

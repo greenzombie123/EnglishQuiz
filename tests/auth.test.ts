@@ -2,7 +2,6 @@ import type { NextFunction, Request, Response } from "express";
 import request from "supertest"
 import express from "express"
 import { redirectToDashBoard } from "../features/auth/auth.controller";
-import type{ DoneCallback } from "passport";
 
 const app = express()
 const stuff = (req:Request, res:Response, next:NextFunction)=>{

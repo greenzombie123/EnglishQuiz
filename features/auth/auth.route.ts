@@ -1,8 +1,8 @@
-import type { NextFunction, Request, Response } from "express";
 import { Router } from "express";
 import { getLogInPage, logInUser, redirectToDashBoard } from "./auth.controller.ts"
+import { checkSignUpForm, getSignUpCompletePage, getSignUpPage, handleAddUser, validateSignUpForm } from "./../../controllers/signup.ts";
 
-const logInRouter = Router();
+export const logInRouter = Router();
 
 logInRouter.get("/", getLogInPage);
 
@@ -10,6 +10,14 @@ logInRouter.post(
   "/",
   logInUser,
   redirectToDashBoard
-);
+); 
 
-export default logInRouter
+export const signupRouter = Router();
+
+
+signupRouter.get("/", getSignUpPage)
+
+signupRouter.get("/completed", getSignUpCompletePage)
+
+signupRouter.post("/", checkSignUpForm(), validateSignUpForm, handleAddUser)
+

@@ -1,5 +1,8 @@
 import type { NextFunction, Request, Response } from "express";
+// import passport from "./../../config/passport.config"
 import passport from "passport";
+
+// Logging In
 
 export const getLogInPage = (
   req: Request,
