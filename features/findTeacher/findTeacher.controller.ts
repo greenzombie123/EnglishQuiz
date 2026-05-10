@@ -23,16 +23,6 @@ export const getFindTeacherPage = (req:Request, res:Response, next:NextFunction)
     res.render("findTeacherPage")
 }
 
- const createUserNameValidator = ()=> body("teacher").notEmpty().escape() 
-
- const createTeacherValidator = ()=> body("teacher").notEmpty().escape() 
-
- const validateUserName = (req:Request, res:Response, next:NextFunction)=>{
-    const results = validationResult(req)
-    if(!results.isEmpty()) return res.send({errors:results.array()})
-    next()
-}
-
 export const getTeacher = async (req:Request<{},{}, AddStudentToTeacherBody>, res:Response)=>{
     try {
         const {teacher} = req.body
@@ -48,6 +38,4 @@ export const getTeacher = async (req:Request<{},{}, AddStudentToTeacherBody>, re
         res.send(error)
     }
 }
-
-export const findTeacher = [createTeacherValidator(), validateUserName]
 

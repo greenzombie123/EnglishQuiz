@@ -5,6 +5,8 @@ import { body, validationResult } from "express-validator";
 export const checkSignUpForm = () =>
   body(["username", "password"]).notEmpty().escape();
 
+export const checkfindTeacherForm = ()=> body("teacher").notEmpty().escape() 
+
 // Called after checkSignUpForm to verify results
 export const validate = (
   req: Request,
