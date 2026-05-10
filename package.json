@@ -4,7 +4,7 @@
   "description": "",
   "main": "app.ts",
   "scripts": {
-    "test": "jest",
+    "test": "vitest",
     "dev": "node --watch app.ts --trace-warnings",
     "dev:client": "npx tsc -p tsconfig.json --watch",
     "commit": "git add -A && git commit"
@@ -12,7 +12,7 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type":"module",
+  "type": "module",
   "dependencies": {
     "@aws-sdk/client-s3": "^3.975.0",
     "@aws-sdk/s3-presigned-post": "^3.1002.0",
@@ -34,17 +34,14 @@
     "passport-local": "^1.0.0",
     "pg": "^8.16.3",
     "supertest": "^7.2.2",
-    "uuid": "^13.0.0"
+    "uuid": "^8.3.2"
   },
   "devDependencies": {
     "@types/express": "^5.0.5",
     "@types/jest": "^30.0.0",
     "@types/node": "^25.6.0",
-    "jest": "^29.7.0",
-    "ts-jest": "^29.4.9",
-    "ts-node": "^10.9.2"
+    "@types/uuid": "^10.0.0",
+    "ts-node": "^10.9.2",
+    "vitest": "^3.2.4"
   }
 }
-
-
-   

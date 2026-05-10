@@ -10,6 +10,7 @@ import {
   validateSignUpForm,
 } from "./auth.controller.ts";
 
+// Endpoint is /login
 export const logInRouter = Router();
 
 logInRouter.get("/", getLogInPage);
