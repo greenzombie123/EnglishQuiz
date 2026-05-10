@@ -6,6 +6,7 @@ import {
   getTeacher,
 } from "../controllers/findTeacher.ts";
 
+// EndPoint "/findTeacher"
 const findTeacherRouter = Router();
 
 findTeacherRouter.post("/finished", addStudentToTeacher);

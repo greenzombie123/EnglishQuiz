@@ -37,11 +37,11 @@ export const getSignUpCompletePage = (
 ) => {
   if (!req.user) return res.render("/");
   res.locals.username = req.user.username
-  res.render("signupComplete");
+  res.render("auth/signupComplete");
 };
 
 export const getSignUpPage = (req: Request, res: Response) => {
-  res.render("signupPage");
+  res.render("auth/signupPage");
 };
 
 // Allows you to define the types
