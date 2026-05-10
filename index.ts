@@ -6,7 +6,7 @@ import session from "express-session";
 
 import indexRouter from "./routes/index.ts";
 import lessonsRouter from "./routes/lessons.ts";
-import findTeacherRouter from "./features/auth/auth.route.ts";
+import findTeacherRouter from "./features/findTeacher/findTeacher.route.ts";
 import {signupRouter, logInRouter} from "./features/auth/auth.route.ts"
 
 // Create a server
