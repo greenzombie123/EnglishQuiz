@@ -1,6 +1,6 @@
 import request from "supertest"
 import express from "express"
-import { getLogInPage, redirectToDashBoard, validateSignUpForm } from "../features/auth/auth.controller.ts";
+import { getLogInPage, redirectToDashBoard} from "../features/auth/auth.controller.ts";
 import { test, expect, describe } from 'vitest'
 import views from "../dirNames.ts";
 

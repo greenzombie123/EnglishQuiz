@@ -3,12 +3,11 @@ import {
   getLogInPage,
   logInUser,
   redirectToDashBoard,
-  checkSignUpForm,
   getSignUpCompletePage,
   getSignUpPage,
   handleAddUser,
-  validateSignUpForm,
 } from "./auth.controller.ts";
+import { checkSignUpForm, validate } from "../../middleware/validate.ts";
 
 // Endpoint "/login"
 export const logInRouter = Router();
@@ -24,4 +23,4 @@ signupRouter.get("/", getSignUpPage);
 
 signupRouter.get("/completed", getSignUpCompletePage);
 
-signupRouter.post("/", checkSignUpForm(), validateSignUpForm, handleAddUser);
+signupRouter.post("/", checkSignUpForm(), validate, handleAddUser);
