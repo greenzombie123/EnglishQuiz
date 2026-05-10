@@ -1,16 +1,13 @@
-import type { NextFunction, Request, Response } from "express";
 import request from "supertest"
 import express from "express"
-import { redirectToDashBoard, validateSignUpForm } from "../features/auth/auth.controller";
+import { getLogInPage, redirectToDashBoard, validateSignUpForm } from "../features/auth/auth.controller";
 import { test, expect, describe } from 'vitest'
+import views from "../dirNames.ts";
 
 const app = express()
-app.use(express.json())
-app.use(express.urlencoded({ extended: false }));
-
-
-
-//! Test redirectToDashBoard
+app.set("views", views);
+app.set("view engine", "ejs");
+// app.use(express.static("views"));
 
 
 describe("authentication", ()=>{
@@ -19,8 +16,13 @@ describe("authentication", ()=>{
 
         app.post("/login", redirectToDashBoard)
 
-        const response = await request(app).post("/login").expect("Content-Type", "text/plain; charset=utf-8").expect(302)
+        await request(app).post("/login").expect("Content-Type", "text/plain; charset=utf-8").expect(302)
+    })
 
-        // expect(response.c)
+    test("getLoginPage renders the correct view", async ()=>{
+
+        app.get("/login", getLogInPage)
+
+        await request(app).get("/login").expect("Content-Type", /html/).expect(200)
     })
 })

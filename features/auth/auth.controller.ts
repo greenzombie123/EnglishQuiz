@@ -10,7 +10,7 @@ export const getLogInPage = (
   res: Response,
   next: NextFunction,
 ) => {
-  res.render("login");
+  res.render("auth/login");
 };
 
 export const logInUser =
