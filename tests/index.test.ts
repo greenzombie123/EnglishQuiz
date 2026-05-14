@@ -2,7 +2,7 @@ import type { NextFunction, Request, Response } from "express";
 import request from "supertest"
 import express from "express"
 import { test, expect, describe } from 'vitest'
-import { getIndexPage } from "../controllers";
+import { getIndexPage } from "../controllers/index.ts";
 import views from "../dirNames.ts";
 
 const app = express()

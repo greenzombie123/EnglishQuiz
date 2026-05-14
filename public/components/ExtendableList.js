@@ -9,6 +9,7 @@ export class ExtendableList extends HTMLElement {
         const templateContent = template.content;
         const clonedContent = templateContent.cloneNode(true);
         this.root.appendChild(clonedContent);
+        console.log("fefe");
     }
     connectedCallback() {
         const groupnames = Array.from(document.querySelectorAll('p'));
@@ -25,4 +26,3 @@ export class ExtendableList extends HTMLElement {
     }
 }
 customElements.define("extendable-list", ExtendableList);
-//# sourceMappingURL=ExtendableList.js.map

@@ -26,8 +26,10 @@ server.use(express.json());
 
 // For html ejs files
 server.use(express.static("views"));
+
 // For the generated source map files
 server.use("/components", express.static("components"));
+
 // For lesson page
 server.use("/lessons", express.static("public/components"));
 

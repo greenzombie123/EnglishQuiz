@@ -16,4 +16,3 @@ export class EndSlide extends HTMLElement {
     disconnectedCallback() { }
 }
 customElements.define("end-slide", EndSlide);
-//# sourceMappingURL=EndSlide.js.map

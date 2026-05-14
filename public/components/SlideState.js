@@ -22,4 +22,3 @@ export const slideState = () => {
         isFirstSlide
     };
 };
-//# sourceMappingURL=SlideState.js.map

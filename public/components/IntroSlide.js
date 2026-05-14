@@ -48,4 +48,3 @@ export class IntroSlide extends HTMLElement {
     };
 }
 customElements.define("intro-slide", IntroSlide);
-//# sourceMappingURL=IntroSlide.js.map

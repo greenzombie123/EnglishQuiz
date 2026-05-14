@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    "target": "esnext",
+    "module": "nodenext",
+    "outDir": "public",
+    "noEmit": false,
+     "rewriteRelativeImportExtensions": true
+  },
+  "files": ["./components/index.ts", "./components/lessonCreaterIndex.ts", "./components/ExtendableList.ts"],
+}

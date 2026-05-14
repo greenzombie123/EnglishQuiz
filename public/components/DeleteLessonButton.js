@@ -62,4 +62,3 @@ class DeleteLessonButton extends HTMLElement {
 }
 customElements.define("deletelesson-button", DeleteLessonButton);
 export {};
-//# sourceMappingURL=DeleteLessonButton.js.map

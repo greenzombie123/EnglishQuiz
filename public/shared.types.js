@@ -6,4 +6,3 @@ export {};
 //   definition:"fee",
 //   targetword:"fee"
 // }
-//# sourceMappingURL=shared.types.js.map

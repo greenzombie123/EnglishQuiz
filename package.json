@@ -6,7 +6,8 @@
   "scripts": {
     "test": "vitest",
     "dev": "node --watch app.ts --trace-warnings",
-    "dev:client": "npx tsc -p tsconfig.json --watch",
+    "dev:client": "npx tsc -p tsconfig.browser.json --watch",
+    "dev:server": "npx tsc -p tsconfig.json --watch",
     "commit": "git add -A && git commit"
   },
   "keywords": [],

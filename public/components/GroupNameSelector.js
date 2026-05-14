@@ -41,4 +41,3 @@ export class GroupNameSelector extends HTMLElement {
 customElements.define("groupname-selecter", GroupNameSelector);
 // Sets the value to be sent to the server
 // this.internals.setFormValue("something here");
-//# sourceMappingURL=GroupNameSelector.js.map

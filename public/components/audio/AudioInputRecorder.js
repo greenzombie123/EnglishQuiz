@@ -145,4 +145,3 @@ export default class AudioInputRecorder extends HTMLElement {
     };
 }
 customElements.define("audio-input-recorder", AudioInputRecorder);
-//# sourceMappingURL=AudioInputRecorder.js.map

@@ -97,4 +97,3 @@ const style = `
 }
 `;
 customElements.define("lesson-slider", LessonSlider);
-//# sourceMappingURL=Lesson.js.map

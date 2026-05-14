@@ -108,4 +108,3 @@ export class DeleteLessonDialog extends HTMLElement {
     };
 }
 customElements.define("deletelesson-dialog", DeleteLessonDialog);
-//# sourceMappingURL=DeleteLessonDialog.js.map

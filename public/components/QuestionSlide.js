@@ -70,4 +70,3 @@ export class QuestionSlide extends HTMLElement {
     shuffle = (array) => array.sort(() => Math.random() - 0.5);
 }
 customElements.define("question-slide", QuestionSlide);
-//# sourceMappingURL=QuestionSlide.js.map
