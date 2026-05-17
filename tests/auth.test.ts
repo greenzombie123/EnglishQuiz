@@ -3,15 +3,16 @@ import express from "express"
 import { getLogInPage, redirectToDashBoard } from "../features/auth/auth.controller.ts";
 import { test, expect, describe, vi } from 'vitest'
 import views from "../dirNames.ts";
-import { handleAddNewTeacher } from "../features/auth/auth.service.ts";
-import { Teacher } from "../features/auth/auth.model.ts";
+import { handleAddNewStudent, handleAddNewTeacher } from "../features/auth/auth.service.ts";
+import { Student, Teacher } from "../features/auth/auth.model.ts";
 
 const app = express()
 app.set("views", views);
 app.set("view engine", "ejs");
 
 vi.mock("../features/auth/auth.model.ts", () => ({
-    Teacher: { create: vi.fn() }
+    Teacher: { create: vi.fn() },
+    Student:{ create: vi.fn() }
 }))
 
 vi.mock("uuid", () => ({
@@ -41,6 +42,11 @@ describe("Authentication Service", () => {
         await handleAddNewTeacher("bb", "gg")
 
         expect(Teacher.create).toHaveBeenCalledWith("bb", "gg", "12")
-        
+    })
+
+     test("handleAddNewStudent adds a new student to database", async () => {
+        await handleAddNewStudent("bb", "gg")
+
+        expect(Student.create).toHaveBeenCalledWith("bb", "gg", "12")
     })
 })
