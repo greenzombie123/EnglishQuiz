@@ -1,28 +1,46 @@
 import request from "supertest"
 import express from "express"
-import { getLogInPage, redirectToDashBoard} from "../features/auth/auth.controller.ts";
-import { test, expect, describe } from 'vitest'
+import { getLogInPage, redirectToDashBoard } from "../features/auth/auth.controller.ts";
+import { test, expect, describe, vi } from 'vitest'
 import views from "../dirNames.ts";
+import { handleAddNewTeacher } from "../features/auth/auth.service.ts";
+import { Teacher } from "../features/auth/auth.model.ts";
 
 const app = express()
 app.set("views", views);
 app.set("view engine", "ejs");
-// app.use(express.static("views"));
+
+vi.mock("../features/auth/auth.model.ts", () => ({
+    Teacher: { create: vi.fn() }
+}))
+
+vi.mock("uuid", () => ({
+    v4: vi.fn().mockReturnValue("12")
+}))
 
 
-describe.skip("authentication", ()=>{
+describe("authentication", () => {
 
-    test("redirectToDashBoard renders the dashboard", async ()=>{
+    test("redirectToDashBoard renders the dashboard", async () => {
 
         app.post("/login", redirectToDashBoard)
 
         await request(app).post("/login").expect("Content-Type", "text/plain; charset=utf-8").expect(302)
     })
 
-    test("getLoginPage renders the correct view", async ()=>{
+    test("getLoginPage renders the correct view", async () => {
 
         app.get("/login", getLogInPage)
 
         await request(app).get("/login").expect("Content-Type", /html/).expect(200)
+    })
+})
+
+describe("Authentication Service", () => {
+    test("handleAddNewTeacher adds a new teacher to database", async () => {
+        await handleAddNewTeacher("bb", "gg")
+
+        expect(Teacher.create).toHaveBeenCalledWith("bb", "gg", "12")
+        
     })
 })

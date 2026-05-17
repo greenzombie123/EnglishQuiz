@@ -8,8 +8,8 @@ vi.mock("../config/database.config.ts", () => ({
 
 describe("Teacher", ()=>{
     test("addTeacher adds a new teacher to the database", ()=>{
-        Teacher.create("aaa", "bbb", 12)
+        Teacher.create("aaa", "bbb", "12")
 
-        expect(pool.query).toHaveBeenCalledWith("INSERT INTO teachers (username, password, id) VALUES($1,$2,$3)", ["aaa", "bbb", 12])
+        expect(pool.query).toHaveBeenCalledWith("INSERT INTO teachers (username, password, id) VALUES($1,$2,$3)", ["aaa", "bbb", "12"])
     })
 })

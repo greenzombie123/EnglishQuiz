@@ -5,7 +5,7 @@ const teacherRepo = new TeacherRepository()
 export class Teacher{
     constructor(){}
 
-    static create = async (username:string, password:string, id:number)=>{
+    static create = async (username:string, password:string, id:string)=>{
         await teacherRepo.addTeacher(username, password, id)
     }
 }
