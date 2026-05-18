@@ -16,6 +16,8 @@ export const handleAddNewStudent = async (username: string, password: string) =>
 
 // Check if the user has already registered or not
 export const handleDoesUserExist = async (username: string, password: string) => {
+  
+  //TODO Replace!
   const teachers = await pool.query(
     "SELECT * FROM teachers WHERE username = $1",
     [username]

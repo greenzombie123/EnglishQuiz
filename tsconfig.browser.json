@@ -4,6 +4,7 @@
     "module": "nodenext",
     "outDir": "public",
     "noEmit": false,
+    "strict": true, 
      "rewriteRelativeImportExtensions": true
   },
   "files": ["./components/index.ts", "./components/lessonCreaterIndex.ts", "./components/ExtendableList.ts"],
