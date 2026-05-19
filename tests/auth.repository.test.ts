@@ -9,7 +9,6 @@ afterEach(() => {
 
 vi.mock(import("../config/database.config.ts"))
 
-// vi.mock(import("../pop.ts"))
 
 describe("TeacherRepository", () => {
 
@@ -22,7 +21,6 @@ describe("TeacherRepository", () => {
         expect(pool.query).toHaveBeenCalledWith("INSERT INTO teachers (username, password, id) VALUES($1,$2,$3)", ["aaa", "bbb", "1"])
     })
 
-    //TODO FInish this SHIT!!!!
     test("findByUserName returns a row with one Teacher object", async () => {
 
         (vi.mocked(pool.query) as Mock).mockResolvedValue({rows:[{username:"gg"}]})
@@ -35,8 +33,9 @@ describe("TeacherRepository", () => {
 
 describe("StudentRepository", () => {
 
+    const studentRepository = new StudentRepository()
+
     test("addStudent calls pool.query with the correct arguments", () => {
-        const studentRepository = new StudentRepository()
 
         studentRepository.addStudent("aaa", "bbb", "1")
 
@@ -44,5 +43,12 @@ describe("StudentRepository", () => {
     })
 
     //TODO FInish this SHIT!!!!
-    test("findByUserName returns a row with one Teacher object", () => { })
+    test("findByUserName returns a row with one Teacher object", async () => { 
+        
+        (vi.mocked(pool.query) as Mock).mockResolvedValue({rows:[{username:"gg"}]})
+
+        const teacher = await studentRepository.findByUsername("gg")
+
+        expect(teacher).toEqual({ username: "gg" })
+    })
 })

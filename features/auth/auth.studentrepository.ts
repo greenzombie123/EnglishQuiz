@@ -7,5 +7,14 @@ export class StudentRepository {
             [username, password, id]
         );
     }
+
+    async findByUsername(username: string): Promise<unknown> {
+        const studentsRow = await pool.query(
+            "SELECT * FROM students WHERE username = $1",
+            [username]
+        );
+
+        return studentsRow.rows[0]
+    }
 }
 
