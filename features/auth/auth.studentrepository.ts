@@ -1,4 +1,5 @@
 import { pool } from "../../config/database.config.ts";
+import type { Student } from "./auth.model.ts";
 
 export class StudentRepository {
     async addStudent(username: string, password: string, id: string) {
@@ -8,13 +9,15 @@ export class StudentRepository {
         );
     }
 
-    async findByUsername(username: string): Promise<unknown> {
-        const studentsRow = await pool.query(
+    async findByUsername(username: string) {
+        const studentsRow = await pool.query<Student>(
             "SELECT * FROM students WHERE username = $1",
             [username]
         );
 
         return studentsRow.rows[0]
     }
+
+    async findAllStudents() { }
 }
 

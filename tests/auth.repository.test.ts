@@ -42,7 +42,6 @@ describe("StudentRepository", () => {
         expect(pool.query).toHaveBeenCalledWith("INSERT INTO students (username, password, id) VALUES($1,$2,$3)", ["aaa", "bbb", "1"])
     })
 
-    //TODO FInish this SHIT!!!!
     test("findByUserName returns a row with one Teacher object", async () => { 
         
         (vi.mocked(pool.query) as Mock).mockResolvedValue({rows:[{username:"gg"}]})

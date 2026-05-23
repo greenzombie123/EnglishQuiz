@@ -1,6 +1,8 @@
 import { StudentRepository } from "./auth.studentrepository.ts"
 import { TeacherRepository } from "./auth.teacherrepository.ts"
 
+type NoStudent = {username:string, }
+
 const teacherRepo = new TeacherRepository()
 const studentRepo = new StudentRepository()
 
@@ -35,5 +37,9 @@ export class Student {
 
     static create = async (username: string, password: string, id: string) => {
         await studentRepo.addStudent(username, password, id)
+    }
+
+    static findByUsername = async(username:string) =>{
+        return await studentRepo.findByUsername(username)
     }
 }
