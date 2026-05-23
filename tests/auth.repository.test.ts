@@ -46,7 +46,7 @@ describe("StudentRepository", () => {
         
         (vi.mocked(pool.query) as Mock).mockResolvedValue({rows:[{username:"gg"}]})
 
-        const teacher = await studentRepository.findByUsername("gg")
+        const teacher = await studentRepository.findByUserName("gg")
 
         expect(teacher).toEqual({ username: "gg" })
     })

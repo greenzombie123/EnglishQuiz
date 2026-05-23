@@ -1,14 +1,5 @@
 import { pool } from "../../config/database.config.ts";
-import * as z from "zod"
-import { Teacher } from "./auth.model.ts";
-
-// const Teacher = z.object({
-//     username:z.string(),
-//     password:z.string(),
-//     id:z.string()
-// })
-
-// type Teacher = z.infer<typeof Teacher>
+import type { Teacher } from "./auth.model.ts";
 
 export class TeacherRepository {
     async addTeacher(username: string, password: string, id: string) {
@@ -18,8 +9,8 @@ export class TeacherRepository {
         );
     }
 
-    async findByUserName(username: string):Promise<unknown> {
-        const teacherRow = await pool.query(
+    async findByUserName(username: string) {
+        const teacherRow = await pool.query<Teacher>(
             "SELECT * FROM teachers WHERE username = $1",
             [username]
         );

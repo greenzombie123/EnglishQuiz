@@ -9,7 +9,7 @@ export class StudentRepository {
         );
     }
 
-    async findByUsername(username: string) {
+    async findByUserName(username: string) {
         const studentsRow = await pool.query<Student>(
             "SELECT * FROM students WHERE username = $1",
             [username]
@@ -17,7 +17,5 @@ export class StudentRepository {
 
         return studentsRow.rows[0]
     }
-
-    async findAllStudents() { }
 }
 

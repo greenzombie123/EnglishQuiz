@@ -12,6 +12,14 @@ describe("Teacher", () => {
 
         expect(pool.query).toHaveBeenCalledWith("INSERT INTO teachers (username, password, id) VALUES($1,$2,$3)", ["aaa", "bbb", "12"])
     })
+
+    test("Teacher.findByUserName returns a teacher", async ()=>{
+        (vi.mocked(pool.query) as Mock).mockReturnValue({ rows: [{ username: "aa" }] })
+
+        const teacher = await Teacher.findByUserName("aa")
+
+        expect(teacher?.username).toBe("aa")
+    })
 })
 
 describe("Student", () => {

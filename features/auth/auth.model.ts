@@ -21,6 +21,10 @@ export class Teacher {
     static create = async (username: string, password: string, id: string) => {
         await teacherRepo.addTeacher(username, password, id)
     }
+
+    static findByUserName = async(username:string) =>{
+        return await teacherRepo.findByUserName(username)
+    }
 }
 
 export class Student {
@@ -40,6 +44,6 @@ export class Student {
     }
 
     static findByUsername = async(username:string) =>{
-        return await studentRepo.findByUsername(username)
+        return await studentRepo.findByUserName(username)
     }
 }
