@@ -17,12 +17,11 @@ export const handleAddNewStudent = async (username: string, password: string) =>
 // Check if the user has already registered or not
 export const handleDoesUserExist = async (username: string) => {
   
-  //TODO Replace!
   const teacher = await Teacher.findByUserName(username)
 
-  const student = await Student.findByUsername(username)
+  if(teacher) return true
 
-  if (teachers.rowCount === null || students.rowCount === null) return false;
-  else if (teachers.rowCount + students.rowCount === 0) return false;
-  return true;
+  const student = await Student.findByUserName(username)
+
+  return student ? true : false
 };

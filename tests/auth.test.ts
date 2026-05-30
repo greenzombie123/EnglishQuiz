@@ -11,10 +11,10 @@ const app = express()
 app.set("views", views);
 app.set("view engine", "ejs");
 
-vi.mock("../features/auth/auth.model.ts", () => ({
-    Teacher: { create: vi.fn() },
-    Student:{ create: vi.fn() }
-}))
+// vi.mock("../features/auth/auth.model.ts", () => ({
+//     Teacher: { create: vi.fn() },
+//     Student:{ create: vi.fn() }
+// }))
 
 vi.mock("uuid", () => ({
     v4: vi.fn().mockReturnValue("12")
@@ -42,12 +42,16 @@ describe("authentication", () => {
 
 describe("Authentication Service", () => {
     test("handleAddNewTeacher adds a new teacher to database", async () => {
+        vi.spyOn(Teacher, "create")
+
         await handleAddNewTeacher("bb", "gg")
 
         expect(Teacher.create).toHaveBeenCalledWith("bb", "gg", "12")
     })
 
      test("handleAddNewStudent adds a new student to database", async () => {
+        vi.spyOn(Student, "create")
+
         await handleAddNewStudent("bb", "gg")
 
         expect(Student.create).toHaveBeenCalledWith("bb", "gg", "12")
@@ -55,8 +59,9 @@ describe("Authentication Service", () => {
 })
 
 describe("Services", ()=>{
-    test.skip("handleDoesUserExist returns true if user has already registered", async ()=>{
-        (vi.mocked(pool.query) as Mock).mockResolvedValue({rows:[{username:"Sam"}]})
+    test("handleDoesUserExist returns true if user is student and has already registered", async ()=>{
+        vi.spyOn(Teacher, "findByUserName").mockResolvedValue(undefined)
+        vi.spyOn(Student, "findByUserName").mockResolvedValue({username:"Sam"} as Student)
 
         const hasUserRegistered = await handleDoesUserExist("Sam")
 

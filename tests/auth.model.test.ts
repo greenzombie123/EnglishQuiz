@@ -32,7 +32,7 @@ describe("Student", () => {
     test("Student.findByUsername returns a student", async () => {
         (vi.mocked(pool.query) as Mock).mockReturnValue({ rows: [{ username: "aa" }] })
 
-        const student = await Student.findByUsername("aa")
+        const student = await Student.findByUserName("aa")
 
         expect(student?.username).toBe("aa")
     })
