@@ -1,5 +1,6 @@
-export interface AddStudentToTeacherBody {
+export interface AddStudentToTeacherRequest {
     teacher:string
+    user:User
 }
 
 export type User = {
@@ -7,10 +8,10 @@ export type User = {
   password: string;
 };
 
-export type Teacher = User & {
-  userType: "teacher";
-};
+// export type Teacher = User & {
+//   userType: "teacher";
+// };
 
-export type Student = User & {
-  userType: "student";
-};
+// export type Student = User & {
+//   userType: "student";
+// };

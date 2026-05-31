@@ -11,11 +11,6 @@ const app = express()
 app.set("views", views);
 app.set("view engine", "ejs");
 
-// vi.mock("../features/auth/auth.model.ts", () => ({
-//     Teacher: { create: vi.fn() },
-//     Student:{ create: vi.fn() }
-// }))
-
 vi.mock("uuid", () => ({
     v4: vi.fn().mockReturnValue("12")
 }))

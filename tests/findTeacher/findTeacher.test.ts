@@ -1,8 +1,11 @@
-import { expect, test, vi, describe, afterEach, Mock } from "vitest";
+import { expect, test, vi, describe, afterEach, Mock, beforeEach } from "vitest";
 import { FindTeacher } from "../../features/findTeacher/findTeacher.model.ts";
 import { pool } from "../../config/database.config.ts";
-import { beforeEach } from "node:test";
 import { addToTeachersStudents, doesTeacherExist } from "../../features/findTeacher/findTeacher.service.ts";
+import request from "supertest"
+import express from "express"
+import session from "express-session"
+import { addStudentToTeacher } from "../../features/findTeacher/findTeacher.controller.ts";
 
 describe("FindTeacher", () => {
 
@@ -29,7 +32,7 @@ describe("FindTeacher", () => {
     })
 })
 
-describe("FindTeacher controllers", () => {
+describe("FindTeacher services", () => {
 
     beforeEach(() => {
         vi.restoreAllMocks()
@@ -37,7 +40,7 @@ describe("FindTeacher controllers", () => {
 
     test("addToTeachersStudents creates a row in the db table", async () => {
         const spy = vi.spyOn(FindTeacher, "addToTeachersStudents").mockImplementation(vi.fn())
-        
+
         await addToTeachersStudents("Teacher", "Student")
 
         expect(spy).toHaveBeenCalled()
@@ -50,5 +53,31 @@ describe("FindTeacher controllers", () => {
         const teacherExist = await doesTeacherExist("Teacher")
 
         expect(teacherExist).toBe(true)
+    })
+})
+
+describe("findteacher controllers", () => {
+
+    beforeEach(() => {
+        vi.restoreAllMocks()
+    })
+
+    const app = express()
+
+    app.post("/findTeacher/finished", addStudentToTeacher)
+
+   const agent = request.agent(app)
+
+    test.skip("addStudentToTeacher creates a row in the students_teachers db", async () => {
+
+        const spy = vi.spyOn(FindTeacher, "addToTeachersStudents").mockImplementation(vi.fn())
+
+        await agent.post("/findTeacher/finished").send({username:"wow", password:"fefe"}).expect("Content-Type", /text/).expect(302)
+
+        expect(spy).toHaveBeenCalled()
+    })
+
+    test("doesTeacherExist creates a row in the students_teachers db", async () => {
+
     })
 })

@@ -1,16 +1,17 @@
 import type { NextFunction, Request, Response } from "express";
 import { body, validationResult } from "express-validator";
 import { pool } from "../../config/database.config.ts";
-import type { Teacher } from "./findTeacher.types.ts"
-import type { AddStudentToTeacherBody } from "./findTeacher.types.ts";
+import type { AddStudentToTeacherRequest } from "./findTeacher.types.ts";
+import { FindTeacher } from "./findTeacher.model.ts";
 
 
-export const addStudentToTeacher = async (req:Request<{}, {}, AddStudentToTeacherBody>, res:Response, next:NextFunction)=>{
-    if(!req.user)return res.redirect("/")
+export const addStudentToTeacher = async (req:Request<{}, {}, AddStudentToTeacherRequest>, res:Response, next:NextFunction)=>{
+   if(!req.user)return res.redirect("/")
     try {
         const {username:student} = req.user
         const teacher = req.body.teacher
-        await pool.query("INSERT INTO teachers_students (teacherUserName, studentUserName) VALUES($1, $2)", [teacher, student])
+        await FindTeacher.addToTeachersStudents(teacher, student)
+        // await pool.query("INSERT INTO teachers_students (teacherUserName, studentUserName) VALUES($1, $2)", [teacher, student])
         res.redirect("/signup/completed")
     } catch (error) {
         res.send(error)
@@ -23,7 +24,7 @@ export const getFindTeacherPage = (req:Request, res:Response, next:NextFunction)
     res.render("findTeacherPage")
 }
 
-export const getTeacher = async (req:Request<{},{}, AddStudentToTeacherBody>, res:Response)=>{
+export const doesTeacherExist = async (req:Request<{},{}, AddStudentToTeacherBody>, res:Response)=>{
     try {
         const {teacher} = req.body
         const {rows} = await pool.query<Teacher>("SELECT * FROM teachers WHERE username = $1", [teacher])
