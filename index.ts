@@ -4,7 +4,7 @@ import views from "./dirNames.ts";
 import passport from "./config/passport.config.ts"
 import session from "express-session";
 
-import indexRouter from "./routes/index.ts";
+import indexRouter from "./features/home/home.route.ts"
 import lessonsRouter from "./routes/lessons.ts";
 import findTeacherRouter from "./features/findTeacher/findTeacher.route.ts";
 import {signupRouter, logInRouter} from "./features/auth/auth.route.ts"
