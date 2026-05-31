@@ -6,5 +6,8 @@ export class FindTeacher {
             [teacherUsername, studentUserName])
     }
 
-    static getTeacherUserName = (teacherUserName: string): string => { }
+    static doesTeacherExist = async (teacherUserName: string) => { 
+        const {rows} = await pool.query("SELECT * FROM teachers WHERE username = $1", [teacherUserName])
+        return (rows[0] && rows[0].username === teacherUserName)
+    }
 }
