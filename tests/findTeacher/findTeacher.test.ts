@@ -3,7 +3,7 @@ import { FindTeacher } from "../../features/findTeacher/findTeacher.model.ts";
 import { pool } from "../../config/database.config.ts";
 import { addToTeachersStudents, doesTeacherExist } from "../../features/findTeacher/findTeacher.service.ts";
 import request from "supertest"
-import express from "express"
+import express, { NextFunction, Request, Response } from "express"
 import session from "express-session"
 import { addStudentToTeacher } from "../../features/findTeacher/findTeacher.controller.ts";
 
@@ -63,16 +63,21 @@ describe("findteacher controllers", () => {
     })
 
     const app = express()
+    app.use(express.urlencoded({ extended: true }));
+    app.use(express.json());
 
-    app.post("/findTeacher/finished", addStudentToTeacher)
+    const mockController = (request: Request, res: Response, next: NextFunction) => {
+        request.user = { username: "apple", userType: "teacher" }
+        next()
+    }
 
-   const agent = request.agent(app)
+    app.post("/findTeacher/finished", mockController, addStudentToTeacher)
 
-    test.skip("addStudentToTeacher creates a row in the students_teachers db", async () => {
+    test("addStudentToTeacher creates a row in the students_teachers db", async () => {
 
         const spy = vi.spyOn(FindTeacher, "addToTeachersStudents").mockImplementation(vi.fn())
 
-        await agent.post("/findTeacher/finished").send({username:"wow", password:"fefe"}).expect("Content-Type", /text/).expect(302)
+        await request(app).post("/findTeacher/finished").send({teacher:"apple"}) .expect(302) 
 
         expect(spy).toHaveBeenCalled()
     })

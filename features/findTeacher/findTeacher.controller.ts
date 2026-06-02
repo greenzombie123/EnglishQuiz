@@ -1,20 +1,21 @@
 import type { NextFunction, Request, Response } from "express";
-import { body, validationResult } from "express-validator";
 import { pool } from "../../config/database.config.ts";
 import type { AddStudentToTeacherRequest } from "./findTeacher.types.ts";
 import { FindTeacher } from "./findTeacher.model.ts";
 
 
 export const addStudentToTeacher = async (req:Request<{}, {}, AddStudentToTeacherRequest>, res:Response, next:NextFunction)=>{
-   if(!req.user)return res.redirect("/")
     try {
-        const {username:student} = req.user
-        const teacher = req.body.teacher
-        await FindTeacher.addToTeachersStudents(teacher, student)
+        if(!req.user) throw new Error("User has not been authenticated")
+        const studentUserName = req.user.username
+        const teacherUserName = req.body.teacher
+        await FindTeacher.addToTeachersStudents(teacherUserName, studentUserName)
         // await pool.query("INSERT INTO teachers_students (teacherUserName, studentUserName) VALUES($1, $2)", [teacher, student])
+       
         res.redirect("/signup/completed")
     } catch (error) {
-        res.send(error)
+        console.error(error)
+        next(error)
     }
    
 }

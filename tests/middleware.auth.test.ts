@@ -16,5 +16,5 @@ const mockFinalRequest = (req: Request, res: Response, next:NextFunction) => {
 app.get('/', mockRequest, isAuthenticated, mockFinalRequest)
 
 test("Checks if the user is already autheticated", async () => {
-    const response = await request(app).get("/").expect(200)
+    await request(app).get("/").expect(200)
 })
