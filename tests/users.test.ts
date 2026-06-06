@@ -12,8 +12,12 @@ describe("User", () => {
         const spy = vi.spyOn(pool, "query").mockImplementation(vi.fn())
 
         await User.registerUser("aaa", "ccc", "bbb", "teacher")
+        await User.registerUser("aaa", "ccc", "bbb", "student")
 
-        expect(spy).toBeCalledWith(`INSERT INTO teachers (username, password, id) VALUES($1,$2,$3)`,
+        expect(spy).toHaveBeenNthCalledWith(1, `INSERT INTO teachers (username, password, id) VALUES($1,$2,$3)`,
+            ["aaa", "ccc", "bbb"])
+
+        expect(spy).toHaveBeenNthCalledWith(2, `INSERT INTO students (username, password, id) VALUES($1,$2,$3)`,
             ["aaa", "ccc", "bbb"])
     })
 })
