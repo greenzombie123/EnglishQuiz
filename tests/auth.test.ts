@@ -56,10 +56,9 @@ describe("Authentication Service", () => {
 
 describe("Services", () => {
     test("handleDoesUserExist returns true if user is student and has already registered", async () => {
-        vi.spyOn(Teacher, "findByUserName").mockResolvedValue(undefined)
-        vi.spyOn(Student, "findByUserName").mockResolvedValue({ username: "Sam" } as Student)
+        (vi.spyOn(User, "doesUserExist")).mockResolvedValue(true)
 
-        const hasUserRegistered = await handleDoesUserExist("Sam")
+        const hasUserRegistered = await handleDoesUserExist("Sam", "teacher")
 
         expect(hasUserRegistered).toBe(true)
     })

@@ -61,7 +61,7 @@ export const handleAddUser = async (
 ) => {
   const { username, password, userType } = req.body;
 
-  const result = await handleDoesUserExist(username);
+  const result = await handleDoesUserExist(username, userType);
 
   if (result) {
     res.end("User exists, bro!");
