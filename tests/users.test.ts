@@ -31,4 +31,14 @@ describe("User", () => {
 
         expect(user).toEqual({username:"aaa"})
     })
+
+    test("User.doesUserExist returns true if user exist", async()=>{
+        const spy = (vi.spyOn(pool, "query") as Mock).mockResolvedValue({rows:[{username:"aaa"}]})
+
+        const isUserRegistered = await User.doesUserExist("aaa", "student")
+
+        expect(spy).toHaveBeenCalledWith(`SELECT * FROM students WHERE username = $1`, ["aaa"])
+
+        expect(isUserRegistered).toEqual(true)
+    })
 })
