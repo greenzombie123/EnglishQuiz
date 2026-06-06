@@ -4,8 +4,7 @@ import { pool } from "../../config/database.config.ts";
 import { addToTeachersStudents, doesTeacherExist } from "../../features/findTeacher/findTeacher.service.ts";
 import request from "supertest"
 import express, { NextFunction, Request, Response } from "express"
-import session from "express-session"
-import { addStudentToTeacher } from "../../features/findTeacher/findTeacher.controller.ts";
+import { addStudentToTeacher, searchTeacher } from "../../features/findTeacher/findTeacher.controller.ts";
 
 describe("FindTeacher", () => {
 
@@ -82,7 +81,19 @@ describe("findteacher controllers", () => {
         expect(spy).toHaveBeenCalled()
     })
 
-    test("doesTeacherExist creates a row in the students_teachers db", async () => {
+    // test.skip("doesTeacherExist returns true if teacher exist", async () => {
+    //     const spy = vi.spyOn(FindTeacher, "addToTeachersStudents").mockResolvedValue()
 
+    //     await request(app).post("/findTeacher/finished").send({teacher:"apple"}) .expect(302) 
+
+    //     expect(spy).toHaveBeenCalled()
+    // })
+
+    test.skip("getTeacher returns a teacher", async () => {
+        const spy = vi.spyOn(FindTeacher, "addToTeachersStudents").mockResolvedValue()
+
+        await request(app).post("/findTeacher/finished").send({teacher:"apple"}) .expect(302) 
+
+        expect(spy).toHaveBeenCalled()
     })
 })

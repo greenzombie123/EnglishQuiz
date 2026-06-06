@@ -9,9 +9,7 @@ export const addStudentToTeacher = async (req:Request<{}, {}, AddStudentToTeache
         if(!req.user) throw new Error("User has not been authenticated")
         const studentUserName = req.user.username
         const teacherUserName = req.body.teacher
-        await FindTeacher.addToTeachersStudents(teacherUserName, studentUserName)
-        // await pool.query("INSERT INTO teachers_students (teacherUserName, studentUserName) VALUES($1, $2)", [teacher, student])
-       
+        await FindTeacher.addToTeachersStudents(teacherUserName, studentUserName)       
         res.redirect("/signup/completed")
     } catch (error) {
         console.error(error)
@@ -25,7 +23,7 @@ export const getFindTeacherPage = (req:Request, res:Response, next:NextFunction)
     res.render("findTeacherPage")
 }
 
-export const doesTeacherExist = async (req:Request<{},{}, AddStudentToTeacherBody>, res:Response)=>{
+export const searchTeacher = async (req:Request<{},{}, AddStudentToTeacherRequest>, res:Response)=>{
     try {
         const {teacher} = req.body
         const {rows} = await pool.query<Teacher>("SELECT * FROM teachers WHERE username = $1", [teacher])
@@ -39,5 +37,9 @@ export const doesTeacherExist = async (req:Request<{},{}, AddStudentToTeacherBod
     } catch (error) {
         res.send(error)
     }
+}
+
+export const getTeacher = async (req:Request, res:Response, next:NextFunction)=>{
+    
 }
 

@@ -1,8 +1,9 @@
 import { Router } from "express";
 import {
   addStudentToTeacher,
-  getFindTeacherPage,
-  getTeacher} from "./findTeacher.controller.ts"
+  searchTeacher,
+  getFindTeacherPage
+} from "./findTeacher.controller.ts"
 import { checkfindTeacherForm, validate } from "../../middleware/validate.ts";
 
 // Endpoint "/findTeacher"
@@ -13,7 +14,7 @@ findTeacherRouter.post("/finished", addStudentToTeacher);
 
 findTeacherRouter.get("/", getFindTeacherPage);
 
-findTeacherRouter.post("/", checkfindTeacherForm(), validate, getTeacher);
+findTeacherRouter.post("/", checkfindTeacherForm(), validate, searchTeacher);
 
 
 
