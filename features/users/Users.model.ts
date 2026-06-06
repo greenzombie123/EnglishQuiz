@@ -1,3 +1,4 @@
+import { StringDecoder } from "string_decoder"
 import { pool } from "../../config/database.config.ts"
 import type { Role } from "./Users.types.ts"
 
@@ -5,13 +6,11 @@ export class User {
     username: string
     password: string
     id: string
-    role: Role
 
-    constructor(username: string, password: string, id: string, role: Role) {
+    constructor(username: string, password: string, id: string) {
         this.username = username
         this.password = password
         this.id = id
-        this.role = role
     }
 
     static decideRole = (role: Role) => role === "student" ? "student" : "teacher"

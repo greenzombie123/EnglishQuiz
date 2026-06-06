@@ -4,6 +4,8 @@ import { pool } from "../../config/database.config.ts";
 import request from "supertest"
 import express, { NextFunction, Request, Response } from "express"
 import { addStudentToTeacher, searchTeacher } from "../../features/findTeacher/findTeacher.controller.ts";
+import { User } from "../../features/users/Users.model.ts";
+import views from "../../dirNames.ts";
 
 describe("FindTeacher", () => {
 
@@ -31,6 +33,9 @@ describe("findteacher controllers", () => {
     const app = express()
     app.use(express.urlencoded({ extended: true }));
     app.use(express.json());
+    app.set("views", views);
+    app.set("view engine", "ejs");
+    app.use(express.static("views"));
 
     const mockController = (request: Request, res: Response, next: NextFunction) => {
         request.user = { username: "apple", userType: "teacher" }
@@ -43,24 +48,21 @@ describe("findteacher controllers", () => {
 
         const spy = vi.spyOn(TeacherStudent, "registerPair").mockImplementation(vi.fn())
 
-        await request(app).post("/findTeacher/finished").send({teacher:"apple"}) .expect(302) 
+        await request(app).post("/findTeacher/finished").send({ teacher: "apple" }).expect(302)
 
         expect(spy).toHaveBeenCalled()
     })
 
-    // test.skip("doesTeacherExist returns true if teacher exist", async () => {
-    //     const spy = vi.spyOn(FindTeacher, "addToTeachersStudents").mockResolvedValue()
+    test("searchTeacher returns a teacher", async () => {
 
-    //     await request(app).post("/findTeacher/finished").send({teacher:"apple"}) .expect(302) 
+        const teacher: User = { username: "pop", password: "o", id: "p" }
 
-    //     expect(spy).toHaveBeenCalled()
-    // })
+        app.post("/findTeacher/", searchTeacher)
 
-    test.skip("getTeacher returns a teacher", async () => {
-        const spy = vi.spyOn(TeacherStudent, "registerPair").mockResolvedValue()
+        const spy = vi.spyOn(User, "findByUserName").mockResolvedValue(teacher)
 
-        await request(app).post("/findTeacher/finished").send({teacher:"apple"}) .expect(302) 
+        await request(app).post("/findTeacher").send({ teacher: teacher.username}).expect("Content-type", /html/).expect(200)
 
-        expect(spy).toHaveBeenCalled()
+        expect(spy).toHaveBeenCalledWith("pop", "teacher")
     })
 })
