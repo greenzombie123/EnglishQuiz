@@ -1,6 +1,7 @@
 import { Student, Teacher } from "../features/auth/auth.model.ts";
 import { expect, vi, describe, test, Mock } from "vitest";
 import { pool } from "../config/database.config.ts";
+import { User } from "../features/users/Users.model.ts";
 
 vi.mock("../config/database.config.ts", () => ({
     pool: { query: vi.fn() }
@@ -8,6 +9,7 @@ vi.mock("../config/database.config.ts", () => ({
 
 describe("Teacher", () => {
     test("Teacher.create adds a new teacher to the database", async () => {
+        // await User.registerUser("aaa", "bbb". "12",)
         await Teacher.create("aaa", "bbb", "12")
 
         expect(pool.query).toHaveBeenCalledWith("INSERT INTO teachers (username, password, id) VALUES($1,$2,$3)", ["aaa", "bbb", "12"])

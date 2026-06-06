@@ -6,6 +6,7 @@ import views from "../dirNames.ts";
 import { handleAddNewStudent, handleAddNewTeacher, handleDoesUserExist } from "../features/auth/auth.service.ts";
 import { Student, Teacher } from "../features/auth/auth.model.ts";
 import { pool } from "../config/database.config.ts";
+import { User } from "../features/users/Users.model.ts";
 
 const app = express()
 app.set("views", views);
@@ -37,14 +38,14 @@ describe("authentication", () => {
 
 describe("Authentication Service", () => {
     test("handleAddNewTeacher adds a new teacher to database", async () => {
-        vi.spyOn(Teacher, "create")
+        const spy = vi.spyOn(User, "registerUser").mockImplementation(vi.fn())
 
         await handleAddNewTeacher("bb", "gg")
 
-        expect(Teacher.create).toHaveBeenCalledWith("bb", "gg", "12")
+        expect(spy).toHaveBeenCalledWith("bb", "gg", "12", "teacher")
     })
 
-     test("handleAddNewStudent adds a new student to database", async () => {
+    test("handleAddNewStudent adds a new student to database", async () => {
         vi.spyOn(Student, "create")
 
         await handleAddNewStudent("bb", "gg")
@@ -53,10 +54,10 @@ describe("Authentication Service", () => {
     })
 })
 
-describe("Services", ()=>{
-    test("handleDoesUserExist returns true if user is student and has already registered", async ()=>{
+describe("Services", () => {
+    test("handleDoesUserExist returns true if user is student and has already registered", async () => {
         vi.spyOn(Teacher, "findByUserName").mockResolvedValue(undefined)
-        vi.spyOn(Student, "findByUserName").mockResolvedValue({username:"Sam"} as Student)
+        vi.spyOn(Student, "findByUserName").mockResolvedValue({ username: "Sam" } as Student)
 
         const hasUserRegistered = await handleDoesUserExist("Sam")
 
