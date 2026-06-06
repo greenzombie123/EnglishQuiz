@@ -7,14 +7,12 @@ import { User } from "../users/Users.model.ts";
 export const handleAddNewTeacher = async (username: string, password: string) => {
   const id = createId();
   await User.registerUser(username, password, id, "teacher")
-  
-  //await Teacher.create(username, password, id)
 };
 
 // Add new student to the database
 export const handleAddNewStudent = async (username: string, password: string) => {
   const id = createId();
-  await Student.create(username, password, id)
+  await User.registerUser(username, password, id, "student")
 };
 
 // Check if the user has already registered or not

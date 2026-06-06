@@ -46,11 +46,11 @@ describe("Authentication Service", () => {
     })
 
     test("handleAddNewStudent adds a new student to database", async () => {
-        vi.spyOn(Student, "create")
+        const spy = vi.spyOn(User, "registerUser").mockImplementation(vi.fn())
 
         await handleAddNewStudent("bb", "gg")
 
-        expect(Student.create).toHaveBeenCalledWith("bb", "gg", "12")
+        expect(spy).toHaveBeenCalledWith("bb", "gg", "12", "student")
     })
 })
 
