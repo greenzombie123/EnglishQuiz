@@ -2,7 +2,7 @@ import { pool } from "../../config/database.config.ts";
 import { v4 as createId } from "uuid";
 import { Student, Teacher } from "./auth.model.ts";
 import { User } from "../users/Users.model.ts";
-import { Role } from "../users/Users.types.ts";
+import type { Role } from "../users/Users.types.ts";
 
 // Add new teacher to the database
 export const handleAddNewTeacher = async (username: string, password: string) => {

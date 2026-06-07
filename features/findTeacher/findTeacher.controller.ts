@@ -36,6 +36,6 @@ export const searchTeacher = async (req: Request<{}, {}, AddStudentToTeacherRequ
         res.locals.isTeacherFound = true
         res.render("findTeacherPage")
     } catch (error) {
-        res.send(error)
+        throw new Error("Experienced an error while searching for teacher")
     }
 }

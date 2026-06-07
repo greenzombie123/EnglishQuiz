@@ -59,10 +59,16 @@ describe("findteacher controllers", () => {
 
         app.post("/findTeacher/", searchTeacher)
 
-        const spy = vi.spyOn(User, "findByUserName").mockResolvedValue(teacher)
+        const spy1 = vi.spyOn(User, "findByUserName").mockResolvedValueOnce(teacher)
 
-        await request(app).post("/findTeacher").send({ teacher: teacher.username}).expect("Content-type", /html/).expect(200)
+        const res1 = await request(app).post("/findTeacher").send({ teacher: teacher.username }).expect("Content-type", /html/).expect(200)
 
-        expect(spy).toHaveBeenCalledWith("pop", "teacher")
+        // Testing for erros
+        const spy2 = vi.spyOn(User, "findByUserName").mockRejectedValueOnce("Wow")
+
+        let res2 = await request(app).post("/findTeacher").send({}).expect("Content-type", /html/)
+
+        expect(spy1).toHaveBeenNthCalledWith(1, "pop", "teacher")
+        expect(res2.statusCode).toBe(500)
     })
 })
