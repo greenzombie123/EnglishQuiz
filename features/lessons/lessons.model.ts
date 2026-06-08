@@ -1,3 +1,4 @@
+import { group } from "node:console";
 import { pool } from "../../config/database.config.ts";
 import { Slide } from "./lessons.types.ts";
 
@@ -12,7 +13,7 @@ export class IntroSlide extends Slide {
     }
 
     static getIntroSlides = async (lessonId: string) => {
-        const { rows } = await pool.query<IntroSlide[]>(`
+        const { rows } = await pool.query<IntroSlide>(`
             SELECT 
             targetword, 
             definition,
@@ -48,6 +49,48 @@ export class QuestionSlide extends Slide {
     }
 
     static getQuestionSlides = async (lessonId: string) => {
+        const { rows } = await pool.query<QuestionSlide>(`
+            SELECT 
+            question, 
+            correctanswer, 
+            wronganswer1, 
+            wronganswer2,
+            wronganswer3,
+            slideorder,
+            type
+            FROM questionslides
+            INNER JOIN lessons_questionslides
+            ON lessons_questionslides.lessonid = questionslides.id
+            WHERE lessons_questionslides.lessonid = $1
+            `, [lessonId]);
+        return rows.length ? rows : [];
+    }
+}
 
+export class Lesson {
+    name: string
+    groupname: string
+
+    constructor(name: string, groupname: string) {
+        this.name = name
+        this.groupname = groupname
+    }
+
+    static doesLessonExist = async (lessonId: string) => {
+        const { rows } = await pool.query<Lesson>(
+            "SELECT name, groupname FROM lessons WHERE id=$1",
+            [lessonId],
+        );
+
+        return rows[0] ? true : false
+    }
+
+    static getLessonsByTeacher = async (teacherId: string) => {
+        const { rows } = await pool.query<Lesson>(
+            "SELECT name, groupname FROM lessons WHERE teacherid=$1",
+            [teacherId],
+        )
+
+        return rows
     }
 }
