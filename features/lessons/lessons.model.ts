@@ -1,6 +1,7 @@
-import { group } from "node:console";
 import { pool } from "../../config/database.config.ts";
 import { Slide } from "./lessons.types.ts";
+
+type LessonData = Omit<Lesson, "questionSlides" | "introSlides">
 
 export class IntroSlide extends Slide {
     targetword: string;
@@ -12,7 +13,7 @@ export class IntroSlide extends Slide {
         this.definition = definition
     }
 
-    static getIntroSlides = async (lessonId: string) => {
+    static getIntroSlides = async (lessonId: number) => {
         const { rows } = await pool.query<IntroSlide>(`
             SELECT 
             targetword, 
@@ -48,7 +49,7 @@ export class QuestionSlide extends Slide {
         this.wronganswer3 = wronganswer3
     }
 
-    static getQuestionSlides = async (lessonId: string) => {
+    static getQuestionSlides = async (lessonId: number) => {
         const { rows } = await pool.query<QuestionSlide>(`
             SELECT 
             question, 
@@ -67,13 +68,18 @@ export class QuestionSlide extends Slide {
     }
 }
 
+
 export class Lesson {
     name: string
     groupname: string
+    questionSlides: QuestionSlide[] = []
+    introSlides: IntroSlide[] = []
+    id: number
 
-    constructor(name: string, groupname: string) {
+    constructor(name: string, groupname: string, id: number) {
         this.name = name
         this.groupname = groupname
+        this.id = id
     }
 
     static doesLessonExist = async (lessonId: string) => {
@@ -85,12 +91,35 @@ export class Lesson {
         return rows[0] ? true : false
     }
 
-    static getLessonsByTeacher = async (teacherId: string) => {
-        const { rows } = await pool.query<Lesson>(
+    static getLessonsDataByTeacher = async (teacherId: string) => {
+        const { rows } = await pool.query<LessonData>(
             "SELECT name, groupname FROM lessons WHERE teacherid=$1",
             [teacherId],
         )
 
         return rows
+    }
+
+    static getLessonById = async (id: number): Promise<Lesson | undefined> => {
+        const { rows: lessonData } = await pool.query<Lesson>(
+            "SELECT name, groupname, id FROM lessons WHERE id=$1",
+            [id],
+        );
+
+        let lesson: Lesson
+
+        if (lessonData[0]) lesson = lessonData[0]
+        else return undefined
+
+        const questionSlides = await QuestionSlide.getQuestionSlides(id)
+        const introSlides = await IntroSlide.getIntroSlides(id)
+
+        return {
+            name: lesson.name,
+            groupname: lesson.groupname,
+            id: id,
+            introSlides: introSlides,
+            questionSlides: questionSlides
+        }
     }
 }

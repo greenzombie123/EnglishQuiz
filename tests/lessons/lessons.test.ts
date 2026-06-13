@@ -3,6 +3,7 @@ import { pool } from "../../config/database.config.ts";
 import { IntroSlide, Lesson, QuestionSlide } from "../../features/lessons/lessons.model.ts";
 
 
+
 describe("Lessons", () => {
 
     beforeEach(() => {
@@ -17,7 +18,7 @@ describe("Lessons", () => {
 
         const spy = (vi.spyOn(pool, "query") as Mock).mockReturnValueOnce({ rows: [introSlide1, introSlide2] })
 
-        const slides = await IntroSlide.getIntroSlides("1")
+        const slides = await IntroSlide.getIntroSlides(1)
 
         expect(slides).toStrictEqual([introSlide1, introSlide2])
     })
@@ -26,7 +27,7 @@ describe("Lessons", () => {
 
         const spy = (vi.spyOn(pool, "query") as Mock).mockReturnValueOnce({ rows: [] })
 
-        const slides = await IntroSlide.getIntroSlides("1")
+        const slides = await IntroSlide.getIntroSlides(1)
 
         expect(slides).toStrictEqual([])
     })
@@ -38,26 +39,44 @@ describe("Lessons", () => {
 
         const spy = (vi.spyOn(pool, "query") as Mock).mockReturnValueOnce({ rows: [questionSlide1, questionSlide2] })
 
-        const slides = await QuestionSlide.getQuestionSlides("1")
+        const slides = await QuestionSlide.getQuestionSlides(1)
 
         expect(slides).toStrictEqual([questionSlide1, questionSlide2])
     })
 
-    test("Lesson.doesLessonExist", async ()=>{
-        const spy = (vi.spyOn(pool, "query") as Mock).mockResolvedValueOnce({rows:[{username:"fefe"}]})
+    test("Lesson.doesLessonExist", async () => {
+        const spy = (vi.spyOn(pool, "query") as Mock).mockResolvedValueOnce({ rows: [{ username: "fefe" }] })
 
         const teacherIsThere = await Lesson.doesLessonExist("fefe")
 
-        expect(spy).toHaveBeenCalledWith("SELECT name, groupname FROM lessons WHERE id=$1",["fefe"])
+        expect(spy).toHaveBeenCalledWith("SELECT name, groupname FROM lessons WHERE id=$1", ["fefe"])
         expect(teacherIsThere).toBe(true)
     })
 
-    test("Lesson.getLessonsByTeacher", async ()=>{
-        const spy = (vi.spyOn(pool, "query") as Mock).mockResolvedValueOnce({rows:[{name:"fefe", groupname:"pop"}]})
+    test("Lesson.getLessonsByTeacher", async () => {
+        const spy = (vi.spyOn(pool, "query") as Mock).mockResolvedValueOnce({ rows: [{ name: "fefe", groupname: "pop" }] })
 
-        const lessons = await Lesson.getLessonsByTeacher("fefe")
+        const lessons = await Lesson.getLessonsDataByTeacher("fefe")
 
-        expect(spy).toHaveBeenCalledWith("SELECT name, groupname FROM lessons WHERE teacherid=$1",["fefe"])
-        expect(lessons).toEqual([{name:"fefe", groupname:"pop"}])
+        expect(spy).toHaveBeenCalledWith("SELECT name, groupname FROM lessons WHERE teacherid=$1", ["fefe"])
+        expect(lessons).toEqual([{ name: "fefe", groupname: "pop" }])
+    })
+
+    test("Lesson.getLessonById", async () => {
+        const mockQuestionSlideResult: QuestionSlide[] = [{ question: "fe", correctanswer: "a", wronganswer1: "b", wronganswer2: "c", wronganswer3: "d", slideorder: 1, slidetype: "question" }]
+        const mockIntroSlideResult: IntroSlide[] = [{ targetword: "apple", definition: "リンゴ", slideorder: 2, slidetype: "intro" }]
+        const mockLessonDataResult = { name: "abc", groupname: "gg", id: 2 }
+
+        const spy = (vi.spyOn(pool, "query") as Mock)
+            .mockResolvedValueOnce({ rows: [mockLessonDataResult] })
+            .mockResolvedValueOnce({ rows: mockQuestionSlideResult })
+            .mockResolvedValueOnce({ rows: mockIntroSlideResult })
+
+        const mockLesson: Lesson = { name: "abc", groupname: "gg", questionSlides: mockQuestionSlideResult, introSlides: mockIntroSlideResult, id: 2 }
+
+        const lesson = await Lesson.getLessonById(2)
+
+        expect(lesson).toStrictEqual(mockLesson)
+
     })
 })

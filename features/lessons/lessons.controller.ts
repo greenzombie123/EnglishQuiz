@@ -121,7 +121,7 @@ const getQuestionSlides = async (lessonId:string): Promise<QuestionSlideRecord[]
   return rows.length ? rows : [];
 };
 
-// Spread all slide arrays into one
+// Spread all slide arrays into one and then sorts them by slideorder
 const sortSlides = (lessonSlideData: LessonSlideData) => {
 
   let slides:SlideRecord[] = []
