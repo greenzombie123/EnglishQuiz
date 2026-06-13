@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, Mock, test, vi } from "vitest";
 import { pool } from "../../config/database.config.ts";
-import { IntroSlide, Lesson, QuestionSlide } from "../../features/lessons/lessons.model.ts";
+import { IntroSlide, Lesson, LessonData, QuestionSlide } from "../../features/lessons/lessons.model.ts";
 
 
 
@@ -78,5 +78,23 @@ describe("Lessons", () => {
 
         expect(lesson).toStrictEqual(mockLesson)
 
+    })
+
+    test("Lesson.getAllLessonDataByUserName gets all lesson data for student user", async () => {
+        const mockLessonData: LessonData[] = [{ name: "abc", groupname: "bbb", id: 4 }, { name: "PPP", groupname: "bbb", id: 4 }]
+
+        const spy = vi.spyOn(pool, "query") as Mock
+        spy.mockResolvedValueOnce({ rows: mockLessonData })
+
+        const lessonData = await Lesson.getAllLessonDataByUserName("ppp", "student")
+
+        expect(spy).toBeCalledWith(`SELECT lessons.name, lessons.id, lessons.groupname FROM lessons
+                    INNER JOIN teachers
+                    ON lessons.teacherid = teachers.id
+                    INNER JOIN teachers_students
+                    ON teachers.username = teachers_students.teacherusername
+                    WHERE teachers_students.studentusername = $1`, ["ppp"])
+
+        expect(lessonData).toStrictEqual(mockLessonData)
     })
 })

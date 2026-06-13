@@ -1,7 +1,7 @@
 import { pool } from "../../config/database.config.ts";
 import { Slide } from "./lessons.types.ts";
 
-type LessonData = Omit<Lesson, "questionSlides" | "introSlides">
+export type LessonData = Omit<Lesson, "questionSlides" | "introSlides">
 
 export class IntroSlide extends Slide {
     targetword: string;
@@ -98,6 +98,28 @@ export class Lesson {
         )
 
         return rows
+    }
+
+    static getAllLessonDataByUserName = async (username: string, userType: "teacher" | "student"): Promise<LessonData[]> => {
+
+        let queryString: string
+
+        if (userType === "student") {
+            queryString = `SELECT lessons.name, lessons.id, lessons.groupname FROM lessons
+                    INNER JOIN teachers
+                    ON lessons.teacherid = teachers.id
+                    INNER JOIN teachers_students
+                    ON teachers.username = teachers_students.teacherusername
+                    WHERE teachers_students.studentusername = $1`;
+        } else
+            queryString = `SELECT lessons.name, lessons.id, lessons.groupname FROM lessons
+                    INNER JOIN teachers
+                    ON lessons.teacherid = teachers.id
+                    WHERE teachers.username = $1`;
+
+        const { rows } = await pool.query<LessonData>(queryString, [username]);
+
+        return rows;
     }
 
     static getLessonById = async (id: number): Promise<Lesson | undefined> => {

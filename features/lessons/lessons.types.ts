@@ -1,3 +1,5 @@
+import type { LessonData } from "./lessons.model.ts"
+
 export type SlideType = "intro" | "question"
 
 export class Slide {
@@ -9,4 +11,9 @@ export class Slide {
         this.slideorder = slideorder
         this.slidetype = type
     }
-}   
+}
+
+// Contains lesson data structured by groupname. LessonData with no groupname are put in nogroupname array prop.
+export type LessonStore = {
+    [key: string]: LessonData[];
+};
