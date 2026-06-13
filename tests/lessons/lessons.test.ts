@@ -97,4 +97,20 @@ describe("Lessons", () => {
 
         expect(lessonData).toStrictEqual(mockLessonData)
     })
+
+    test("Lesson.getAllLessonDataByUserName gets all lesson data for teacher user", async () => {
+        const mockLessonData: LessonData[] = [{ name: "abc", groupname: "bbb", id: 4 }, { name: "PPP", groupname: "bbb", id: 4 }]
+
+        const spy = vi.spyOn(pool, "query") as Mock
+        spy.mockResolvedValueOnce({ rows: mockLessonData })
+
+        const lessonData = await Lesson.getAllLessonDataByUserName("ddd", "teacher")
+
+        expect(spy).toBeCalledWith(`SELECT lessons.name, lessons.id, lessons.groupname FROM lessons
+                    INNER JOIN teachers
+                    ON lessons.teacherid = teachers.id
+                    WHERE teachers.username = $1`, ["ddd"])
+
+        expect(lessonData).toStrictEqual(mockLessonData)
+    })
 })
