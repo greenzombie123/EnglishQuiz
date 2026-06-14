@@ -20,24 +20,9 @@ export const fetchLessonSlides = async (
   try {
     const { lessonId } = req.params;
 
-    const { rows } = await pool.query<{ name: string; groupname: string }>(
-    "SELECT name, groupname FROM lessons WHERE id=$1",
-    [lessonId],
-    );
+    const lesson = await Lesson.getLessonById(Number(lessonId))
 
-    if(!rows[0]) throw Error("Lesson doesn't exist")
-
-    // Grab all types of slides for the requested lesson
-    const lessonSlideData:LessonSlideData = await getLessonSlideData(lessonId)
-
-    //TODO Refactor and place in services!
-    const sortedSlides = sortSlides(lessonSlideData)
-
-    const lesson:LessonData = {
-      name:rows[0].name,
-      groupname:rows[0].groupname,
-      slides:sortedSlides
-    }
+    if (!lesson) throw Error("Lesson doesn't exist")
 
     res.send(lesson);
 
@@ -101,7 +86,7 @@ type LessonStore = {
 };
 
 const sortLessons = (lessons: LessonData[]) => {
- 
+
 };
 
 const createQueryLessonString = (lessonId: string) => {

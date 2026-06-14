@@ -14,12 +14,14 @@ lessonsRouter.delete('/:lessonId', deleteLesson)
 lessonsRouter.get('/createlesson/:lessonId', getCreateLessonPage)
 lessonsRouter.get('/createlesson', getCreateLessonPage)
 lessonsRouter.post('/createlesson', upload.none(), addLesson)
-lessonsRouter.get('/get/:lessonId', fetchLessonSlides)
 
 // Lesson Page
 lessonsRouter.get('/:lessonId', getLessonPage)
 
 // Dashboard
 lessonsRouter.get('/', getDashBoard)
+
+// Lesson Retrieval
+lessonsRouter.get('/get/:lessonId', fetchLessonSlides)
 
 export default lessonsRouter
