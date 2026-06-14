@@ -16,4 +16,5 @@ export class Slide {
 // Contains lesson data structured by groupname. LessonData with no groupname are put in nogroupname array prop.
 export type LessonStore = {
     [key: string]: LessonData[];
+    nogroup:LessonData[]
 };

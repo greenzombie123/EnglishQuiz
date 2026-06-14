@@ -2,13 +2,12 @@ import type { Request, Response, NextFunction } from "express";
 import { pool } from "../../pool.ts";
 import { format } from "node-pg-format";
 import type {
-  IntroSlideRecord,
   LessonData,
   LessonIdParams,
   LessonSlideData,
-  QuestionSlideRecord,
-  SlideRecord,
 } from "../../shared.types.ts";
+import { Lesson } from "./lessons.model.ts";
+import { createLessonStore } from "./lessons.service.ts";
 
 
 //TODO Fix later
@@ -31,6 +30,7 @@ export const fetchLessonSlides = async (
     // Grab all types of slides for the requested lesson
     const lessonSlideData:LessonSlideData = await getLessonSlideData(lessonId)
 
+    //TODO Refactor and place in services!
     const sortedSlides = sortSlides(lessonSlideData)
 
     const lesson:LessonData = {
@@ -46,97 +46,6 @@ export const fetchLessonSlides = async (
   }
 };
 
-//! Remove is not being used
-const queryLessonSlideString = `
-SELECT 
-targetword, 
-definition, 
-NULL AS question, 
-NULL AS correctanswer, 
-NULL AS wronganswer1, 
-NULL AS wronganswer2,
-NULL AS wronganswer3,
-slideorder,
-type
-FROM introslides 
-INNER JOIN lessons_introslides 
-ON lessons_introslides.introslideid = introslides.id
-WHERE lessons_introslides.lessonid = $1
-
-UNION
-
-SELECT 
-NULL AS targetword, 
-NULL AS definition, 
-question, 
-correctanswer, 
-wronganswer1, 
-wronganswer2,
-wronganswer3,
-slideorder,
-type
-FROM questionslides 
-INNER JOIN lessons_questionslides 
-ON lessons_questionslides.questionslideid = questionslides.id
-WHERE lessons_questionslides.lessonid = $1
-ORDER BY slideorder;
-`;
-
-// Return slides for a lesson. TypeScript will complain if new slide types are added but not implemented
-const getLessonSlideData = async (lessonId:string): Promise<LessonSlideData> => {
-  return {
-    intro: await getIntroSlides(lessonId),
-    question: await getQuestionSlides(lessonId)
-  }
-};
-
-const getIntroSlides = async (lessonId:string): Promise<IntroSlideRecord[] | []> => {
-  const { rows } = await pool.query<IntroSlideRecord>(`
-    SELECT 
-    targetword, 
-    definition,
-    slideorder,
-    type
-    FROM introslides
-    INNER JOIN lessons_introslides 
-    ON lessons_introslides.introslideid = introslides.id
-    WHERE lessons_introslides.lessonid = $1
-    `, [lessonId]);
-  return rows.length ? rows : [];
-};
-
-const getQuestionSlides = async (lessonId:string): Promise<QuestionSlideRecord[] | []> => {
-  const { rows } = await pool.query<QuestionSlideRecord>(`
-    SELECT 
-    question, 
-    correctanswer, 
-    wronganswer1, 
-    wronganswer2,
-    wronganswer3,
-    slideorder,
-    type
-    FROM questionslides
-    INNER JOIN lessons_questionslides
-    ON lessons_questionslides.lessonid = questionslides.id
-    WHERE lessons_questionslides.lessonid = $1
-    `, [lessonId]);
-  return rows.length ? rows : [];
-};
-
-// Spread all slide arrays into one and then sorts them by slideorder
-const sortSlides = (lessonSlideData: LessonSlideData) => {
-
-  let slides:SlideRecord[] = []
-  let keys:keyof LessonSlideData
-
-  for (keys in lessonSlideData) {
-    slides = [...slides, ...lessonSlideData[keys]]
-  }
-
-  return slides.sort(
-    (currentSlide, nextSlide) => currentSlide.slideorder - nextSlide.slideorder,
-  );
-};
 
 export const getLessonPage = (
   req: Request,
@@ -156,8 +65,8 @@ export const getDashBoard = async (
 ) => {
   if (!req.user) return res.redirect("/");
   const { username, userType } = req.user;
-  const lessonsData = await getLessons(userType, username);
-  const lessonStore = sortLessons(lessonsData);
+  const lessonData = await Lesson.getAllLessonDataByUserName(username, userType) //getLessons(userType, username);
+  const lessonStore = createLessonStore(lessonData);
 
   res.locals = { username, userType, lessonStore };
   res.render("dashboard");
@@ -192,21 +101,7 @@ type LessonStore = {
 };
 
 const sortLessons = (lessons: LessonData[]) => {
-  let store: LessonStore = {};
-  store.nogroup = [];
-
-  lessons.forEach((lesson) => {
-    const groupname = lesson.groupname;
-    if (!groupname) store.nogroup!.push(lesson);
-    else if (!store[groupname]) {
-      store[groupname] = [];
-      store[groupname].push(lesson);
-    } else {
-      store[groupname].push(lesson);
-    }
-  });
-
-  return store;
+ 
 };
 
 const createQueryLessonString = (lessonId: string) => {

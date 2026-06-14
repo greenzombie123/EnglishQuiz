@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, Mock, test, vi } from "vitest";
 import { pool } from "../../config/database.config.ts";
 import { IntroSlide, Lesson, LessonData, QuestionSlide } from "../../features/lessons/lessons.model.ts";
+import { Slide } from "../../features/lessons/lessons.types.ts";
 
 
 
@@ -63,20 +64,20 @@ describe("Lessons", () => {
     })
 
     test("Lesson.getLessonById", async () => {
-        const mockQuestionSlideResult: QuestionSlide[] = [{ question: "fe", correctanswer: "a", wronganswer1: "b", wronganswer2: "c", wronganswer3: "d", slideorder: 1, slidetype: "question" }]
-        const mockIntroSlideResult: IntroSlide[] = [{ targetword: "apple", definition: "リンゴ", slideorder: 2, slidetype: "intro" }]
+        const mockQuestionSlide: QuestionSlide = { question: "fe", correctanswer: "a", wronganswer1: "b", wronganswer2: "c", wronganswer3: "d", slideorder: 1, slidetype: "question" }
+        const mockIntroSlide: IntroSlide = { targetword: "apple", definition: "リンゴ", slideorder: 2, slidetype: "intro" }
         const mockLessonDataResult = { name: "abc", groupname: "gg", id: 2 }
 
         const spy = (vi.spyOn(pool, "query") as Mock)
             .mockResolvedValueOnce({ rows: [mockLessonDataResult] })
-            .mockResolvedValueOnce({ rows: mockQuestionSlideResult })
-            .mockResolvedValueOnce({ rows: mockIntroSlideResult })
+            .mockResolvedValueOnce({ rows: [mockQuestionSlide] })
+            .mockResolvedValueOnce({ rows: [mockIntroSlide] })
 
-        const mockLesson: Lesson = { name: "abc", groupname: "gg", questionSlides: mockQuestionSlideResult, introSlides: mockIntroSlideResult, id: 2 }
+        const mockLesson: Lesson = { name: "abc", groupname: "gg", slides: [mockQuestionSlide, mockIntroSlide], id: 2 }
 
         const lesson = await Lesson.getLessonById(2)
 
-        expect(lesson).toStrictEqual(mockLesson)
+        expect(mockLesson).toStrictEqual(lesson)
 
     })
 

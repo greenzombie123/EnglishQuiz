@@ -1,7 +1,7 @@
 import { pool } from "../../config/database.config.ts";
 import { Slide } from "./lessons.types.ts";
 
-export type LessonData = Omit<Lesson, "questionSlides" | "introSlides">
+export type LessonData = Omit<Lesson, "slides">
 
 export class IntroSlide extends Slide {
     targetword: string;
@@ -72,9 +72,8 @@ export class QuestionSlide extends Slide {
 export class Lesson {
     name: string
     groupname: string
-    questionSlides: QuestionSlide[] = []
-    introSlides: IntroSlide[] = []
     id: number
+    slides: Slide[] = []
 
     constructor(name: string, groupname: string, id: number) {
         this.name = name
@@ -135,13 +134,20 @@ export class Lesson {
 
         const questionSlides = await QuestionSlide.getQuestionSlides(id)
         const introSlides = await IntroSlide.getIntroSlides(id)
+        const sortedSlides = sortSlides([...questionSlides, ...introSlides])
 
         return {
             name: lesson.name,
             groupname: lesson.groupname,
             id: id,
-            introSlides: introSlides,
-            questionSlides: questionSlides
+            slides: sortedSlides
         }
     }
 }
+
+// Spread all slide arrays into one and then sorts them by slideorder
+const sortSlides = (slides: Slide[]) => {
+    return slides.sort(
+        (currentSlide, nextSlide) => currentSlide.slideorder - nextSlide.slideorder,
+    );
+};
