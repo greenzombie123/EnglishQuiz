@@ -1,6 +1,7 @@
 import { StringDecoder } from "string_decoder"
 import { pool } from "../../config/database.config.ts"
 import type { Role } from "./Users.types.ts"
+import type { PoolClient } from "pg"
 
 export class User {
     username: string
@@ -25,11 +26,13 @@ export class User {
         );
     }
 
-    static async findByUserName(username: string, role: Role) {
+    static async findByUserName(username: string, role: Role, client?:PoolClient) {
 
+        let p = client ? client : pool
+        
         const table = this.decideRole(role)
 
-        const userRow = await pool.query<User>(
+        const userRow = await p.query<User>(
             `SELECT * FROM ${table}s WHERE username = $1`,
             [username]
         );

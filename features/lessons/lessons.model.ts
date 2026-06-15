@@ -1,7 +1,13 @@
+import { PoolClient } from "pg";
 import { pool } from "../../config/database.config.ts";
-import { Slide } from "./lessons.types.ts";
+import { Slide, SlideType } from "./lessons.types.ts";
 
 export type LessonData = Omit<Lesson, "slides">
+
+export type LessonToSlideData = {
+    lessonId: number;
+    slideId: number;
+}
 
 export class IntroSlide extends Slide {
     targetword: string;
@@ -26,6 +32,10 @@ export class IntroSlide extends Slide {
             WHERE lessons_introslides.lessonid = $1
             `, [lessonId]);
         return rows.length ? rows : [];
+    }
+
+    static postIntroSlides = async(introSlides:IntroSlide[], client?:PoolClient)=>{
+
     }
 }
 
@@ -65,6 +75,10 @@ export class QuestionSlide extends Slide {
             WHERE lessons_questionslides.lessonid = $1
             `, [lessonId]);
         return rows.length ? rows : [];
+    }
+
+    static postQuestionSlides = async(questionSlides:QuestionSlide[], client?:PoolClient)=>{
+
     }
 }
 
@@ -142,6 +156,12 @@ export class Lesson {
             id: id,
             slides: sortedSlides
         }
+    }
+}
+
+export class LessonSlideData {
+    static postLessonSlideData = async (data: LessonToSlideData[], slideType: SlideType) => {
+
     }
 }
 

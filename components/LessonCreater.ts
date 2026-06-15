@@ -1,4 +1,3 @@
-import type { PresignedPost } from "@aws-sdk/s3-presigned-post";
 import {
   IntroSlideRecord,
   QuestionSlideRecord,

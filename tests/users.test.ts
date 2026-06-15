@@ -21,19 +21,34 @@ describe("User", () => {
             ["aaa", "ccc", "bbb"])
     })
 
-    test("User.findByUsername gets teacher of matching username", async()=>{
-        const spy = (vi.spyOn(pool, "query") as Mock).mockResolvedValue({rows:[{username:"aaa"}]})
+    test("User.findByUsername gets teacher of matching username", async () => {
+        const spy = (vi.spyOn(pool, "query") as Mock).mockResolvedValue({ rows: [{ username: "aaa" }] })
 
         const user = await User.findByUserName("aaa", "teacher")
 
         expect(spy).toHaveBeenCalledWith(`SELECT * FROM teachers WHERE username = $1`,
             ["aaa"])
 
-        expect(user).toEqual({username:"aaa"})
+        expect(user).toEqual({ username: "aaa" })
     })
 
-    test("User.doesUserExist returns true if user exist", async()=>{
-        const spy = (vi.spyOn(pool, "query") as Mock).mockResolvedValue({rows:[{username:"aaa"}]})
+    test("User.findByUsername gets teacher of matching username with pool client", async () => {
+
+        const mockQuery = vi.fn().mockResolvedValue({ rows: [{ username: "aaa" }] })
+        const spy = (vi.spyOn(pool, "connect") as Mock)
+        spy.mockResolvedValue({ query: mockQuery })
+        const mockPoolClient = await pool.connect()
+
+        const user = await User.findByUserName("aaa", "teacher", mockPoolClient)
+
+        expect(mockQuery).toHaveBeenCalledWith(`SELECT * FROM teachers WHERE username = $1`,
+            ["aaa"])
+
+        expect(user).toEqual({ username: "aaa" })
+    })
+
+    test("User.doesUserExist returns true if user exist", async () => {
+        const spy = (vi.spyOn(pool, "query") as Mock).mockResolvedValue({ rows: [{ username: "aaa" }] })
 
         const isUserRegistered = await User.doesUserExist("aaa", "student")
 

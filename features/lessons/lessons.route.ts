@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { deleteLesson, fetchLessonSlides, getDashBoard, getLessonPage} from "./lessons.controller.ts"
+import { deleteLesson, getDashBoard, getLesson, getLessonPage} from "./lessons.controller.ts"
 import { addLesson, getCreateLessonPage } from "../../controllers/createLesson.ts";
 import multer from "multer"; // Handles multipart/form-data
 
@@ -22,6 +22,6 @@ lessonsRouter.get('/:lessonId', getLessonPage)
 lessonsRouter.get('/', getDashBoard)
 
 // Lesson Retrieval
-lessonsRouter.get('/get/:lessonId', fetchLessonSlides)
+lessonsRouter.get('/get/:lessonId', getLesson)
 
 export default lessonsRouter

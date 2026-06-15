@@ -47,10 +47,12 @@ export const addLesson = async (
   const client = await pool.connect();
   await client.query("BEGIN");
 
+  //TODO User.getUserByUsername
   const teacherId = await getTeacherId(client, teacherName);
 
   let newLessonId;
 
+  //TODO Lesson.postLesson
   if (teacherId)
     newLessonId = await createLessonRow(client, {
       lessonName,
@@ -58,6 +60,7 @@ export const addLesson = async (
       groupName: groupname,
     });
 
+  //* Get strings of soundurls
   let audioFileNames = extractAudioFiles(question, intro);
 
   let presignedUrlData: PresignUrlData[] = [];
@@ -76,6 +79,7 @@ export const addLesson = async (
   // return res.json(presignedUrlData)
 
   // return res.end();
+
 
   const introString = createIntroSQLString(intro);
   const questionString = createQuestionSQLString(question);
