@@ -1,6 +1,7 @@
 import { PoolClient } from "pg";
 import { pool } from "../../config/database.config.ts";
 import { Slide, SlideType } from "./lessons.types.ts";
+import { format } from "node-pg-format";
 
 export type LessonData = Omit<Lesson, "slides">
 
@@ -13,8 +14,8 @@ export class IntroSlide extends Slide {
     targetword: string;
     definition: string;
 
-    constructor(sliderorder: number, targetword: string, definition: string) {
-        super(sliderorder, "intro")
+    constructor(sliderorder: number, targetword: string, definition: string, soundurl: string) {
+        super(sliderorder, "intro", soundurl)
         this.targetword = targetword
         this.definition = definition
     }
@@ -34,7 +35,7 @@ export class IntroSlide extends Slide {
         return rows.length ? rows : [];
     }
 
-    static postIntroSlides = async(introSlides:IntroSlide[], client?:PoolClient)=>{
+    static postIntroSlides = async (introSlides: IntroSlide[], client?: PoolClient): number[] => {
 
     }
 }
@@ -50,8 +51,9 @@ export class QuestionSlide extends Slide {
         correctanswer: string,
         wronganswer1: string,
         wronganswer2: string,
-        wronganswer3: string) {
-        super(sliderorder, "question")
+        wronganswer3: string,
+        soundurl: string) {
+        super(sliderorder, "question", soundurl)
         this.question = question
         this.correctanswer = correctanswer
         this.wronganswer1 = wronganswer1
@@ -77,8 +79,11 @@ export class QuestionSlide extends Slide {
         return rows.length ? rows : [];
     }
 
-    static postQuestionSlides = async(questionSlides:QuestionSlide[], client?:PoolClient)=>{
+    static postQuestionSlides = async (questionSlides: QuestionSlide[], client?: PoolClient): number[] => {
+        const queryString = createQuestionSlideQueryString(questionSlides)
+        const {rows:ids} = await pool.query<{id:number}>(queryString)
 
+        return ids.map(id=>id.id)
     }
 }
 
@@ -157,6 +162,10 @@ export class Lesson {
             slides: sortedSlides
         }
     }
+
+    static postLessonData = async (name: string, groupname: string, client?: PoolClient): number => {
+
+    }
 }
 
 export class LessonSlideData {
@@ -170,4 +179,55 @@ const sortSlides = (slides: Slide[]) => {
     return slides.sort(
         (currentSlide, nextSlide) => currentSlide.slideorder - nextSlide.slideorder,
     );
+};
+
+// Create a query string to insert introslides
+
+export const createIntroSlideQueryString = (slides: IntroSlide[]) => {
+
+  const introColumns = ["targetword", "definition", "slideorder", "soundurl"]
+  
+  const introSlides = slides.map((slide) => [
+    slide.targetword,
+    slide.definition,
+    slide.slideorder,
+    slide.soundurl
+  ]);
+
+  return format(
+    "INSERT INTO introslides (%I) VALUES %L RETURNING id",
+    introColumns,
+    introSlides
+  );
+};
+
+// Create a query string to insert questionslides
+
+export const createQuestionSlideQueryString = (slides: QuestionSlide[]) => {
+
+  const questionslides = slides.map((slide) => [
+    slide.question,
+    slide.correctanswer,
+    slide.wronganswer1,
+    slide.wronganswer2,
+    slide.wronganswer3,
+    slide.slideorder,
+    slide.soundurl
+  ]);
+
+  const questionColumns = [
+    "question",
+    "correctanswer",
+    "wronganswer1",
+    "wronganswer2",
+    "wronganswer3",
+    "slideorder",
+    "soundurl"
+  ];
+
+  return format(
+    "INSERT INTO questionslides (%I) VALUES %L RETURNING id",
+    questionColumns,
+    questionslides
+  );
 };

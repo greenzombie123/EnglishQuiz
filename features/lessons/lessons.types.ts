@@ -5,11 +5,12 @@ export type SlideType = "intro" | "question"
 export class Slide {
     slideorder: number
     slidetype: SlideType
-    // soundurl:string
+    soundurl:string
 
-    constructor(slideorder: number, type: SlideType) {
+    constructor(slideorder: number, type: SlideType, soundurl:string) {
         this.slideorder = slideorder
         this.slidetype = type
+        this.soundurl = soundurl
     }
 }
 

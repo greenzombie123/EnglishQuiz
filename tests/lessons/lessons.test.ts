@@ -1,9 +1,34 @@
 import { beforeEach, describe, expect, Mock, test, vi } from "vitest";
 import { pool } from "../../config/database.config.ts";
-import { IntroSlide, Lesson, LessonData, QuestionSlide } from "../../features/lessons/lessons.model.ts";
+import { createQuestionSlideQueryString, IntroSlide, Lesson, LessonData, QuestionSlide } from "../../features/lessons/lessons.model.ts";
 import { Slide } from "../../features/lessons/lessons.types.ts";
 
+describe("QuestionSlides", () => {
+    beforeEach(() => {
+        vi.restoreAllMocks()
+    })
 
+    test("QuestionSlide.postQuestionSlides inserts question slides into database and return an array of id numbers", async () => {
+
+        const mockIds = [2,4]
+
+        const spy = vi.spyOn(pool, "query") as Mock
+        spy.mockResolvedValue({rows:[{id:mockIds[0]}, {id:mockIds[1]}]})
+
+        const mockQuestionSlides: QuestionSlide[] = [
+            { question: "Why?", correctanswer: "I dont know!", wronganswer1: "a", wronganswer2: "b", wronganswer3: "c", soundurl: "abc", slidetype: "question", slideorder: 2 },
+            { question: "Where", correctanswer: "I dont know!", wronganswer1: "a", wronganswer2: "b", wronganswer3: "c", soundurl: "abc", slidetype: "question", slideorder: 2 }
+
+        ]
+
+        const queryString = createQuestionSlideQueryString(mockQuestionSlides)
+        
+        const ids = await QuestionSlide.postQuestionSlides(mockQuestionSlides)
+
+        expect(spy).toBeCalledWith(queryString)
+        expect(ids).toStrictEqual(mockIds)
+    })
+})
 
 describe("Lessons", () => {
 
@@ -114,4 +139,6 @@ describe("Lessons", () => {
 
         expect(lessonData).toStrictEqual(mockLessonData)
     })
+
+
 })
