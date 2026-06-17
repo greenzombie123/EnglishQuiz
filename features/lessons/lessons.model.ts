@@ -35,8 +35,13 @@ export class IntroSlide extends Slide {
         return rows.length ? rows : [];
     }
 
-    static postIntroSlides = async (introSlides: IntroSlide[], client?: PoolClient): number[] => {
+    static postIntroSlides = async (introSlides: IntroSlide[], client?: PoolClient): Promise<number[]> => {
+        let p = client ? client : pool
 
+        const queryString = createIntroSlideQueryString(introSlides)
+        const {rows:ids} = await p.query<{id:number}>(queryString)
+
+        return ids.map(id=>id.id)
     }
 }
 
@@ -79,9 +84,12 @@ export class QuestionSlide extends Slide {
         return rows.length ? rows : [];
     }
 
-    static postQuestionSlides = async (questionSlides: QuestionSlide[], client?: PoolClient): number[] => {
+    static postQuestionSlides = async (questionSlides: QuestionSlide[], client?: PoolClient): Promise<number[]> => {
+
+        let p = client ? client : pool
+
         const queryString = createQuestionSlideQueryString(questionSlides)
-        const {rows:ids} = await pool.query<{id:number}>(queryString)
+        const {rows:ids} = await p.query<{id:number}>(queryString)
 
         return ids.map(id=>id.id)
     }

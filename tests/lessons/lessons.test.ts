@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, Mock, test, vi } from "vitest";
 import { pool } from "../../config/database.config.ts";
-import { createQuestionSlideQueryString, IntroSlide, Lesson, LessonData, QuestionSlide } from "../../features/lessons/lessons.model.ts";
+import { createIntroSlideQueryString, createQuestionSlideQueryString, IntroSlide, Lesson, LessonData, QuestionSlide } from "../../features/lessons/lessons.model.ts";
 import { Slide } from "../../features/lessons/lessons.types.ts";
 
 describe("QuestionSlides", () => {
@@ -10,10 +10,10 @@ describe("QuestionSlides", () => {
 
     test("QuestionSlide.postQuestionSlides inserts question slides into database and return an array of id numbers", async () => {
 
-        const mockIds = [2,4]
+        const mockIds = [2, 4]
 
         const spy = vi.spyOn(pool, "query") as Mock
-        spy.mockResolvedValue({rows:[{id:mockIds[0]}, {id:mockIds[1]}]})
+        spy.mockResolvedValue({ rows: [{ id: mockIds[0] }, { id: mockIds[1] }] })
 
         const mockQuestionSlides: QuestionSlide[] = [
             { question: "Why?", correctanswer: "I dont know!", wronganswer1: "a", wronganswer2: "b", wronganswer3: "c", soundurl: "abc", slidetype: "question", slideorder: 2 },
@@ -22,8 +22,35 @@ describe("QuestionSlides", () => {
         ]
 
         const queryString = createQuestionSlideQueryString(mockQuestionSlides)
-        
+
         const ids = await QuestionSlide.postQuestionSlides(mockQuestionSlides)
+
+        expect(spy).toBeCalledWith(queryString)
+        expect(ids).toStrictEqual(mockIds)
+    })
+})
+
+describe("IntroSlides", () => {
+    beforeEach(() => {
+        vi.restoreAllMocks()
+    })
+
+    test("QuestionSlide.postQuestionSlides inserts question slides into database and return an array of id numbers", async () => {
+
+        const mockIds = [2, 4]
+
+        const spy = vi.spyOn(pool, "query") as Mock
+        spy.mockResolvedValue({ rows: [{ id: mockIds[0] }, { id: mockIds[1] }] })
+
+        const mockIntroSlides: IntroSlide[] = [
+            { targetword: "bob", definition: "123", soundurl: "abc", slidetype: "question", slideorder: 2 },
+            { targetword: "wow", definition: "123", soundurl: "abc", slidetype: "question", slideorder: 2 }
+
+        ]
+
+        const queryString = createIntroSlideQueryString(mockIntroSlides)
+
+        const ids = await IntroSlide.postIntroSlides(mockIntroSlides)
 
         expect(spy).toBeCalledWith(queryString)
         expect(ids).toStrictEqual(mockIds)
