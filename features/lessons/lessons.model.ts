@@ -39,9 +39,9 @@ export class IntroSlide extends Slide {
         let p = client ? client : pool
 
         const queryString = createIntroSlideQueryString(introSlides)
-        const {rows:ids} = await p.query<{id:number}>(queryString)
+        const { rows: ids } = await p.query<{ id: number }>(queryString)
 
-        return ids.map(id=>id.id)
+        return ids.map(id => id.id)
     }
 }
 
@@ -89,9 +89,9 @@ export class QuestionSlide extends Slide {
         let p = client ? client : pool
 
         const queryString = createQuestionSlideQueryString(questionSlides)
-        const {rows:ids} = await p.query<{id:number}>(queryString)
+        const { rows: ids } = await p.query<{ id: number }>(queryString)
 
-        return ids.map(id=>id.id)
+        return ids.map(id => id.id)
     }
 }
 
@@ -171,8 +171,11 @@ export class Lesson {
         }
     }
 
-    static postLessonData = async (name: string, groupname: string, client?: PoolClient): number => {
+    static post = async (name: string, groupname: string, teacherId: string, client?: PoolClient): Promise<number[]> => {
 
+        const { rows: ids } = await pool.query<{ id: number }>(`INSERT INTO lessons (name, teacherid, groupname) VALUES('${name}', '${teacherId}', '${groupname}') RETURNING id`)
+
+        return ids.map(id => id.id)
     }
 }
 
@@ -193,49 +196,49 @@ const sortSlides = (slides: Slide[]) => {
 
 export const createIntroSlideQueryString = (slides: IntroSlide[]) => {
 
-  const introColumns = ["targetword", "definition", "slideorder", "soundurl"]
-  
-  const introSlides = slides.map((slide) => [
-    slide.targetword,
-    slide.definition,
-    slide.slideorder,
-    slide.soundurl
-  ]);
+    const introColumns = ["targetword", "definition", "slideorder", "soundurl"]
 
-  return format(
-    "INSERT INTO introslides (%I) VALUES %L RETURNING id",
-    introColumns,
-    introSlides
-  );
+    const introSlides = slides.map((slide) => [
+        slide.targetword,
+        slide.definition,
+        slide.slideorder,
+        slide.soundurl
+    ]);
+
+    return format(
+        "INSERT INTO introslides (%I) VALUES %L RETURNING id",
+        introColumns,
+        introSlides
+    );
 };
 
 // Create a query string to insert questionslides
 
 export const createQuestionSlideQueryString = (slides: QuestionSlide[]) => {
 
-  const questionslides = slides.map((slide) => [
-    slide.question,
-    slide.correctanswer,
-    slide.wronganswer1,
-    slide.wronganswer2,
-    slide.wronganswer3,
-    slide.slideorder,
-    slide.soundurl
-  ]);
+    const questionslides = slides.map((slide) => [
+        slide.question,
+        slide.correctanswer,
+        slide.wronganswer1,
+        slide.wronganswer2,
+        slide.wronganswer3,
+        slide.slideorder,
+        slide.soundurl
+    ]);
 
-  const questionColumns = [
-    "question",
-    "correctanswer",
-    "wronganswer1",
-    "wronganswer2",
-    "wronganswer3",
-    "slideorder",
-    "soundurl"
-  ];
+    const questionColumns = [
+        "question",
+        "correctanswer",
+        "wronganswer1",
+        "wronganswer2",
+        "wronganswer3",
+        "slideorder",
+        "soundurl"
+    ];
 
-  return format(
-    "INSERT INTO questionslides (%I) VALUES %L RETURNING id",
-    questionColumns,
-    questionslides
-  );
+    return format(
+        "INSERT INTO questionslides (%I) VALUES %L RETURNING id",
+        questionColumns,
+        questionslides
+    );
 };
