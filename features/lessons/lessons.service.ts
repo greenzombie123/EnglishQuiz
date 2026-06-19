@@ -30,3 +30,8 @@ export const postLesson = async ({ name, groupname, lessonId, introSlides, quest
     
   }
 }
+
+// Extract id values from each row in the rows prop. Used for bridging tables
+const getIds = (lessonId: string, rows: { id: string }[]) => {
+  return rows.map((row) => [lessonId, row.id]);
+};

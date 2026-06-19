@@ -180,8 +180,22 @@ export class Lesson {
 }
 
 export class LessonSlideData {
-    static postLessonSlideData = async (data: LessonToSlideData[], slideType: SlideType) => {
+    lessonId: number;
+    slideId: number;
 
+    constructor(lessonId: number, slideId: number) {
+        this.lessonId = lessonId
+        this.slideId = slideId
+    }
+
+    static postLessonSlideData = async (lessonid: number, slideIds: number[], slideType: SlideType) => {
+        const slideTableType = slideType === "intro" ? "lessons_introslides" : "lessons_questionslides"
+        const slideIdColumnType = slideType === "intro" ? "introslideid" : "questionslideid"
+
+        const lessonSlideDataArray: [number, number][] = slideIds.map(id => [lessonid, id])
+
+        const queryString = format(`INSERT INTO ${slideTableType} (lessonid, ${slideIdColumnType}) VALUES %L`, lessonSlideDataArray)
+        await pool.query(queryString)
     }
 }
 

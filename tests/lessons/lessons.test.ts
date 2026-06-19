@@ -1,7 +1,25 @@
 import { beforeEach, describe, expect, Mock, test, vi } from "vitest";
 import { pool } from "../../config/database.config.ts";
-import { createIntroSlideQueryString, createQuestionSlideQueryString, IntroSlide, Lesson, LessonData, QuestionSlide } from "../../features/lessons/lessons.model.ts";
+import { createIntroSlideQueryString, createQuestionSlideQueryString, IntroSlide, Lesson, LessonData, LessonSlideData, QuestionSlide } from "../../features/lessons/lessons.model.ts";
 import { Slide } from "../../features/lessons/lessons.types.ts";
+
+describe("LessonSlideData", () => {
+    beforeEach(() => {
+        vi.restoreAllMocks()
+    })
+
+    test("postLessonSlideData adds a record to the Lessons_Introslides table", async () => {
+        //const mockLessonDataSlides: LessonSlideData[] = [{ lessonId: 3, slideId: 5 }]
+
+        const spy = vi.spyOn(pool, "query")
+        spy.mockImplementation(vi.fn())
+
+        await LessonSlideData.postLessonSlideData(2, [2, 3, 10], "intro")
+
+        expect(spy).toBeCalledWith(`INSERT INTO lessons_introslides (lessonid, introslideid) VALUES (2, 2), (2, 3), (2, 10)`)
+    })
+
+})
 
 describe("QuestionSlides", () => {
     beforeEach(() => {
@@ -176,7 +194,7 @@ describe("Lessons", () => {
         const ids = await Lesson.post("abc", "def", "ttt")
 
         expect(spy).toBeCalledWith(`INSERT INTO lessons (name, teacherid, groupname) VALUES('abc', 'ttt', 'def') RETURNING id`)
-        expect(ids).toStrictEqual([12,33])
+        expect(ids).toStrictEqual([12, 33])
     })
 
 })
