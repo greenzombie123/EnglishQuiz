@@ -188,7 +188,7 @@ export class LessonSlideData {
         this.slideId = slideId
     }
 
-    static postLessonSlideData = async (lessonid: number, slideIds: number[], slideType: SlideType) => {
+    static post = async (lessonid: number, slideIds: number[], slideType: SlideType) => {
         const slideTableType = slideType === "intro" ? "lessons_introslides" : "lessons_questionslides"
         const slideIdColumnType = slideType === "intro" ? "introslideid" : "questionslideid"
 

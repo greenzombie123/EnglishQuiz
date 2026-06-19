@@ -14,9 +14,19 @@ describe("LessonSlideData", () => {
         const spy = vi.spyOn(pool, "query")
         spy.mockImplementation(vi.fn())
 
-        await LessonSlideData.postLessonSlideData(2, [2, 3, 10], "intro")
+        await LessonSlideData.post(2, [2, 3, 10], "intro")
 
         expect(spy).toBeCalledWith(`INSERT INTO lessons_introslides (lessonid, introslideid) VALUES (2, 2), (2, 3), (2, 10)`)
+    })
+
+     test("postLessonSlideData adds a record to the Lessons_Questionslides table", async () => {
+
+        const spy = vi.spyOn(pool, "query")
+        spy.mockImplementation(vi.fn())
+
+        await LessonSlideData.post(2, [2, 3, 10], "question")
+
+        expect(spy).toBeCalledWith(`INSERT INTO lessons_questionslides (lessonid, questionslideid) VALUES (2, 2), (2, 3), (2, 10)`)
     })
 
 })
