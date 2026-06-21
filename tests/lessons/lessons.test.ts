@@ -1,7 +1,8 @@
 import { beforeEach, describe, expect, Mock, test, vi } from "vitest";
 import { pool } from "../../config/database.config.ts";
 import { createIntroSlideQueryString, createQuestionSlideQueryString, IntroSlide, Lesson, LessonData, LessonSlideData, QuestionSlide } from "../../features/lessons/lessons.model.ts";
-import { Slide } from "../../features/lessons/lessons.types.ts";
+import { joke } from "../../pop.ts";
+import { Pool } from "pg";
 
 describe("LessonSlideData", () => {
     beforeEach(() => {
@@ -19,7 +20,7 @@ describe("LessonSlideData", () => {
         expect(spy).toBeCalledWith(`INSERT INTO lessons_introslides (lessonid, introslideid) VALUES (2, 2), (2, 3), (2, 10)`)
     })
 
-     test("postLessonSlideData adds a record to the Lessons_Questionslides table", async () => {
+    test("postLessonSlideData adds a record to the Lessons_Questionslides table", async () => {
 
         const spy = vi.spyOn(pool, "query")
         spy.mockImplementation(vi.fn())
@@ -82,6 +83,18 @@ describe("IntroSlides", () => {
 
         expect(spy).toBeCalledWith(queryString)
         expect(ids).toStrictEqual(mockIds)
+    })
+
+    test("delete removes a row from questionslides table", async () => {
+        
+        const spy = vi.spyOn(pool, "query").mockImplementation(vi.fn())
+
+        const mockIds = [10, 20, 4]
+
+        await QuestionSlide.delete(mockIds, pool)
+
+        expect(spy).toHaveBeenCalled()
+        expect(spy).toBeCalledWith(`DELETE FROM questionslides WHERE id in (10,20,4)`)
     })
 })
 
@@ -206,5 +219,4 @@ describe("Lessons", () => {
         expect(spy).toBeCalledWith(`INSERT INTO lessons (name, teacherid, groupname) VALUES('abc', 'ttt', 'def') RETURNING id`)
         expect(ids).toStrictEqual([12, 33])
     })
-
 })

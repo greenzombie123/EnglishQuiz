@@ -6,6 +6,7 @@ import { createLessonStore } from "./lessons.service.ts";
 import type {
   LessonIdParams,
 } from "../../shared.types.ts";
+import { PostLessonReqBody } from "./lessons.types.ts";
 
 export const getLesson = async (
   req: Request<LessonIdParams>,
@@ -65,9 +66,24 @@ export const deleteLesson = async (
 };
 
 export const postLesson = async (
-  req: Request,
+  req: Request<{}, {}, PostLessonReqBody>,
   res: Response,
   next: NextFunction
 ) => {
-  
+  if (!req.user || req.user.userType === "student") return res.redirect("/");
+
+  const { username } = req.user;
+  const { question, intro, lessonName, groupname, lessonId } = req.body;
+
+  /** Call the following
+   * Get the pool client from pool
+   * User.getUserByUsername
+   * If lesson already exists, Lesson.deleteLesson
+   * Lesson.postLessonData
+   * IntroSlide.post
+   * LessonSlideData.post
+   * QuestionSlide.post
+   * LessonSlideData.post
+   */
+
 }

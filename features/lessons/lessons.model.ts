@@ -1,4 +1,4 @@
-import { PoolClient } from "pg";
+import { Pool, PoolClient } from "pg";
 import { pool } from "../../config/database.config.ts";
 import { Slide, SlideType } from "./lessons.types.ts";
 import { format } from "node-pg-format";
@@ -43,6 +43,8 @@ export class IntroSlide extends Slide {
 
         return ids.map(id => id.id)
     }
+
+    static delete = async (ids: number[], client: Pool | PoolClient = pool) => { }
 }
 
 export class QuestionSlide extends Slide {
@@ -92,6 +94,14 @@ export class QuestionSlide extends Slide {
         const { rows: ids } = await p.query<{ id: number }>(queryString)
 
         return ids.map(id => id.id)
+    }
+
+    static delete = async (ids: number[], client: Pool | PoolClient = pool) => { 
+         let p = client ? client : pool
+
+        const queryString = format("DELETE FROM questionslides WHERE id in (%L)", ids)
+
+         await p.query(queryString)
     }
 }
 
@@ -177,6 +187,10 @@ export class Lesson {
 
         return ids.map(id => id.id)
     }
+
+    static delete = async (lessonId: number, client?: PoolClient) => {
+
+    }
 }
 
 export class LessonSlideData {
@@ -188,14 +202,17 @@ export class LessonSlideData {
         this.slideId = slideId
     }
 
-    static post = async (lessonid: number, slideIds: number[], slideType: SlideType) => {
+    static post = async (lessonid: number, slideIds: number[], slideType: SlideType, client?: PoolClient) => {
+
+        let p = client ? client : pool
+
         const slideTableType = slideType === "intro" ? "lessons_introslides" : "lessons_questionslides"
         const slideIdColumnType = slideType === "intro" ? "introslideid" : "questionslideid"
 
         const lessonSlideDataArray: [number, number][] = slideIds.map(id => [lessonid, id])
 
         const queryString = format(`INSERT INTO ${slideTableType} (lessonid, ${slideIdColumnType}) VALUES %L`, lessonSlideDataArray)
-        await pool.query(queryString)
+        await p.query(queryString)
     }
 }
 

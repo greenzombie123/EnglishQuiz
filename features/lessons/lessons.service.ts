@@ -1,6 +1,6 @@
-import {pool} from "../../config/database.config.ts"
+import { pool } from "../../config/database.config.ts"
 import type { IntroSlide, LessonData, QuestionSlide } from "./lessons.model.ts";
-import type { LessonStore } from "./lessons.types.ts";
+import type { LessonStore, PostLessonArg, PostLessonFunc } from "./lessons.types.ts";
 
 // Create lesson store the dashboard use to display available lessons
 export const createLessonStore = (lessons: LessonData[]) => {
@@ -21,13 +21,14 @@ export const createLessonStore = (lessons: LessonData[]) => {
   return store;
 }
 
-export const postLesson = async ({ name, groupname, lessonId, introSlides, questionSlides }: { name: string, groupname: string, lessonId: string, introSlides: IntroSlide[], questionSlides: QuestionSlide[] }) => {
+// Insert lesson, lessonslidedata, and slides into database
+export const postLessonService = async (postLessonArg: PostLessonArg) => {
   const client = await pool.connect()
 
   try {
-    
+
   } catch (error) {
-    
+
   }
 }
 
