@@ -57,6 +57,16 @@ describe("QuestionSlides", () => {
         expect(spy).toBeCalledWith(queryString)
         expect(ids).toStrictEqual(mockIds)
     })
+
+    test("delete removes a row from questionslides table", async () => {
+        
+        const spy = vi.spyOn(pool, "query").mockImplementation(vi.fn())
+
+        await QuestionSlide.delete(2, pool)
+
+        expect(spy).toHaveBeenCalled()
+        expect(spy).toBeCalledWith(`DELETE FROM questionslides WHERE id in (SELECT questionslideid FROM lessons_questionslides WHERE lessonid = 2)`)
+    })
 })
 
 describe("IntroSlides", () => {
@@ -86,16 +96,14 @@ describe("IntroSlides", () => {
         expect(ids).toStrictEqual(mockIds)
     })
 
-    test("delete removes a row from questionslides table", async () => {
+    test("delete removes a row from introslides table", async () => {
         
         const spy = vi.spyOn(pool, "query").mockImplementation(vi.fn())
 
-        const mockIds = [10, 20, 4]
-
-        await QuestionSlide.delete(2, pool)
+        await IntroSlide.delete(2, pool)
 
         expect(spy).toHaveBeenCalled()
-        expect(spy).toBeCalledWith(`DELETE FROM questionslides WHERE id in (SELECT questionslideid FROM lessons_questionslides WHERE lessonid = 2)`)
+        expect(spy).toBeCalledWith(`DELETE FROM introslides WHERE id in (SELECT introslideid FROM lessons_introslides WHERE lessonid = 2)`)
     })
 })
 
