@@ -96,10 +96,10 @@ export class QuestionSlide extends Slide {
         return ids.map(id => id.id)
     }
 
-    static delete = async (ids: number[], client: Pool | PoolClient = pool) => { 
+    static delete = async (lessonId: number, client: Pool | PoolClient = pool) => { 
          let p = client ? client : pool
 
-        const queryString = format("DELETE FROM questionslides WHERE id in (%L)", ids)
+        const queryString = format(`DELETE FROM questionslides WHERE id in (SELECT questionslideid FROM lessons_questionslides WHERE lessonid = %L)`, lessonId)
 
          await p.query(queryString)
     }

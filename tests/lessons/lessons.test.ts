@@ -64,7 +64,8 @@ describe("IntroSlides", () => {
         vi.restoreAllMocks()
     })
 
-    test("QuestionSlide.postQuestionSlides inserts question slides into database and return an array of id numbers", async () => {
+
+    test("IntroSlide.postIntroSlides inserts question slides into database and return an array of id numbers", async () => {
 
         const mockIds = [2, 4]
 
@@ -91,10 +92,10 @@ describe("IntroSlides", () => {
 
         const mockIds = [10, 20, 4]
 
-        await QuestionSlide.delete(mockIds, pool)
+        await QuestionSlide.delete(2, pool)
 
         expect(spy).toHaveBeenCalled()
-        expect(spy).toBeCalledWith(`DELETE FROM questionslides WHERE id in (10,20,4)`)
+        expect(spy).toBeCalledWith(`DELETE FROM questionslides WHERE id in (SELECT questionslideid FROM lessons_questionslides WHERE lessonid = 2)`)
     })
 })
 
