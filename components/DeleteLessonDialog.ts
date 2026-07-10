@@ -1,57 +1,39 @@
-export class DeleteLessonDialog extends HTMLElement {
-  root;
-  dialog;
-  topMessage;
-  bottomMessage;
-  yesButton;
-  noButton;
-  returnButton;
-  href;
-  lessonname;
+import { Task } from "@lit/task";
+import { css, html, LitElement } from "lit";
+import { customElement, query, state } from "lit/decorators.js";
 
-  constructor() {
-    super();
+declare global {
+  interface HTMLElementTagNameMap {
+    "deletelesson-dialog": DeleteLessonDialog;
+  }
+}
 
-    this.href = "";
-    this.lessonname = "";
+@customElement("deletelesson-dialog")
+export class DeleteLessonDialog extends LitElement {
 
-    this.root = this.attachShadow({ mode: "closed" });
+  @state()
+  href = "";
 
-    this.dialog = document.createElement("dialog") as HTMLDialogElement;
-    this.dialog.setAttribute("closedby", "any")
-    this.root.appendChild(this.dialog);
+  @state()
+  lessonname = "";
 
-    const wrapper = document.createElement("div") as HTMLDivElement
-    this.dialog.appendChild(wrapper)
+  @query("dialog")
+  dialog!: HTMLDialogElement;
 
-    this.topMessage = document.createElement("p") as HTMLParagraphElement;
-    this.topMessage.textContent = "Do you want to delete this lesson?";
-    this.topMessage.className = "top"
-    wrapper.appendChild(this.topMessage);
+  private task = new Task(this, {
+    task: async () => {
+      try {
+        const response = await fetch(this.href, { method: "delete" });
+        if (!response.ok)
+          throw new Error("The error is this: " + response.status);
+      } catch (error: any) {
+        console.log(error.message);
+      }
+    }
+  })
 
-    this.bottomMessage = document.createElement("p") as HTMLParagraphElement;
-    this.bottomMessage.className = "bottom"
-    wrapper.appendChild(this.bottomMessage);
-
-    this.yesButton = document.createElement("button") as HTMLButtonElement;
-    this.yesButton.textContent = "Yes";
-    this.yesButton.addEventListener("click", this.#onYesButtonClicked);
-    wrapper.appendChild(this.yesButton);
-
-    this.noButton = document.createElement("button") as HTMLButtonElement;
-    this.noButton.textContent = "No";
-    this.noButton.addEventListener("click", () => this.dialog.close());
-    wrapper.appendChild(this.noButton);
-
-    this.returnButton = document.createElement("a") as HTMLAnchorElement;
-    this.returnButton.textContent = "Return to the dashboard";
-    this.returnButton.href = "/lessons"
-    wrapper.appendChild(this.returnButton);
-
-    
-    const style = document.createElement("style") as HTMLStyleElement
-    style.textContent = `
-        div{
+  static styles = css`   
+    div{
                 font-size: 1.1rem;
                 display: flex;
                 flex-direction: row;
@@ -73,65 +55,63 @@ export class DeleteLessonDialog extends HTMLElement {
                     padding: 3px 6px;
                 }
         }
+  `;
+
+  showDeleteDialog(lessonName: string, href: string) {
+    this.setData(lessonName, href)
+    this.dialog.showModal()
+  }
+
+  private setData(lessonName: string, href: string) {
+    this.lessonname = lessonName;
+    this.href = href
+  }
+
+  async onYesButtonClicked() {
+    this.task.run()
+  }
+
+  onNoButtonClicked() {
+    this.dialog.close()
+  }
+
+  deleteRequestTemplate() {
+    return html`
+       <p class="top"> Do you want to delete this lesson?</p>
+       <p class="bottom">${this.lessonname}</p>
+       <button @click=${this.onYesButtonClicked}>Yes</button>
+       <button @click=${this.onNoButtonClicked}>No</button>`
+  }
+
+  deleteCompletedTemplate() {
+    return html`
+      <p class="top">The lesson was deleted.</p>
+      <a href="/lessons">Return to the dashboard</a>
     `
-    this.root.appendChild(style)
   }
 
-  connectedCallback() {
-
+  deletePendingTemplate() {
+    return html`<p>Deleting lesson....</p>`
   }
 
-  showDeleteDialog = (lessonname: string, href: string) => {
-    this.#reset();
-    this.#setData(lessonname, href);
-    this.#showDialog();
-  };
+  errorTemplate() {
+    return html`<p>Opps! An error occurred!</p>`
+  }
 
-  #setData = (lessonname: string, href: string) => {
-    this.lessonname = lessonname;
-    this.href = href;
-  };
+  protected render() {
+    console.log(this.lessonname, this.href, 12)
 
-  #showDialog = () => {
-    this.topMessage.textContent = "Will you delete this lesson?";
-    this.bottomMessage.textContent = this.lessonname;
-
-    this.dialog.showModal();
-  };
-
-  #onYesButtonClicked = async () => {
-    try {
-      const response = await fetch(this.href, { method: "delete" });
-      if (!response.ok)
-        throw new Error("The error is this: " + response.status);
-      this.#removeButtons();
-      this.#renderReturnButton();
-      this.topMessage.textContent = "The lesson was deleted.";
-      this.bottomMessage.textContent = "";
-    } catch (error: any) {
-      console.log(error.message);
-    }
-  };
-
-  #removeButtons = () => {
-    const buttons = Array.from(
-      this.dialog.querySelectorAll("button")
-    ) as HTMLButtonElement[];
-    buttons.forEach((button) => (button.style.display = "none"));
-  };
-
-  #renderReturnButton = () => {
-    this.returnButton.style.display = "block";
-  };
-
-  #reset = () => {
-    const buttons = Array.from(
-      this.dialog.querySelectorAll("button")
-    ) as HTMLButtonElement[];
-    buttons.forEach((button) => (button.style.display = "block"));
-
-    this.returnButton.style.display = "none";
-  };
+    return html`
+      <dialog closedby="any">
+        <div>
+          ${this.task.render({
+            initial: ()=>this.deleteRequestTemplate(),
+            pending: ()=>this.deletePendingTemplate(),
+            complete: ()=>this.deleteCompletedTemplate(),
+            error: ()=>this.errorTemplate()
+    })}
+        </div>
+      </dialog>
+    `
+  }
 }
-
-customElements.define("deletelesson-dialog", DeleteLessonDialog);

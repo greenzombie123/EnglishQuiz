@@ -1,8 +1,6 @@
 import { beforeEach, describe, expect, Mock, test, vi } from "vitest";
 import { pool } from "../../config/database.config.ts";
 import { createIntroSlideQueryString, createQuestionSlideQueryString, IntroSlide, Lesson, LessonData, LessonSlideData, QuestionSlide } from "../../features/lessons/lessons.model.ts";
-import { joke } from "../../pop.ts";
-import { Pool } from "pg";
 
 describe("LessonSlideData", () => {
     beforeEach(() => {
@@ -52,7 +50,7 @@ describe("QuestionSlides", () => {
 
         const queryString = createQuestionSlideQueryString(mockQuestionSlides)
 
-        const ids = await QuestionSlide.postQuestionSlides(mockQuestionSlides)
+        const ids = await QuestionSlide.post(mockQuestionSlides)
 
         expect(spy).toBeCalledWith(queryString)
         expect(ids).toStrictEqual(mockIds)
@@ -90,7 +88,7 @@ describe("IntroSlides", () => {
 
         const queryString = createIntroSlideQueryString(mockIntroSlides)
 
-        const ids = await IntroSlide.postIntroSlides(mockIntroSlides)
+        const ids = await IntroSlide.post(mockIntroSlides)
 
         expect(spy).toBeCalledWith(queryString)
         expect(ids).toStrictEqual(mockIds)
@@ -121,7 +119,7 @@ describe("Lessons", () => {
 
         const spy = (vi.spyOn(pool, "query") as Mock).mockReturnValueOnce({ rows: [introSlide1, introSlide2] })
 
-        const slides = await IntroSlide.getIntroSlides(1)
+        const slides = await IntroSlide.get(1)
 
         expect(slides).toStrictEqual([introSlide1, introSlide2])
     })
@@ -130,7 +128,7 @@ describe("Lessons", () => {
 
         const spy = (vi.spyOn(pool, "query") as Mock).mockReturnValueOnce({ rows: [] })
 
-        const slides = await IntroSlide.getIntroSlides(1)
+        const slides = await IntroSlide.get(1)
 
         expect(slides).toStrictEqual([])
     })
@@ -142,7 +140,7 @@ describe("Lessons", () => {
 
         const spy = (vi.spyOn(pool, "query") as Mock).mockReturnValueOnce({ rows: [questionSlide1, questionSlide2] })
 
-        const slides = await QuestionSlide.getQuestionSlides(1)
+        const slides = await QuestionSlide.get(1)
 
         expect(slides).toStrictEqual([questionSlide1, questionSlide2])
     })
@@ -218,7 +216,7 @@ describe("Lessons", () => {
     })
 
     test("Lesson.post sends lesson data to database and return id", async () => {
-        const mockIds = [{ id: 12 }, { id: 33 }]
+        const mockIds = [{ id: 12 }]
 
         const spy = vi.spyOn(pool, "query") as Mock
         spy.mockResolvedValue({ rows: mockIds })
@@ -226,6 +224,6 @@ describe("Lessons", () => {
         const ids = await Lesson.post("abc", "def", "ttt")
 
         expect(spy).toBeCalledWith(`INSERT INTO lessons (name, teacherid, groupname) VALUES('abc', 'ttt', 'def') RETURNING id`)
-        expect(ids).toStrictEqual([12, 33])
+        expect(ids).toBe(12)
     })
 })

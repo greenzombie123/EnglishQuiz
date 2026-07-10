@@ -1,4 +1,4 @@
-import { Router } from "express";
+import { type NextFunction, Router, type Request, type Response } from "express";
 import {
   addStudentToTeacher,
   searchTeacher,

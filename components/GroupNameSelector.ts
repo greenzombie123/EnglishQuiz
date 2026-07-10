@@ -1,6 +1,6 @@
 export class GroupNameSelector extends HTMLElement {
   static formAssociated = true;
-
+  
   internals;
   root;
 

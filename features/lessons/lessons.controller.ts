@@ -2,11 +2,11 @@ import type { Request, Response, NextFunction } from "express";
 import { pool } from "../../pool.ts";
 import { format } from "node-pg-format";
 import { Lesson } from "./lessons.model.ts";
-import { createLessonStore } from "./lessons.service.ts";
+import { createLessonStore, postLessonService } from "./lessons.service.ts";
 import type {
   LessonIdParams,
 } from "../../shared.types.ts";
-import { PostLessonReqBody } from "./lessons.types.ts";
+import type { PostLessonArg, PostLessonReqBody, PostLessonResult } from "./lessons.types.ts";
 
 export const getLesson = async (
   req: Request<LessonIdParams>,
@@ -54,6 +54,7 @@ export const getDashBoard = async (
   res.render("dashboard");
 };
 
+//TODO Change to where the user is sent to dashboard right after the request is successful.
 export const deleteLesson = async (
   req: Request,
   res: Response,
@@ -73,17 +74,17 @@ export const postLesson = async (
   if (!req.user || req.user.userType === "student") return res.redirect("/");
 
   const { username } = req.user;
-  const { question, intro, lessonName, groupname, lessonId } = req.body;
+  const { question, intro, lessonName: name, groupname, lessonId } = req.body;
 
-  /** Call the following
-   * Get the pool client from pool
-   * User.getUserByUsername
-   * If lesson already exists, Lesson.deleteLesson
-   * Lesson.postLessonData
-   * IntroSlide.post
-   * LessonSlideData.post
-   * QuestionSlide.post
-   * LessonSlideData.post
-   */
+  console.log(req.body.question)
 
+  const id = lessonId === "" ? lessonId : parseInt(lessonId)
+
+  const postLessonResult = await postLessonService(username, { name, groupname, lessonId: id, questionSlides: question, introSlides: intro })
+
+  if (postLessonResult.isError) {
+    throw postLessonResult.message
+  }
+
+  res.redirect("/lessons");
 }

@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { deleteLesson, getDashBoard, getLesson, getLessonPage} from "./lessons.controller.ts"
+import { deleteLesson, getDashBoard, getLesson, getLessonPage, postLesson} from "./lessons.controller.ts"
 import { addLesson, getCreateLessonPage } from "../../controllers/createLesson.ts";
 import multer from "multer"; // Handles multipart/form-data
 
@@ -11,9 +11,11 @@ const lessonsRouter = Router();
 lessonsRouter.delete('/:lessonId', deleteLesson)
 
 // Lesson Creation
+//TODO Put into lessons/controller.ts
 lessonsRouter.get('/createlesson/:lessonId', getCreateLessonPage)
 lessonsRouter.get('/createlesson', getCreateLessonPage)
-lessonsRouter.post('/createlesson', upload.none(), addLesson)
+
+lessonsRouter.post('/createlesson', upload.none(), postLesson)
 
 // Lesson Page
 lessonsRouter.get('/:lessonId', getLessonPage)

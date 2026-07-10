@@ -1,22 +1,91 @@
 import { lesssonCreaterStore } from "../store/LessonCreaterStore.js";
 export default class AudioInputRecorder extends HTMLElement {
-    store;
-    root;
-    mediaRecorder;
-    dialog;
-    startButton;
-    stopButton;
-    playButton;
-    name;
-    finishButton;
-    cancelButton;
-    indicator;
-    audio;
-    warning;
-    mimeType = "";
-    audioFile = null;
     constructor() {
         super();
+        this.mimeType = "";
+        this.audioFile = null;
+        this.handleAudioFileCreated = () => { };
+        this.#handleStartRecording = () => {
+            if (this.mediaRecorder &&
+                this.mediaRecorder.state === "inactive" &&
+                this.audio.paused) {
+                if (this.audioFile) {
+                    URL.revokeObjectURL(this.audioFile.url);
+                    this.audioFile = null;
+                }
+                this.#changeIndicatorColor("recording");
+                this.mediaRecorder.start();
+            }
+        };
+        this.#handleStopRecording = () => {
+            if (this.mediaRecorder &&
+                this.mediaRecorder.state === "recording" &&
+                this.audio.paused) {
+                this.#changeIndicatorColor("inactive");
+                this.mediaRecorder.stop();
+            }
+        };
+        this.#handlePlayRecording = () => {
+            if (this.mediaRecorder &&
+                this.mediaRecorder.state === "inactive" &&
+                this.audioFile) {
+                this.audio.src = this.audioFile.url;
+                this.audio.play();
+                this.#changeIndicatorColor("playing");
+            }
+        };
+        this.#handleUpdateAudioFiles = () => {
+            if (!this.audioFile?.file)
+                return this.#giveWarning("No file has been recorded yet.");
+            if (!this.#hasName())
+                return this.#giveWarning("Write the name of the audio file");
+            if (!this.#hasNewName())
+                return this.#giveWarning("Another audio file has the same name.");
+            // Grab the audio files and add the newly recorded one to the array and set as new state
+            const audioFiles = this.store.getState("audioFiles");
+            const newAudioFile = new File([this.audioFile.file], this.name.value + '.webm', { type: this.audioFile.file.type });
+            console.log(newAudioFile.name);
+            this.store.setState("audioFiles", [...audioFiles, newAudioFile]);
+            this.#handleCloseDialog();
+        };
+        this.#handleCloseDialog = () => {
+            URL.revokeObjectURL(this.audioFile?.url || "");
+            this.audioFile = null;
+            this.audio.src = "";
+            this.name.value = "";
+            this.dialog.close();
+        };
+        this.#handleSetAudioUrl = (event) => {
+            this.audioFile = { url: URL.createObjectURL(event.data), file: event.data };
+        };
+        this.#changeIndicatorColor = (state) => {
+            switch (state) {
+                case "recording":
+                    this.indicator.style.backgroundColor = "red";
+                    break;
+                case "inactive":
+                    this.indicator.style.backgroundColor = "black";
+                    break;
+                case "playing":
+                    this.indicator.style.backgroundColor = "green";
+                    break;
+                default:
+                    break;
+            }
+        };
+        this.#hasName = () => this.name.value !== "";
+        this.#hasNewName = () => {
+            const audioFilesNames = this.store
+                .getState("audioFiles")
+                .map((audioFile) => audioFile.name);
+            if (!audioFilesNames.length)
+                return true;
+            return audioFilesNames.some((audioFilesName) => audioFilesName !== this.name.value);
+        };
+        this.#hasAudioFile = () => this.audioFile !== null;
+        this.#giveWarning = (message) => {
+            this.warning.textContent = message;
+        };
         this.root = this.attachShadow({ mode: "closed" });
         const template = document.getElementById("audio-input-recorder");
         this.root.appendChild(template.content.cloneNode(true));
@@ -41,7 +110,6 @@ export default class AudioInputRecorder extends HTMLElement {
         this.store.subscribe("audioFilesChanged", this.handleAudioFileCreated);
     }
     connectedCallback() { }
-    handleAudioFileCreated = () => { };
     async getMedia() {
         try {
             const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -62,86 +130,16 @@ export default class AudioInputRecorder extends HTMLElement {
         if (!canUseMedia)
             this.dialog.close();
     }
-    #handleStartRecording = () => {
-        if (this.mediaRecorder &&
-            this.mediaRecorder.state === "inactive" &&
-            this.audio.paused) {
-            if (this.audioFile) {
-                URL.revokeObjectURL(this.audioFile.url);
-                this.audioFile = null;
-            }
-            this.#changeIndicatorColor("recording");
-            this.mediaRecorder.start();
-        }
-    };
-    #handleStopRecording = () => {
-        if (this.mediaRecorder &&
-            this.mediaRecorder.state === "recording" &&
-            this.audio.paused) {
-            this.#changeIndicatorColor("inactive");
-            this.mediaRecorder.stop();
-        }
-    };
-    #handlePlayRecording = () => {
-        if (this.mediaRecorder &&
-            this.mediaRecorder.state === "inactive" &&
-            this.audioFile) {
-            this.audio.src = this.audioFile.url;
-            this.audio.play();
-            this.#changeIndicatorColor("playing");
-        }
-    };
-    #handleUpdateAudioFiles = () => {
-        if (!this.audioFile?.file)
-            return this.#giveWarning("No file has been recorded yet.");
-        if (!this.#hasName())
-            return this.#giveWarning("Write the name of the audio file");
-        if (!this.#hasNewName())
-            return this.#giveWarning("Another audio file has the same name.");
-        // Grab the audio files and add the newly recorded one to the array and set as new state
-        const audioFiles = this.store.getState("audioFiles");
-        const newAudioFile = new File([this.audioFile.file], this.name.value + '.webm', { type: this.audioFile.file.type });
-        console.log(newAudioFile.name);
-        this.store.setState("audioFiles", [...audioFiles, newAudioFile]);
-        this.#handleCloseDialog();
-    };
-    #handleCloseDialog = () => {
-        URL.revokeObjectURL(this.audioFile?.url || "");
-        this.audioFile = null;
-        this.audio.src = "";
-        this.name.value = "";
-        this.dialog.close();
-    };
-    #handleSetAudioUrl = (event) => {
-        this.audioFile = { url: URL.createObjectURL(event.data), file: event.data };
-    };
-    #changeIndicatorColor = (state) => {
-        switch (state) {
-            case "recording":
-                this.indicator.style.backgroundColor = "red";
-                break;
-            case "inactive":
-                this.indicator.style.backgroundColor = "black";
-                break;
-            case "playing":
-                this.indicator.style.backgroundColor = "green";
-                break;
-            default:
-                break;
-        }
-    };
-    #hasName = () => this.name.value !== "";
-    #hasNewName = () => {
-        const audioFilesNames = this.store
-            .getState("audioFiles")
-            .map((audioFile) => audioFile.name);
-        if (!audioFilesNames.length)
-            return true;
-        return audioFilesNames.some((audioFilesName) => audioFilesName !== this.name.value);
-    };
-    #hasAudioFile = () => this.audioFile !== null;
-    #giveWarning = (message) => {
-        this.warning.textContent = message;
-    };
+    #handleStartRecording;
+    #handleStopRecording;
+    #handlePlayRecording;
+    #handleUpdateAudioFiles;
+    #handleCloseDialog;
+    #handleSetAudioUrl;
+    #changeIndicatorColor;
+    #hasName;
+    #hasNewName;
+    #hasAudioFile;
+    #giveWarning;
 }
 customElements.define("audio-input-recorder", AudioInputRecorder);

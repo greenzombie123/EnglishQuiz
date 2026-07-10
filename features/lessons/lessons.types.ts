@@ -1,24 +1,23 @@
-import { PoolClient } from "pg"
 import type { IntroSlide, LessonData, QuestionSlide } from "./lessons.model.ts"
 
 export type SlideType = "intro" | "question"
 
 export class Slide {
-    slideorder: number
-    slidetype: SlideType
-    soundurl:string
+  slideorder: number
+  slidetype: SlideType
+  soundurl: string
 
-    constructor(slideorder: number, type: SlideType, soundurl:string) {
-        this.slideorder = slideorder
-        this.slidetype = type
-        this.soundurl = soundurl
-    }
+  constructor(slideorder: number, type: SlideType, soundurl: string) {
+    this.slideorder = slideorder
+    this.slidetype = type
+    this.soundurl = soundurl
+  }
 }
 
 // Contains lesson data structured by groupname. LessonData with no groupname are put in nogroupname array prop.
 export type LessonStore = {
-    [key: string]: LessonData[];
-    nogroup:LessonData[]
+  [key: string]: LessonData[];
+  nogroup: LessonData[]
 };
 
 export interface PostLessonFunc {
@@ -28,9 +27,9 @@ export interface PostLessonFunc {
 export interface PostLessonArg {
   name: string
   groupname: string
-  lessonId: number,
-  introSlides: IntroSlide[]
-  questionSlides: QuestionSlide[]
+  lessonId: number | "",
+  introSlides: IntroSlide[]|undefined
+  questionSlides: QuestionSlide[]|undefined
 }
 
 // type for post lesson form
@@ -39,5 +38,16 @@ export interface PostLessonReqBody {
   intro: IntroSlide[] | undefined;
   lessonName: string;
   groupname: string;
-  lessonId: number;
+  lessonId: string;
 }
+
+export type PostLessonRejected = {
+  isError:true,
+  message:unknown
+}
+
+export type PostLessonPassed = {
+  isError:false
+}
+
+export type PostLessonResult = PostLessonPassed | PostLessonRejected

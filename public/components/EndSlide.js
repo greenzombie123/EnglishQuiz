@@ -1,7 +1,7 @@
 export class EndSlide extends HTMLElement {
-    root = null;
     constructor() {
         super();
+        this.root = null;
     }
     connectedCallback() {
         const template = document.getElementById("end-slide");

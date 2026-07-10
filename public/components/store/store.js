@@ -1,7 +1,6 @@
 export default class Store {
-    state;
-    events = new Map();
     constructor(initialState) {
+        this.events = new Map();
         this.state = initialState;
         this.events.set("stateChanged", []);
     }

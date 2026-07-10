@@ -36,6 +36,10 @@ server.use("/lessons", express.static("public/components"));
 // For Lesson Creator Page
 server.use(express.static("public/components"));
 
+server.use(express.static("public/client"));
+
+server.use("/node_modules", express.static("node_modules"))
+
 // For everything in the public folder
 server.use(express.static("public"));
 

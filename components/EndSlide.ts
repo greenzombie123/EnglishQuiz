@@ -26,7 +26,6 @@ export class EndSlide extends HTMLElement {
       ".button"
     ) as HTMLButtonElement;
 
-
     this.root.appendChild(clonedContent);
   }
 

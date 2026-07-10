@@ -1,10 +1,10 @@
 import type { NextFunction, Request, Response } from "express";
 import { pool } from "../pool.ts";
 import { format } from "node-pg-format";
-import {
-  createIntroSQLString,
-  createQuestionSQLString,
-} from "../querystrings.ts";
+// import {
+//   createIntroSQLString,
+//   createQuestionSQLString,
+// } from "../querystrings.ts";
 import type {
   AddLessonBody,
   LessonIdParams,
@@ -44,6 +44,8 @@ export const addLesson = async (
   const { username: teacherName } = req.user; //as { username: string };
   const { question, intro, lessonName, groupname, lessonId } = req.body;
 
+  console.log(req.body)
+
   const client = await pool.connect();
   await client.query("BEGIN");
 
@@ -81,18 +83,18 @@ export const addLesson = async (
   // return res.end();
 
 
-  const introString = createIntroSQLString(intro);
-  const questionString = createQuestionSQLString(question);
+  // const introString = createIntroSQLString(intro);
+  // const questionString = createQuestionSQLString(question);
 
   //TODO Change insertLesson by including soundurl
-  await insertLesson(
-    introString,
-    questionString,
-    lessonName,
-    teacherName,
-    groupname,
-    lessonId,
-  );
+  // await insertLesson(
+  //   introString,
+  //   questionString,
+  //   lessonName,
+  //   teacherName,
+  //   groupname,
+  //   lessonId,
+  // );
 
   res.redirect("/lessons");
 };

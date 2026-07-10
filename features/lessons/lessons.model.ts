@@ -1,6 +1,6 @@
-import { Pool, PoolClient } from "pg";
+import type { Pool, PoolClient } from "pg";
 import { pool } from "../../config/database.config.ts";
-import { Slide, SlideType } from "./lessons.types.ts";
+import { Slide, type SlideType } from "./lessons.types.ts";
 import { format } from "node-pg-format";
 
 export type LessonData = Omit<Lesson, "slides">
@@ -20,7 +20,7 @@ export class IntroSlide extends Slide {
         this.definition = definition
     }
 
-    static getIntroSlides = async (lessonId: number) => {
+    static get = async (lessonId: number) => {
         const { rows } = await pool.query<IntroSlide>(`
             SELECT 
             targetword, 
@@ -35,10 +35,11 @@ export class IntroSlide extends Slide {
         return rows.length ? rows : [];
     }
 
-    static postIntroSlides = async (introSlides: IntroSlide[], client?: PoolClient): Promise<number[]> => {
+    static post = async (introSlides: IntroSlide[], client?: PoolClient): Promise<number[]> => {
         let p = client ? client : pool
 
         const queryString = createIntroSlideQueryString(introSlides)
+     
         const { rows: ids } = await p.query<{ id: number }>(queryString)
 
         return ids.map(id => id.id)
@@ -74,7 +75,7 @@ export class QuestionSlide extends Slide {
         this.wronganswer3 = wronganswer3
     }
 
-    static getQuestionSlides = async (lessonId: number) => {
+    static get = async (lessonId: number) => {
         const { rows } = await pool.query<QuestionSlide>(`
             SELECT 
             question, 
@@ -92,7 +93,7 @@ export class QuestionSlide extends Slide {
         return rows.length ? rows : [];
     }
 
-    static postQuestionSlides = async (questionSlides: QuestionSlide[], client?: PoolClient): Promise<number[]> => {
+    static post = async (questionSlides: QuestionSlide[], client?: PoolClient): Promise<number[]> => {
 
         let p = client ? client : pool
 
@@ -175,8 +176,8 @@ export class Lesson {
         if (lessonData[0]) lesson = lessonData[0]
         else return undefined
 
-        const questionSlides = await QuestionSlide.getQuestionSlides(id)
-        const introSlides = await IntroSlide.getIntroSlides(id)
+        const questionSlides = await QuestionSlide.get(id)
+        const introSlides = await IntroSlide.get(id)
         const sortedSlides = sortSlides([...questionSlides, ...introSlides])
 
         return {
@@ -187,11 +188,11 @@ export class Lesson {
         }
     }
 
-    static post = async (name: string, groupname: string, teacherId: string, client?: PoolClient): Promise<number[]> => {
+    static post = async (name: string, groupname: string, teacherId: string, client?: PoolClient): Promise<number|undefined> => {
 
-        const { rows: ids } = await pool.query<{ id: number }>(`INSERT INTO lessons (name, teacherid, groupname) VALUES('${name}', '${teacherId}', '${groupname}') RETURNING id`)
+        const { rows} = await pool.query<{ id: number }>(`INSERT INTO lessons (name, teacherid, groupname) VALUES('${name}', '${teacherId}', '${groupname}') RETURNING id`)
 
-        return ids.map(id => id.id)
+        return rows[0] ? rows[0].id : undefined
     }
 
     static delete = async (lessonId: number, client?: PoolClient) => {
@@ -233,6 +234,8 @@ const sortSlides = (slides: Slide[]) => {
 
 export const createIntroSlideQueryString = (slides: IntroSlide[]) => {
 
+    console.log(slides)
+
     const introColumns = ["targetword", "definition", "slideorder", "soundurl"]
 
     const introSlides = slides.map((slide) => [
@@ -241,6 +244,8 @@ export const createIntroSlideQueryString = (slides: IntroSlide[]) => {
         slide.slideorder,
         slide.soundurl
     ]);
+
+    console.log(introSlides)
 
     return format(
         "INSERT INTO introslides (%I) VALUES %L RETURNING id",

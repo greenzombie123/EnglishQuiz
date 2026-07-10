@@ -1,7 +1,6 @@
 import "./DeleteLessonButton.js";
 import "./DeleteLessonDialog.js";
 export class ExtendableList extends HTMLElement {
-    root;
     constructor() {
         super();
         this.root = this.attachShadow({ mode: "open" });
@@ -9,7 +8,6 @@ export class ExtendableList extends HTMLElement {
         const templateContent = template.content;
         const clonedContent = templateContent.cloneNode(true);
         this.root.appendChild(clonedContent);
-        console.log("fefe");
     }
     connectedCallback() {
         const groupnames = Array.from(document.querySelectorAll('p'));

@@ -1,10 +1,15 @@
 export class IntroSlide extends HTMLElement {
-    targetWord = "";
-    definition = "";
-    isFirstSlide = false;
-    root = null;
     constructor() {
         super();
+        this.targetWord = "";
+        this.definition = "";
+        this.isFirstSlide = false;
+        this.root = null;
+        this.setData = (introSlideData, isFirstSlide) => {
+            this.targetWord = introSlideData.targetword;
+            this.definition = introSlideData.definition;
+            this.isFirstSlide = isFirstSlide;
+        };
     }
     connectedCallback() {
         const template = document.getElementById("intro-slide");
@@ -41,10 +46,5 @@ export class IntroSlide extends HTMLElement {
         this.root.appendChild(clonedContent);
     }
     disconnectedCallback() { }
-    setData = (introSlideData, isFirstSlide) => {
-        this.targetWord = introSlideData.targetword;
-        this.definition = introSlideData.definition;
-        this.isFirstSlide = isFirstSlide;
-    };
 }
 customElements.define("intro-slide", IntroSlide);

@@ -1,13 +1,25 @@
 import { lesssonCreaterStore } from "../store/LessonCreaterStore.js";
 import "../utility/PopUpModal.js";
 export default class AudioInputTab extends HTMLElement {
-    root;
-    audioFile = null;
-    audio;
-    store;
-    static observedAttributes = ["fileName"];
+    static { this.observedAttributes = ["fileName"]; }
     constructor() {
         super();
+        this.audioFile = null;
+        this.handleDeleteButtonClicked = () => {
+            const popUpModal = document.createElement("pop-up-modal");
+            const topMessage = `Delete this audio file?`;
+            const bottomMessage = `${this.audioFile ? this.audioFile.name : ""}`;
+            this.root.appendChild(popUpModal);
+            popUpModal.showPopUpModal(topMessage, bottomMessage, this.handleRemoveAudioFile);
+        };
+        this.handleRemoveAudioFile = () => {
+            if (!this.audioFile)
+                return Error("No audio file was set");
+            const audioFiles = this.store.getState("audioFiles");
+            const deletingAudioFile = this.audioFile;
+            const newAudioFiles = audioFiles.filter((audioFile) => audioFile.name !== deletingAudioFile.name);
+            this.store.setState("audioFiles", newAudioFiles);
+        };
         this.root = this.attachShadow({ mode: "closed" });
         const template = document.getElementById("audio-input-tab");
         this.root.appendChild(template.content.cloneNode(true));
@@ -32,20 +44,5 @@ export default class AudioInputTab extends HTMLElement {
     setAudioUrl(file) {
         this.audioFile = file;
     }
-    handleDeleteButtonClicked = () => {
-        const popUpModal = document.createElement("pop-up-modal");
-        const topMessage = `Delete this audio file?`;
-        const bottomMessage = `${this.audioFile ? this.audioFile.name : ""}`;
-        this.root.appendChild(popUpModal);
-        popUpModal.showPopUpModal(topMessage, bottomMessage, this.handleRemoveAudioFile);
-    };
-    handleRemoveAudioFile = () => {
-        if (!this.audioFile)
-            return Error("No audio file was set");
-        const audioFiles = this.store.getState("audioFiles");
-        const deletingAudioFile = this.audioFile;
-        const newAudioFiles = audioFiles.filter((audioFile) => audioFile.name !== deletingAudioFile.name);
-        this.store.setState("audioFiles", newAudioFiles);
-    };
 }
 customElements.define("audio-input-tab", AudioInputTab);

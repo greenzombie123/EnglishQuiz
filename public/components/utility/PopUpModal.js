@@ -1,12 +1,28 @@
 export class PopUpModal extends HTMLElement {
-    root;
-    dialog;
-    topMessage;
-    bottomMessage;
-    yesButton;
-    noButton;
     constructor() {
         super();
+        this.showPopUpModal = (topMessage, bottomMessage, onYesClickHandler) => {
+            this.#setData(topMessage, bottomMessage, onYesClickHandler);
+            this.#showDialog();
+        };
+        this.#setData = (topMessage, bottomMessage, onYesClickHandler) => {
+            this.topMessage.textContent = topMessage;
+            if (bottomMessage)
+                this.bottomMessage.textContent = bottomMessage;
+            if (onYesClickHandler)
+                this.yesButton.addEventListener("click", () => {
+                    onYesClickHandler();
+                    // Close the dialog right after 
+                    this.#onNoButtonClickedHandler();
+                });
+        };
+        this.#showDialog = () => {
+            this.dialog.showModal();
+        };
+        this.#onNoButtonClickedHandler = () => {
+            this.dialog.close();
+            this.remove();
+        };
         this.root = this.attachShadow({ mode: "closed" });
         this.dialog = document.createElement("dialog");
         this.dialog.setAttribute("closedby", "any");
@@ -58,27 +74,8 @@ export class PopUpModal extends HTMLElement {
     }
     connectedCallback() {
     }
-    showPopUpModal = (topMessage, bottomMessage, onYesClickHandler) => {
-        this.#setData(topMessage, bottomMessage, onYesClickHandler);
-        this.#showDialog();
-    };
-    #setData = (topMessage, bottomMessage, onYesClickHandler) => {
-        this.topMessage.textContent = topMessage;
-        if (bottomMessage)
-            this.bottomMessage.textContent = bottomMessage;
-        if (onYesClickHandler)
-            this.yesButton.addEventListener("click", () => {
-                onYesClickHandler();
-                // Close the dialog right after 
-                this.#onNoButtonClickedHandler();
-            });
-    };
-    #showDialog = () => {
-        this.dialog.showModal();
-    };
-    #onNoButtonClickedHandler = () => {
-        this.dialog.close();
-        this.remove();
-    };
+    #setData;
+    #showDialog;
+    #onNoButtonClickedHandler;
 }
 customElements.define("pop-up-modal", PopUpModal);

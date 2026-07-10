@@ -18,8 +18,6 @@ export class ExtendableList extends HTMLElement {
 
     this.root.appendChild(clonedContent)
 
-    console.log("fefe")
-
   }
 
   connectedCallback(){
