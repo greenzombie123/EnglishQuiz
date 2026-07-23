@@ -67,24 +67,53 @@ export const deleteLesson = async (
 };
 
 export const postLesson = async (
-  req: Request<{}, {}, PostLessonReqBody>,
+  req: Request,
   res: Response,
   next: NextFunction
 ) => {
   if (!req.user || req.user.userType === "student") return res.redirect("/");
 
   const { username } = req.user;
-  const { question, intro, lessonName: name, groupname, lessonId } = req.body;
+  const { question, intro, name, groupname, id } = req.body;
 
-  console.log(req.body.question)
+  const lessonId = id === "" ? "" : parseInt(id)
 
-  const id = lessonId === "" ? lessonId : parseInt(lessonId)
-
-  const postLessonResult = await postLessonService(username, { name, groupname, lessonId: id, questionSlides: question, introSlides: intro })
+  const postLessonResult = await postLessonService(username, { name, groupname, lessonId, questionSlides: question, introSlides: intro })
 
   if (postLessonResult.isError) {
     throw postLessonResult.message
   }
 
-  res.redirect("/lessons");
+  res.sendStatus(200)
 }
+
+export const getGroupNames = async (
+  req: Request<{ lessonId: string }>,
+  res: Response,
+  next: NextFunction,
+) => {
+
+  if (!req.user) res.render("/")
+
+  const { username } = req.user!
+
+  const groupnames = await Lesson.getAllGroupNamesByTeacher(username)
+
+  res.send(groupnames)
+}
+
+export const getCreateLessonPage = (
+  req: Request<{ lessonId: number }>,
+  res: Response,
+  next: NextFunction,
+) => {
+  if (!req.user) return res.redirect("/");
+
+  const { lessonId } = req.params;
+
+  res.locals.lessonId = lessonId || "";
+
+  res.render("createLesson");
+};
+
+// export const get

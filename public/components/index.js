@@ -19,3 +19,4 @@ const fetchLesson = async (lessonId) => {
     return response.json();
 };
 startLesson();
+//# sourceMappingURL=index.js.map

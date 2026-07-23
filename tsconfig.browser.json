@@ -5,6 +5,7 @@
     "outDir": "public",
     "noEmit": false,
     "strict": true, 
+    "sourceMap": true,
      "rewriteRelativeImportExtensions": true,
      "experimentalDecorators": true,
      "useDefineForClassFields": false,

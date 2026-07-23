@@ -10,9 +10,14 @@ export type LessonToSlideData = {
     slideId: number;
 }
 
+export type IntroSlideData = InstanceType<typeof IntroSlide>
+
+export type SlideData = IntroSlideData | QuestionSlideData
+
 export class IntroSlide extends Slide {
     targetword: string;
     definition: string;
+    type: "intro" = "intro"
 
     constructor(sliderorder: number, targetword: string, definition: string, soundurl: string) {
         super(sliderorder, "intro", soundurl)
@@ -21,7 +26,7 @@ export class IntroSlide extends Slide {
     }
 
     static get = async (lessonId: number) => {
-        const { rows } = await pool.query<IntroSlide>(`
+        const { rows } = await pool.query<IntroSlideData>(`
             SELECT 
             targetword, 
             definition,
@@ -39,7 +44,7 @@ export class IntroSlide extends Slide {
         let p = client ? client : pool
 
         const queryString = createIntroSlideQueryString(introSlides)
-     
+
         const { rows: ids } = await p.query<{ id: number }>(queryString)
 
         return ids.map(id => id.id)
@@ -52,7 +57,17 @@ export class IntroSlide extends Slide {
 
         await p.query(queryString)
     }
+
+    static deleteById = async (slideIds:number[], client:Pool):Promise<IntroSlideData[]> => {
+         let p = client ? client : pool
+
+         const queryString = format(`DELETE FROM introslides WHERE id in (%L)`, slideIds)
+
+         return (await p.query<IntroSlideData>(queryString)).rows
+    }
 }
+
+export type QuestionSlideData = InstanceType<typeof QuestionSlide>
 
 export class QuestionSlide extends Slide {
     question: string;
@@ -60,6 +75,7 @@ export class QuestionSlide extends Slide {
     wronganswer1: string;
     wronganswer2: string;
     wronganswer3: string;
+    type: "question" = "question"
 
     constructor(sliderorder: number, question: string,
         correctanswer: string,
@@ -76,7 +92,7 @@ export class QuestionSlide extends Slide {
     }
 
     static get = async (lessonId: number) => {
-        const { rows } = await pool.query<QuestionSlide>(`
+        const { rows } = await pool.query<QuestionSlideData>(`
             SELECT 
             question, 
             correctanswer, 
@@ -87,7 +103,7 @@ export class QuestionSlide extends Slide {
             type
             FROM questionslides
             INNER JOIN lessons_questionslides
-            ON lessons_questionslides.lessonid = questionslides.id
+            ON lessons_questionslides.questionslideid = questionslides.id
             WHERE lessons_questionslides.lessonid = $1
             `, [lessonId]);
         return rows.length ? rows : [];
@@ -110,14 +126,22 @@ export class QuestionSlide extends Slide {
 
         await p.query(queryString)
     }
+
+    static deleteById = async (slideIds:number[], client:Pool):Promise<QuestionSlideData[]> => {
+         let p = client ? client : pool
+
+         const queryString = format(`DELETE FROM introslides WHERE id in (%L)`, slideIds)
+
+         return (await p.query<QuestionSlideData>(queryString)).rows
+    }
 }
 
 
 export class Lesson {
     name: string
     groupname: string
-    id: number
-    slides: Slide[] = []
+    id: number | undefined = undefined
+    slides: SlideData[] = []
 
     constructor(name: string, groupname: string, id: number) {
         this.name = name
@@ -188,11 +212,32 @@ export class Lesson {
         }
     }
 
-    static post = async (name: string, groupname: string, teacherId: string, client?: PoolClient): Promise<number|undefined> => {
+    static getAllGroupNamesByTeacher = async (username: string): Promise<string[]> => {
+        const { rows } = await pool.query<{ groupname: string }>(
+            `select distinct groupname from lessons where groupname <> '' 
+                and teacherid = (select id from teachers where username = $1);
+            `, [username]
+        )
 
-        const { rows} = await pool.query<{ id: number }>(`INSERT INTO lessons (name, teacherid, groupname) VALUES('${name}', '${teacherId}', '${groupname}') RETURNING id`)
+        if(!rows.length) return []
+
+        return rows.map(row=>row.groupname)
+    }
+
+    static post = async (name: string, groupname: string, teacherId: string, client?: PoolClient): Promise<number | undefined> => {
+
+        const { rows } = await pool.query<{ id: number }>(`INSERT INTO lessons (name, teacherid, groupname) VALUES('${name}', '${teacherId}', '${groupname}') RETURNING id`)
 
         return rows[0] ? rows[0].id : undefined
+    }
+
+    static update = async(lessonId:number, name: string, groupname: string, client?: PoolClient)=>{
+
+        let p = client ? client : pool
+        
+        const queryString = format(`UPDATE lessons SET (name, groupname) = (%L, %L) WHERE id = %L`, name, groupname, lessonId)
+
+        await p.query(queryString)
     }
 
     static delete = async (lessonId: number, client?: PoolClient) => {
@@ -224,7 +269,7 @@ export class LessonSlideData {
 }
 
 // Spread all slide arrays into one and then sorts them by slideorder
-const sortSlides = (slides: Slide[]) => {
+const sortSlides = (slides: SlideData[]) => {
     return slides.sort(
         (currentSlide, nextSlide) => currentSlide.slideorder - nextSlide.slideorder,
     );
@@ -234,8 +279,6 @@ const sortSlides = (slides: Slide[]) => {
 
 export const createIntroSlideQueryString = (slides: IntroSlide[]) => {
 
-    console.log(slides)
-
     const introColumns = ["targetword", "definition", "slideorder", "soundurl"]
 
     const introSlides = slides.map((slide) => [
@@ -244,8 +287,6 @@ export const createIntroSlideQueryString = (slides: IntroSlide[]) => {
         slide.slideorder,
         slide.soundurl
     ]);
-
-    console.log(introSlides)
 
     return format(
         "INSERT INTO introslides (%I) VALUES %L RETURNING id",

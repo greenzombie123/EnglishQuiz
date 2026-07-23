@@ -29,7 +29,7 @@ export class GroupNameSelector extends HTMLElement {
   }
 
   connectedCallback() {
-    // console.log(1231)
+    
   }
 
   onInputChange = (e: Event) => {

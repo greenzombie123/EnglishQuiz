@@ -36,20 +36,45 @@ export const postLessonService = async (teacherUsername: string, postLessonArg: 
 
     let lessonId: number | "" | undefined = postLessonArg.lessonId
 
+    // If new lesson, post the new lesson
     if (!lessonId) {
       lessonId = await Lesson.post(postLessonArg.name, postLessonArg.groupname, teacher.id, client)
       if (!lessonId) throw new Error("Couldn't post new lesson")
+
+      if (postLessonArg.introSlides && postLessonArg.introSlides.length) {
+        const IntroSlideIds = await IntroSlide.post(postLessonArg.introSlides, client)
+        await LessonSlideData.post(lessonId, IntroSlideIds, "intro", client)
+      }
+
+      if (postLessonArg.questionSlides && postLessonArg.questionSlides.length) {
+        const questionSlideIds = await QuestionSlide.post(postLessonArg.questionSlides, client)
+        await LessonSlideData.post(lessonId, questionSlideIds, "question", client)
+      }
     }
 
-    if (postLessonArg.introSlides) {
-      const IntroSlideIds = await IntroSlide.post(postLessonArg.introSlides, client)
-      await LessonSlideData.post(lessonId, IntroSlideIds, "intro")
+    // If not a new lesson, update the old one
+    else {
+
+      await Lesson.update(lessonId, postLessonArg.name, postLessonArg.groupname, client)
+
+      await IntroSlide.delete(lessonId, client)
+
+      if (postLessonArg.introSlides.length) {
+        const IntroSlideIds = await IntroSlide.post(postLessonArg.introSlides, client)
+        await LessonSlideData.post(lessonId, IntroSlideIds, "intro", client)
+      }
+
+
+      await QuestionSlide.delete(lessonId, client)
+      
+      if (postLessonArg.questionSlides.length) {
+        const questionSlideIds = await QuestionSlide.post(postLessonArg.questionSlides, client)
+        await LessonSlideData.post(lessonId, questionSlideIds, "question", client)
+      }
+
     }
 
-    if (postLessonArg.questionSlides) {
-      const questionSlideIds = await QuestionSlide.post(postLessonArg.questionSlides, client)
-      await LessonSlideData.post(lessonId, questionSlideIds, "question", client)
-    }
+
 
     await client.query("COMMIT");
 
@@ -67,8 +92,3 @@ export const postLessonService = async (teacherUsername: string, postLessonArg: 
   }
   return postLessonResult
 }
-
-// Extract id values from each row in the rows prop. Used for bridging tables
-const getIds = (lessonId: string, rows: { id: string }[]) => {
-  return rows.map((row) => [lessonId, row.id]);
-};

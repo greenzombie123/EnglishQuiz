@@ -79,3 +79,4 @@ export class PopUpModal extends HTMLElement {
     #onNoButtonClickedHandler;
 }
 customElements.define("pop-up-modal", PopUpModal);
+//# sourceMappingURL=PopUpModal.js.map

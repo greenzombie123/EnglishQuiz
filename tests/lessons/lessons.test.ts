@@ -43,8 +43,8 @@ describe("QuestionSlides", () => {
         spy.mockResolvedValue({ rows: [{ id: mockIds[0] }, { id: mockIds[1] }] })
 
         const mockQuestionSlides: QuestionSlide[] = [
-            { question: "Why?", correctanswer: "I dont know!", wronganswer1: "a", wronganswer2: "b", wronganswer3: "c", soundurl: "abc", slidetype: "question", slideorder: 2 },
-            { question: "Where", correctanswer: "I dont know!", wronganswer1: "a", wronganswer2: "b", wronganswer3: "c", soundurl: "abc", slidetype: "question", slideorder: 2 }
+            { question: "Why?", correctanswer: "I dont know!", wronganswer1: "a", wronganswer2: "b", wronganswer3: "c", soundurl: "abc", type: "question", slideorder: 2 },
+            { question: "Where", correctanswer: "I dont know!", wronganswer1: "a", wronganswer2: "b", wronganswer3: "c", soundurl: "abc", type: "question", slideorder: 2 }
 
         ]
 
@@ -81,8 +81,8 @@ describe("IntroSlides", () => {
         spy.mockResolvedValue({ rows: [{ id: mockIds[0] }, { id: mockIds[1] }] })
 
         const mockIntroSlides: IntroSlide[] = [
-            { targetword: "bob", definition: "123", soundurl: "abc", slidetype: "question", slideorder: 2 },
-            { targetword: "wow", definition: "123", soundurl: "abc", slidetype: "question", slideorder: 2 }
+            { targetword: "bob", definition: "123", soundurl: "abc", type: "intro", slideorder: 2 },
+            { targetword: "wow", definition: "123", soundurl: "abc", type: "intro", slideorder: 2 }
 
         ]
 
@@ -114,8 +114,8 @@ describe("Lessons", () => {
 
     test("IntroSlide.getIntroSlides gets an array of slides from database", async () => {
 
-        const introSlide1: IntroSlide = { definition: "f", targetword: "g", slideorder: 1, slidetype: "intro", soundurl: "abc" }
-        const introSlide2: IntroSlide = { definition: "a", targetword: "b", slideorder: 1, slidetype: "intro", soundurl: "abc" }
+        const introSlide1: IntroSlide = { definition: "f", targetword: "g", slideorder: 1, type: "intro", soundurl: "abc" }
+        const introSlide2: IntroSlide = { definition: "a", targetword: "b", slideorder: 1, type: "intro", soundurl: "abc" }
 
         const spy = (vi.spyOn(pool, "query") as Mock).mockReturnValueOnce({ rows: [introSlide1, introSlide2] })
 
@@ -135,7 +135,7 @@ describe("Lessons", () => {
 
     test("QuestionSlide.getQuestionSlides gets an array of slides from database", async () => {
 
-        const questionSlide1: QuestionSlide = { question: "a", correctanswer: "a", wronganswer1: "b", wronganswer2: "c", wronganswer3: "d", slideorder: 3, slidetype: "question", soundurl: "999" }
+        const questionSlide1: QuestionSlide = { question: "a", correctanswer: "a", wronganswer1: "b", wronganswer2: "c", wronganswer3: "d", slideorder: 3, type: "question", soundurl: "999" }
         const questionSlide2: QuestionSlide = { ...questionSlide1 }
 
         const spy = (vi.spyOn(pool, "query") as Mock).mockReturnValueOnce({ rows: [questionSlide1, questionSlide2] })
@@ -164,8 +164,8 @@ describe("Lessons", () => {
     })
 
     test("Lesson.getLessonById", async () => {
-        const mockQuestionSlide: QuestionSlide = { question: "fe", correctanswer: "a", wronganswer1: "b", wronganswer2: "c", wronganswer3: "d", slideorder: 1, slidetype: "question", soundurl: "POP" }
-        const mockIntroSlide: IntroSlide = { targetword: "apple", definition: "リンゴ", slideorder: 2, slidetype: "intro", soundurl: "POP" }
+        const mockQuestionSlide: QuestionSlide = { question: "fe", correctanswer: "a", wronganswer1: "b", wronganswer2: "c", wronganswer3: "d", slideorder: 1, type: "question", soundurl: "POP" }
+        const mockIntroSlide: IntroSlide = { targetword: "apple", definition: "リンゴ", slideorder: 2, type: "intro", soundurl: "POP" }
         const mockLessonDataResult = { name: "abc", groupname: "gg", id: 2 }
 
         const spy = (vi.spyOn(pool, "query") as Mock)

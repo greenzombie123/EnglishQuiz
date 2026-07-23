@@ -83,7 +83,6 @@ let DeleteLessonDialog = class DeleteLessonDialog extends LitElement {
         return html `<p>Opps! An error occurred!</p>`;
     }
     render() {
-        console.log(this.lessonname, this.href, 12);
         return html `
       <dialog closedby="any">
         <div>
@@ -111,3 +110,4 @@ DeleteLessonDialog = __decorate([
     customElement("deletelesson-dialog")
 ], DeleteLessonDialog);
 export { DeleteLessonDialog };
+//# sourceMappingURL=DeleteLessonDialog.js.map

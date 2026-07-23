@@ -1,6 +1,5 @@
 import { Router } from "express";
-import { deleteLesson, getDashBoard, getLesson, getLessonPage, postLesson} from "./lessons.controller.ts"
-import { addLesson, getCreateLessonPage } from "../../controllers/createLesson.ts";
+import { deleteLesson, getCreateLessonPage, getDashBoard, getGroupNames, getLesson, getLessonPage, postLesson} from "./lessons.controller.ts"
 import multer from "multer"; // Handles multipart/form-data
 
 const upload = multer() // Do this to parse the formdata
@@ -15,15 +14,19 @@ lessonsRouter.delete('/:lessonId', deleteLesson)
 lessonsRouter.get('/createlesson/:lessonId', getCreateLessonPage)
 lessonsRouter.get('/createlesson', getCreateLessonPage)
 
-lessonsRouter.post('/createlesson', upload.none(), postLesson)
+// lessonsRouter.post('/createlesson', upload.none(), postLesson)
+lessonsRouter.post('/createlesson', postLesson)
+
+// Get groupnames by teacher username
+lessonsRouter.get('/groupnames', getGroupNames)
+
+// Lesson Retrieval
+lessonsRouter.get('/get/:lessonId', getLesson)
 
 // Lesson Page
 lessonsRouter.get('/:lessonId', getLessonPage)
 
 // Dashboard
 lessonsRouter.get('/', getDashBoard)
-
-// Lesson Retrieval
-lessonsRouter.get('/get/:lessonId', getLesson)
 
 export default lessonsRouter

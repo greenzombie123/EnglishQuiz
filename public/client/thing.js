@@ -29,3 +29,4 @@ const log = "green";
 const g = ([a, b]) => {
 };
 g(["fe", 2]);
+//# sourceMappingURL=thing.js.map

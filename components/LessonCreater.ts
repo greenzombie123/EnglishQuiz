@@ -48,7 +48,7 @@ class LessonCreater extends HTMLElement {
     this.store.subscribe("audioFilesChanged", this.#handleUpdateSoundSelect);
   }
 
-  connectedCallback() {}
+  connectedCallback() { }
 
   async attributeChangedCallback(
     name: string,
@@ -113,22 +113,19 @@ class LessonCreater extends HTMLElement {
             <fieldset>
             <legend>Introduction</legend>
             <label>Enter the target word
-                <input type="text" name="intro[${index}][targetword]" required ${
-                  slideData?.type === "intro"
-                    ? "value=" + slideData.targetword
-                    : ""
-                } />
+                <input type="text" name="intro[${index}][targetword]" required ${slideData?.type === "intro"
+          ? "value=" + slideData.targetword
+          : ""
+        } />
             </label>
             <label>Enter definition of target word
-                <input type="text" name="intro[${index}][definition]" required ${
-                  slideData?.type === "intro"
-                    ? "value=" + slideData.definition
-                    : ""
-                } />
+                <input type="text" name="intro[${index}][definition]" required ${slideData?.type === "intro"
+          ? "value=" + slideData.definition
+          : ""
+        } />
             </label>
-            <input type="hidden" name="intro[${index}][slideorder]" id="slideOrderInput" ${
-              slideData?.type === "intro" ? "value=" + slideData.slideorder : ""
-            } />
+            <input type="hidden" name="intro[${index}][slideorder]" id="slideOrderInput" ${slideData?.type === "intro" ? "value=" + slideData.slideorder : ""
+        } />
             ${this.#attachSoundSelectToFieldSet(slideData?.soundurl, "intro", index)}
         </fieldset>
         <div class="fieldSetButtons">
@@ -142,45 +139,39 @@ class LessonCreater extends HTMLElement {
              <fieldset class="question">
             <legend>Question</legend>
             <label>Enter question
-                <input type="text" name="question[${index}][question]" required ${
-                  slideData?.type === "question"
-                    ? "value=" + slideData.question
-                    : ""
-                } />
+                <input type="text" name="question[${index}][question]" required ${slideData?.type === "question"
+          ? "value=" + slideData.question
+          : ""
+        } />
             </label>
             <label>Enter the correct answer
-                <input type="text" name="question[${index}][correctanswer]" required  ${
-                  slideData?.type === "question"
-                    ? "value=" + slideData.correctanswer
-                    : ""
-                } />
+                <input type="text" name="question[${index}][correctanswer]" required  ${slideData?.type === "question"
+          ? "value=" + slideData.correctanswer
+          : ""
+        } />
             </label>
             <label>Enter the wrong answer
-                <input type="text" name="question[${index}][wronganswer1]" required ${
-                  slideData?.type === "question"
-                    ? "value=" + slideData.wronganswer1
-                    : ""
-                } />
+                <input type="text" name="question[${index}][wronganswer1]" required ${slideData?.type === "question"
+          ? "value=" + slideData.wronganswer1
+          : ""
+        } />
             </label>
             <label>Enter the wrong answer (Optional)
-                <input type="text" name="question[${index}][wronganswer2]" ${
-                  slideData?.type === "question" && slideData.wronganswer2
-                    ? "value=" + slideData.wronganswer2
-                    : ""
-                } />
+                <input type="text" name="question[${index}][wronganswer2]" ${slideData?.type === "question" && slideData.wronganswer2
+          ? "value=" + slideData.wronganswer2
+          : ""
+        } />
             </label>
             <label>Enter the wrong answer (Optional)
-                <input type="text" name="question[${index}][wronganswer3]" ${
-                  slideData?.type === "question" && slideData.wronganswer3
-                    ? "value=" + slideData.wronganswer3
-                    : ""
-                } />
+                <input type="text" name="question[${index}][wronganswer3]" ${slideData?.type === "question" && slideData.wronganswer3
+          ? "value=" + slideData.wronganswer3
+          : ""
+        } />
             </label>
-            <input type="hidden" name="question[${index}][slideorder]" id="slideOrderInput" ${
-              slideData?.type === "question"
-                ? "value=" + slideData.slideorder
-                : ""
-            } />
+            <input type="hidden" name="question[${index}][slideorder]" id="slideOrderInput" ${slideData?.type === "question"
+          ? "value=" + slideData.slideorder
+          : ""
+        } />
             ${this.#attachSoundSelectToFieldSet(slideData?.soundurl, "question", index)}
         </fieldset>
         <div class="fieldSetButtons">
@@ -508,9 +499,9 @@ class LessonCreater extends HTMLElement {
     return values;
   };
 
-  disconnectedCallback() {}
+  disconnectedCallback() { }
 
-  connectedMoveCallback() {}
+  connectedMoveCallback() { }
 }
 
 customElements.define("lesson-creater", LessonCreater);

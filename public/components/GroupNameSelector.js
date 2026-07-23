@@ -33,9 +33,9 @@ export class GroupNameSelector extends HTMLElement {
         select.addEventListener("change", this.onSelectChange);
     }
     connectedCallback() {
-        // console.log(1231)
     }
 }
 customElements.define("groupname-selecter", GroupNameSelector);
 // Sets the value to be sent to the server
 // this.internals.setFormValue("something here");
+//# sourceMappingURL=GroupNameSelector.js.map

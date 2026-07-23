@@ -24,3 +24,4 @@ export class ExtendableList extends HTMLElement {
     }
 }
 customElements.define("extendable-list", ExtendableList);
+//# sourceMappingURL=ExtendableList.js.map

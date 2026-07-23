@@ -4,12 +4,10 @@ export type SlideType = "intro" | "question"
 
 export class Slide {
   slideorder: number
-  slidetype: SlideType
   soundurl: string
 
   constructor(slideorder: number, type: SlideType, soundurl: string) {
     this.slideorder = slideorder
-    this.slidetype = type
     this.soundurl = soundurl
   }
 }
@@ -28,8 +26,8 @@ export interface PostLessonArg {
   name: string
   groupname: string
   lessonId: number | "",
-  introSlides: IntroSlide[]|undefined
-  questionSlides: QuestionSlide[]|undefined
+  introSlides: IntroSlide[]
+  questionSlides: QuestionSlide[]
 }
 
 // type for post lesson form

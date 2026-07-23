@@ -70,3 +70,4 @@ export class QuestionSlide extends HTMLElement {
     disconnectedCallback() { }
 }
 customElements.define("question-slide", QuestionSlide);
+//# sourceMappingURL=QuestionSlide.js.map

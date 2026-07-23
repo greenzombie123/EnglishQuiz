@@ -12,13 +12,13 @@ declare global {
 export class DeleteLessonDialog extends LitElement {
 
   @state()
-  href = "";
+  private href = "";
 
   @state()
-  lessonname = "";
+  private lessonname = "";
 
   @query("dialog")
-  dialog!: HTMLDialogElement;
+  private dialog!: HTMLDialogElement;
 
   private task = new Task(this, {
     task: async () => {
@@ -99,7 +99,6 @@ export class DeleteLessonDialog extends LitElement {
   }
 
   protected render() {
-    console.log(this.lessonname, this.href, 12)
 
     return html`
       <dialog closedby="any">
