@@ -1,8 +1,6 @@
-import { IntroSlideData, Lesson, QuestionSlideData } from "../../features/lessons/lessons.model.ts";
-export { IntroSlideData, QuestionSlideData, SlideData} from "../../features/lessons/lessons.model.ts"
+import { IntroSlideData, Lesson, QuestionSlideData } from "../types.ts";
 
 export type LessonData = Omit<InstanceType<typeof Lesson>, "slides"> & { intro: IntroSlideData[], question: QuestionSlideData[] }
-export type LessonRecord = InstanceType<typeof Lesson>
 
 // export type SlideData = IntroSlideData | QuestionSlideData
 

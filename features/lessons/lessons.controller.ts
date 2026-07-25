@@ -34,10 +34,16 @@ export const getLessonPage = (
   res: Response,
   next: NextFunction,
 ) => {
+
   const { lessonId } = req.params as { lessonId: string };
   res.locals.lessonId = parseInt(lessonId);
-  res.locals.lessonName = req.query.lessonname as string;
   res.render("lesson");
+
+
+  // const { lessonId } = req.params as { lessonId: string };
+  // res.locals.lessonId = parseInt(lessonId);
+  // res.locals.lessonName = req.query.lessonname as string;
+  // res.render("lesson");
 };
 
 export const getDashBoard = async (

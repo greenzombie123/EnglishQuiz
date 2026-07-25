@@ -6,11 +6,12 @@ import "./SlideSelector.ts"
 import "./SoundSelector.ts"
 import "./SlideFieldSet.ts"
 import { map } from "lit/directives/map.js"
-import { IntroSlideData, LessonData, LessonDataChanged, LessonRecord, QuestionSlideData, SlideAdded, SlideChanged, SlideData, SlideDeleted, SlideOrderChanged, StateChanged } from "./types.ts"
+import { LessonData, LessonDataChanged, SlideAdded, SlideChanged, SlideDeleted, SlideOrderChanged, StateChanged } from "./types.ts"
 import { Task } from "@lit/task"
 import "../MessageDialog.ts"
 
 import type { MessageDialog } from "../MessageDialog.ts"
+import { IntroSlideData, LessonRecord, QuestionSlideData, SlideData } from "../types.ts"
 
 export type MoveButtonState = "none" | "up" | "down" | "both"
 
@@ -218,16 +219,16 @@ export class LessonCreator extends LitElement {
         task: async () => {
             const response = await fetch(`/lessons/get/${this.lessonId}`)
 
-            if(!response.ok) return
+            if (!response.ok) return
 
             const lesson = await response.json() as LessonRecord
 
             this.lessonName = lesson.name
             this.groupName = lesson.groupname
             this.slideCount = lesson.slides.length
-            this.slides = [...lesson.slides] 
+            this.slides = [...lesson.slides]
         },
-        args:()=>[]
+        args: () => []
     })
 
     private getGroupNames = new Task(this, {
@@ -269,7 +270,7 @@ export class LessonCreator extends LitElement {
 
             <slide-selector></slide-selector>
 
-            <button type="button" class="submit" @click=${this.sendLessonHandler}>Create Lesson</button>
+            <button type="button" class="submit" @click=${this.sendLessonHandler}>${!this.lessonId ? "Create Lesson" : "Edit Lesson"}</button>
 
         </form>
 

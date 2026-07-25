@@ -4,6 +4,7 @@ import { Slide, type SlideType } from "./lessons.types.ts";
 import { format } from "node-pg-format";
 
 export type LessonData = Omit<Lesson, "slides">
+export type LessonRecord = InstanceType<typeof Lesson>
 
 export type LessonToSlideData = {
     lessonId: number;
@@ -150,7 +151,7 @@ export class Lesson {
     }
 
     static doesLessonExist = async (lessonId: string) => {
-        const { rows } = await pool.query<Lesson>(
+        const { rows } = await pool.query<LessonData>(
             "SELECT name, groupname FROM lessons WHERE id=$1",
             [lessonId],
         );
@@ -189,13 +190,13 @@ export class Lesson {
         return rows;
     }
 
-    static getLessonById = async (id: number): Promise<Lesson | undefined> => {
-        const { rows: lessonData } = await pool.query<Lesson>(
+    static getLessonById = async (id: number): Promise<LessonRecord | undefined> => {
+        const { rows: lessonData } = await pool.query<LessonRecord>(
             "SELECT name, groupname, id FROM lessons WHERE id=$1",
             [id],
         );
 
-        let lesson: Lesson
+        let lesson: LessonRecord
 
         if (lessonData[0]) lesson = lessonData[0]
         else return undefined
@@ -325,3 +326,5 @@ export const createQuestionSlideQueryString = (slides: QuestionSlide[]) => {
         questionslides
     );
 };
+
+const g:LessonRecord = {slides:[], name:"efe", groupname:"fefe", id:1}

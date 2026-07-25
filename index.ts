@@ -20,9 +20,15 @@ server.set("view engine", "ejs");
 server.use(express.urlencoded({ extended: true }));
 server.use(express.json());
 
-// Serve static files from views directory.
-// First one create a vitual path that will point to the directory.
-// Also serve the ts files through the source maps for debugging
+/**
+ *   When the client requests a static file, express.static helps Express seek the location of the file.
+ *   When you send something like "components" to express.static, Express will attempt to find a file in
+ *   a folder called "components". 
+ *   If you pass a url string like "components" along with a string to express static, Express will only 
+ *   seek files if the url, that was used to send the request, has the sub directory "components" in it AND if the file exists 
+ *   in the directory represented by the string passed as an argument to express.static. 
+ */
+
 
 // For html ejs files
 server.use(express.static("views"));
@@ -30,12 +36,14 @@ server.use(express.static("views"));
 // For the generated source map files
 server.use("/components", express.static("components"));
 
+
 // For lesson page
 server.use("/lessons", express.static("public/components"));
 
 // For Lesson Creator Page
 server.use(express.static("public/components"));
 
+//TODO Only meant for testing. Remove when can!
 server.use(express.static("public/client"));
 
 server.use("/node_modules", express.static("node_modules"))

@@ -10,5 +10,5 @@
      "experimentalDecorators": true,
      "useDefineForClassFields": false,
   },
-  "files": ["./components/index.ts", "./components/lessonCreaterIndex.ts", "./components/ExtendableList.ts", "./client/stuff.ts"],
+  "files": ["./components/index.ts", "./components/lessonCreaterIndex.ts", "./components/ExtendableList.ts", "./client/stuff.ts", "./components/presenter/LessonPresenter.ts"],
 }

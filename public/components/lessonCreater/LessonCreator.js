@@ -239,7 +239,7 @@ let LessonCreator = class LessonCreator extends LitElement {
 
             <slide-selector></slide-selector>
 
-            <button type="button" class="submit" @click=${this.sendLessonHandler}>Create Lesson</button>
+            <button type="button" class="submit" @click=${this.sendLessonHandler}>${!this.lessonId ? "Create Lesson" : "Edit Lesson"}</button>
 
         </form>
 

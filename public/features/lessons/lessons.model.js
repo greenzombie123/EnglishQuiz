@@ -205,4 +205,5 @@ export const createQuestionSlideQueryString = (slides) => {
     ];
     return format("INSERT INTO questionslides (%I) VALUES %L RETURNING id", questionColumns, questionslides);
 };
+const g = { slides: [], name: "efe", groupname: "fefe", id: 1 };
 //# sourceMappingURL=lessons.model.js.map

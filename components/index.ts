@@ -2,6 +2,7 @@ import "./Lesson.ts";
 import type { LessonSlider } from "./Lesson.ts";
 import type { LessonInfo } from "./LessonCreater.ts";
 
+
 declare const lessonId: number;
 
 const startLesson = async () => {
