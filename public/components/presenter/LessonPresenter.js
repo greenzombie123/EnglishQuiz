@@ -10,6 +10,7 @@ import "./Slide.js";
 let LessonPresenter = class LessonPresenter extends LitElement {
     constructor() {
         super(...arguments);
+        this.slides = [];
         this.status = "loading";
         this.slideIndex = 1;
         this.userCorrectHandler = () => {
@@ -31,14 +32,36 @@ let LessonPresenter = class LessonPresenter extends LitElement {
                 flex: 1;
                 display: flex;
                 flex-direction: column;
+
+                .start{
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: center;
+                    align-items: center;
+                    height:100%;
+
+                    p{
+                        font-size:45px
+                    }
+
+                    button{
+                            font-size: 30px;
+                            padding: 5px 15px;
+                    }
+                }
+            }
             `
     ]; }
     async connectedCallback() {
         super.connectedCallback();
         const res = await fetch(`./get/${this.lessonId}`);
         if (!res.ok)
-            this.status = "error";
-        this.lesson = await res.json();
+            return this.status = "error";
+        const lesson = await res.json();
+        const slides = await this.getSlidesWithAudio(lesson);
+        this.lesson = lesson;
+        this.slides = slides;
+        console.log(this.slides);
         this.status = "lessonLoaded";
     }
     errorTemplate() {
@@ -48,8 +71,8 @@ let LessonPresenter = class LessonPresenter extends LitElement {
         return html `<p>Loading.....</p>`;
     }
     lessonTemplate() {
-        const currentSlide = this.lesson?.slides[this.slideIndex - 1];
-        return html `<lesson-slide .slide=${currentSlide} @userActed=${this.userActedHandler}></lesson-slide>`;
+        let currentSlide = { ...this.slides[this.slideIndex - 1] };
+        return html `${html `<lesson-slide .slide=${currentSlide} @userActed=${this.userActedHandler}></lesson-slide>`}`;
     }
     lessonFinishedTemplate() {
         return html `
@@ -57,12 +80,43 @@ let LessonPresenter = class LessonPresenter extends LitElement {
             <a href="./">Go back to dashboard</a>
         `;
     }
+    startLessonTemplate() {
+        return html `
+            <div class="start">
+                <p>Let's get started!</p>
+                <button @click=${this.handleStartLesson} >Ok</button>
+            </div>
+        `;
+    }
     render() {
         const template = this.status === "error" ? this.errorTemplate()
-            : this.status === "lessonLoaded" ? this.lessonTemplate()
-                : this.status === "finished" ? this.lessonFinishedTemplate()
-                    : this.loadingTemplate();
+            : this.status === "lessonLoaded" ? this.startLessonTemplate()
+                : this.status === "start" ? this.lessonTemplate()
+                    : this.status === "finished" ? this.lessonFinishedTemplate()
+                        : this.loadingTemplate();
         return html `${template}`;
+    }
+    // In order to allow autoplay for audio recordings, user must click after page load
+    handleStartLesson() {
+        this.status = "start";
+    }
+    //TODO Implement S3 functionalality later
+    async getSlidesWithAudio(lesson) {
+        const { slides } = lesson;
+        const slidesWithAudio = await Promise.all(slides.map(async (slide) => {
+            const res = await fetch("/lessons/audiofiles");
+            const sound = await res.blob();
+            if (slide.type === "intro") {
+                const { targetword, definition, slideorder, type } = slide;
+                return { targetword, definition, slideorder, type, sound };
+            }
+            // if slideType is "question"
+            else {
+                const { question, correctanswer, wronganswer1, wronganswer2, wronganswer3, slideorder, type } = slide;
+                return { question, correctanswer, wronganswer1, wronganswer2, wronganswer3, slideorder, type, sound };
+            }
+        }));
+        return slidesWithAudio;
     }
     userWrongHandler() {
         // if the question slide is the first slide, force an update to reshuffle the questions
@@ -97,9 +151,6 @@ let LessonPresenter = class LessonPresenter extends LitElement {
 __decorate([
     property({ type: Number })
 ], LessonPresenter.prototype, "lessonId", void 0);
-__decorate([
-    state()
-], LessonPresenter.prototype, "lesson", void 0);
 __decorate([
     state()
 ], LessonPresenter.prototype, "status", void 0);

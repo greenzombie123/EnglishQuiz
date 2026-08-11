@@ -5,14 +5,8 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 import { LitElement, html, css } from "lit";
-import { customElement, property, query } from "lit/decorators.js";
+import { customElement, query, queryAll, state } from "lit/decorators.js";
 let MessageDialog = class MessageDialog extends LitElement {
-    constructor() {
-        super(...arguments);
-        this.message = "";
-        this.linkText = "";
-        this.url = "";
-    }
     static { this.styles = [
         css `
             dialog{
@@ -33,34 +27,69 @@ let MessageDialog = class MessageDialog extends LitElement {
         `
     ]; }
     render() {
+        if (!this.init)
+            return html `<dialog></dialog>`;
+        const init = this.init;
+        const buttons = init.link ?
+            html `<a href=${init.link}>${init.buttonText}</a>` :
+            html `
+                <button type="button" >Yes</button>
+                <button type="button" >No</button>
+            `;
         return html `
         <dialog>
             <div>
-                <p>${this.message}</p>
-                <a href=${this.url}>${this.linkText}</a>
+                <p>${init.text}</p>
+                ${buttons}
             </div>
         </dialog>
         `;
     }
-    open() {
-        this._dialog.showModal();
+    handleUserResponse() {
+        this._dialog.close();
+    }
+    open(init) {
+        this.init = init;
     }
     close() {
         this._dialog.close();
     }
+    async getUserResponse(init) {
+        this.init = init;
+        await this.updateComplete;
+        const buttons = this._buttons;
+        if (this.yesHandler)
+            buttons[0]?.removeEventListener("click", this.yesHandler);
+        if (this.noHandler)
+            buttons[1]?.removeEventListener("click", this.noHandler);
+        let userResponse = new Promise((res, rej) => {
+            const yesClickedHandler = () => {
+                res({ response: "Yes" });
+            };
+            const noClickedHandler = () => {
+                res({ response: "No" });
+            };
+            buttons[0]?.addEventListener("click", yesClickedHandler);
+            buttons[1]?.addEventListener("click", noClickedHandler);
+        });
+        const finalResponse = await userResponse;
+        this.close();
+        return finalResponse;
+    }
+    updated(_changedProperties) {
+        if (this.init)
+            this._dialog.showModal();
+    }
 };
 __decorate([
-    property()
-], MessageDialog.prototype, "message", void 0);
-__decorate([
-    property()
-], MessageDialog.prototype, "linkText", void 0);
-__decorate([
-    property()
-], MessageDialog.prototype, "url", void 0);
+    state()
+], MessageDialog.prototype, "init", void 0);
 __decorate([
     query("dialog")
 ], MessageDialog.prototype, "_dialog", void 0);
+__decorate([
+    queryAll("button")
+], MessageDialog.prototype, "_buttons", void 0);
 MessageDialog = __decorate([
     customElement("message-dialog")
 ], MessageDialog);

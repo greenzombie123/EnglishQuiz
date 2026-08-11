@@ -7,6 +7,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 import { LitElement, html, css } from "lit";
 import { customElement, property, query } from "lit/decorators.js";
 import { map } from "lit/directives/map.js";
+import { removeExtention } from "../../util/util.js";
 let SoundSelector = class SoundSelector extends LitElement {
     constructor() {
         super(...arguments);
@@ -36,12 +37,13 @@ let SoundSelector = class SoundSelector extends LitElement {
     ]; }
     optionTemplate(soundUrl) {
         const isSelected = soundUrl === this.selectedSoundurl;
-        return html `<option ?selected=${isSelected} value=${soundUrl}>${soundUrl}</option>`;
+        const fileNameWithOutExtension = removeExtention(soundUrl);
+        return html `<option ?selected=${isSelected} value=${soundUrl}>${fileNameWithOutExtension}</option>`;
     }
     render() {
         return html `
         <select class="sound_select" name="soundurl" @input=${this.onSoundUrlChanged} >
-            <option value=${this.selectedSoundurl} ?selected=${!this.selectedSoundurl} > --- No Sound File Chosen </option>
+            <option value="" ?selected=${!this.selectedSoundurl} > --- No Sound File Chosen </option>
             ${map(this.soundUrls, (soundUrl) => this.optionTemplate(soundUrl))}
         </select>
     `;

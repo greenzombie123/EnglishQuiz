@@ -1,10 +1,11 @@
 import { LitElement, html, css } from "lit";
 import { customElement, property, state } from "lit/decorators.js"
+import { cache } from 'lit/directives/cache.js'
 import "./Slide.ts"
 import type { Lesson, SlideData } from "../types.ts";
-import type { UserActed } from "./types.ts"
+import type { LessonSlide, UserActed } from "./types.ts"
 
-type LessonState = "loading" | "error" | "finished" | "lessonLoaded"
+type LessonState = "loading" | "error" | "finished" | "lessonLoaded" | "start"
 
 @customElement("lesson-presenter")
 export class LessonPresenter extends LitElement {
@@ -14,14 +15,33 @@ export class LessonPresenter extends LitElement {
                 flex: 1;
                 display: flex;
                 flex-direction: column;
+
+                .start{
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: center;
+                    align-items: center;
+                    height:100%;
+
+                    p{
+                        font-size:45px
+                    }
+
+                    button{
+                            font-size: 30px;
+                            padding: 5px 15px;
+                    }
+                }
+            }
             `
     ];
 
     @property({ type: Number })
     lessonId?: number
 
-    @state()
     lesson?: Lesson
+
+    slides: LessonSlide[] = []
 
     @state()
     status: LessonState = "loading"
@@ -33,8 +53,12 @@ export class LessonPresenter extends LitElement {
         super.connectedCallback()
 
         const res = await fetch(`./get/${this.lessonId}`)
-        if (!res.ok) this.status = "error"
-        this.lesson = await res.json()
+        if (!res.ok) return this.status = "error"
+        const lesson = await res.json()
+        const slides = await this.getSlidesWithAudio(lesson)
+        this.lesson = lesson
+        this.slides = slides
+        console.log(this.slides)
         this.status = "lessonLoaded"
     }
 
@@ -47,9 +71,9 @@ export class LessonPresenter extends LitElement {
     }
 
     lessonTemplate() {
-        const currentSlide = this.lesson?.slides[this.slideIndex - 1]!
+        let currentSlide = { ...this.slides[this.slideIndex - 1] }
 
-        return html`<lesson-slide .slide=${currentSlide} @userActed=${this.userActedHandler}></lesson-slide>`
+        return html`${html`<lesson-slide .slide=${currentSlide} @userActed=${this.userActedHandler}></lesson-slide>`}`
     }
 
     lessonFinishedTemplate() {
@@ -59,14 +83,55 @@ export class LessonPresenter extends LitElement {
         `
     }
 
+    startLessonTemplate() {
+        return html`
+            <div class="start">
+                <p>Let's get started!</p>
+                <button @click=${this.handleStartLesson} >Ok</button>
+            </div>
+        `
+    }
+
     render() {
 
         const template = this.status === "error" ? this.errorTemplate()
-            : this.status === "lessonLoaded" ? this.lessonTemplate()
-                : this.status === "finished" ? this.lessonFinishedTemplate()
-                    : this.loadingTemplate()
+            : this.status === "lessonLoaded" ? this.startLessonTemplate()
+                : this.status === "start" ? this.lessonTemplate()
+                    : this.status === "finished" ? this.lessonFinishedTemplate()
+                        : this.loadingTemplate()
 
         return html`${template}`;
+    }
+
+    // In order to allow autoplay for audio recordings, user must click after page load
+    private handleStartLesson() {
+        this.status = "start"
+    }
+
+    //TODO Implement S3 functionalality later
+    private async getSlidesWithAudio(lesson: Lesson) {
+
+        const { slides } = lesson
+
+        const slidesWithAudio = await Promise.all<LessonSlide>(slides.map<Promise<LessonSlide>>(async slide => {
+            const res = await fetch("/lessons/audiofiles")
+            const sound = await res.blob()
+
+            if (slide.type === "intro") {
+                const { targetword, definition, slideorder, type } = slide
+
+                return { targetword, definition, slideorder, type, sound }
+            }
+
+            // if slideType is "question"
+            else {
+                const { question, correctanswer, wronganswer1, wronganswer2, wronganswer3, slideorder, type } = slide
+
+                return { question, correctanswer, wronganswer1, wronganswer2, wronganswer3, slideorder, type, sound }
+            }
+        }))
+
+        return slidesWithAudio
     }
 
     private userCorrectHandler = () => {

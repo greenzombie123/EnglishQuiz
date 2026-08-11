@@ -34,6 +34,16 @@ export type SlideDeleted = {
     slideorder: number
 }
 
-export type StateChanged = SlideChanged | LessonDataChanged | SlideAdded | SlideOrderChanged | SlideDeleted
+export type AudioFilesUpdated = {
+    action: "audioFilesUpdated",
+    audioFile: File
+}
+
+export type AudioFileDeleted = {
+    action: "audioFileDeleted",
+    name: string
+}
+
+export type StateChanged = SlideChanged | LessonDataChanged | SlideAdded | SlideOrderChanged | SlideDeleted | AudioFilesUpdated | AudioFileDeleted
 
 

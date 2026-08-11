@@ -40,12 +40,12 @@ export interface PostLessonReqBody {
 }
 
 export type PostLessonRejected = {
-  isError:true,
-  message:unknown
+  isError: true,
+  message: unknown
 }
 
 export type PostLessonPassed = {
-  isError:false
+  isError: false
 }
 
 export type PostLessonResult = PostLessonPassed | PostLessonRejected

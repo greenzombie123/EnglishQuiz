@@ -14,7 +14,8 @@ export class IntroSlide extends Slide {
             targetword, 
             definition,
             slideorder,
-            type
+            type,
+            soundurl
             FROM introslides
             INNER JOIN lessons_introslides 
             ON lessons_introslides.introslideid = introslides.id
@@ -58,7 +59,8 @@ export class QuestionSlide extends Slide {
             wronganswer2,
             wronganswer3,
             slideorder,
-            type
+            type,
+            soundurl
             FROM questionslides
             INNER JOIN lessons_questionslides
             ON lessons_questionslides.questionslideid = questionslides.id

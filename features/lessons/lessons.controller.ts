@@ -6,7 +6,7 @@ import { createLessonStore, postLessonService } from "./lessons.service.ts";
 import type {
   LessonIdParams,
 } from "../../shared.types.ts";
-import type { PostLessonArg, PostLessonReqBody, PostLessonResult } from "./lessons.types.ts";
+import { dirname } from "../../dirNames.ts"
 
 export const getLesson = async (
   req: Request<LessonIdParams>,
@@ -38,12 +38,6 @@ export const getLessonPage = (
   const { lessonId } = req.params as { lessonId: string };
   res.locals.lessonId = parseInt(lessonId);
   res.render("lesson");
-
-
-  // const { lessonId } = req.params as { lessonId: string };
-  // res.locals.lessonId = parseInt(lessonId);
-  // res.locals.lessonName = req.query.lessonname as string;
-  // res.render("lesson");
 };
 
 export const getDashBoard = async (
@@ -122,4 +116,10 @@ export const getCreateLessonPage = (
   res.render("createLesson");
 };
 
-// export const get
+export const getAudioFiles = (
+  req: Request,
+  res: Response,
+  next: NextFunction) => {
+
+  res.sendFile("/public/hello.mp3", { root: dirname })
+}

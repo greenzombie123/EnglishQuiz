@@ -32,7 +32,8 @@ export class IntroSlide extends Slide {
             targetword, 
             definition,
             slideorder,
-            type
+            type,
+            soundurl
             FROM introslides
             INNER JOIN lessons_introslides 
             ON lessons_introslides.introslideid = introslides.id
@@ -59,12 +60,12 @@ export class IntroSlide extends Slide {
         await p.query(queryString)
     }
 
-    static deleteById = async (slideIds:number[], client:Pool):Promise<IntroSlideData[]> => {
-         let p = client ? client : pool
+    static deleteById = async (slideIds: number[], client: Pool): Promise<IntroSlideData[]> => {
+        let p = client ? client : pool
 
-         const queryString = format(`DELETE FROM introslides WHERE id in (%L)`, slideIds)
+        const queryString = format(`DELETE FROM introslides WHERE id in (%L)`, slideIds)
 
-         return (await p.query<IntroSlideData>(queryString)).rows
+        return (await p.query<IntroSlideData>(queryString)).rows
     }
 }
 
@@ -101,7 +102,8 @@ export class QuestionSlide extends Slide {
             wronganswer2,
             wronganswer3,
             slideorder,
-            type
+            type,
+            soundurl
             FROM questionslides
             INNER JOIN lessons_questionslides
             ON lessons_questionslides.questionslideid = questionslides.id
@@ -128,12 +130,12 @@ export class QuestionSlide extends Slide {
         await p.query(queryString)
     }
 
-    static deleteById = async (slideIds:number[], client:Pool):Promise<QuestionSlideData[]> => {
-         let p = client ? client : pool
+    static deleteById = async (slideIds: number[], client: Pool): Promise<QuestionSlideData[]> => {
+        let p = client ? client : pool
 
-         const queryString = format(`DELETE FROM introslides WHERE id in (%L)`, slideIds)
+        const queryString = format(`DELETE FROM introslides WHERE id in (%L)`, slideIds)
 
-         return (await p.query<QuestionSlideData>(queryString)).rows
+        return (await p.query<QuestionSlideData>(queryString)).rows
     }
 }
 
@@ -220,9 +222,9 @@ export class Lesson {
             `, [username]
         )
 
-        if(!rows.length) return []
+        if (!rows.length) return []
 
-        return rows.map(row=>row.groupname)
+        return rows.map(row => row.groupname)
     }
 
     static post = async (name: string, groupname: string, teacherId: string, client?: PoolClient): Promise<number | undefined> => {
@@ -232,10 +234,10 @@ export class Lesson {
         return rows[0] ? rows[0].id : undefined
     }
 
-    static update = async(lessonId:number, name: string, groupname: string, client?: PoolClient)=>{
+    static update = async (lessonId: number, name: string, groupname: string, client?: PoolClient) => {
 
         let p = client ? client : pool
-        
+
         const queryString = format(`UPDATE lessons SET (name, groupname) = (%L, %L) WHERE id = %L`, name, groupname, lessonId)
 
         await p.query(queryString)
@@ -327,4 +329,4 @@ export const createQuestionSlideQueryString = (slides: QuestionSlide[]) => {
     );
 };
 
-const g:LessonRecord = {slides:[], name:"efe", groupname:"fefe", id:1}
+const g: LessonRecord = { slides: [], name: "efe", groupname: "fefe", id: 1 }

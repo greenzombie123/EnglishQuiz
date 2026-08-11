@@ -2,6 +2,7 @@ import { LitElement, html, css } from "lit";
 import { customElement, property, query, state } from "lit/decorators.js"
 import { map } from "lit/directives/map.js";
 import { SlideAdded, SlideChanged } from "./types.ts";
+import { removeExtention } from "../../util/util.ts";
 
 @customElement("sound-selector")
 export class SoundSelector extends LitElement {
@@ -41,7 +42,8 @@ export class SoundSelector extends LitElement {
 
     optionTemplate(soundUrl: string) {
         const isSelected = soundUrl === this.selectedSoundurl
-        return html`<option ?selected=${isSelected} value=${soundUrl}>${soundUrl}</option>`
+        const fileNameWithOutExtension = removeExtention(soundUrl)
+        return html`<option ?selected=${isSelected} value=${soundUrl}>${fileNameWithOutExtension}</option>`
     }
 
 
@@ -49,7 +51,7 @@ export class SoundSelector extends LitElement {
 
         return html`
         <select class="sound_select" name="soundurl" @input=${this.onSoundUrlChanged} >
-            <option value=${this.selectedSoundurl} ?selected=${!this.selectedSoundurl} > --- No Sound File Chosen </option>
+            <option value="" ?selected=${!this.selectedSoundurl} > --- No Sound File Chosen </option>
             ${map(this.soundUrls, (soundUrl) => this.optionTemplate(soundUrl))}
         </select>
     `;

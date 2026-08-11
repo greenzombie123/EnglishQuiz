@@ -6,7 +6,6 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 };
 import { LitElement, html, css } from "lit";
 import { customElement, property, query } from "lit/decorators.js";
-import { ifDefined } from "lit/directives/if-defined.js";
 import { map } from "lit/directives/map.js";
 let GroupNameSelector = class GroupNameSelector extends LitElement {
     constructor() {
@@ -50,7 +49,7 @@ let GroupNameSelector = class GroupNameSelector extends LitElement {
     render() {
         return html `
             <label for="newGroupName">Create a group to put your lesson in</label>
-            <input type="text" id="newGroupName" name="newgroupname" value=${ifDefined(this.groupName)} @input=${this.onGroupNameChanged}>
+            <input type="text" id="newGroupName" name="newgroupname" value=${this.groupName} @input=${this.onGroupNameChanged}>
             <label for="groupNames">Or choose a preexisting group</label>
             <select name="oldgroupname" id="groupNames" @input=${this.onGroupNameChanged}>
                 <option value="" selected>Choose a group name</option>

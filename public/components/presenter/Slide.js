@@ -5,7 +5,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 import { LitElement, html, nothing } from "lit";
-import { customElement, property } from "lit/decorators.js";
+import { customElement, property, query } from "lit/decorators.js";
 import { classMap } from "lit/directives/class-map.js";
 import { introSlideStyle, questionSlideStyle, slideStyle } from "./styles.js";
 import { choose } from "lit/directives/choose.js";
@@ -27,7 +27,7 @@ let Slide = class Slide extends LitElement {
         const previousButton = this.slide?.slideorder !== 1 ? html `<button type="button" class="next" @click=${() => this.userClicked("previousSlide")}>Previous</button>` : html `${nothing}`;
         return html ` 
         <div class=${classMap(classes)}>
-            <div class="targetWord">${targetword}</div>
+            <div class="targetWord" @click=${this.handlePlaySound}>${targetword}</div>
             <div class="definition">${definition}</div>
         </div>
         <div class="buttons">
@@ -46,11 +46,15 @@ let Slide = class Slide extends LitElement {
         ];
         const sortedButtons = this.shuffle(buttons);
         return html `
-            <p class=${classMap(classes)}>${question}</p>
+            <p class=${classMap(classes)} @click=${this.handlePlaySound}>${question}</p>
             <div class="buttons">
                 ${sortedButtons}
             </div>
         `;
+    }
+    handlePlaySound() {
+        if (this._audio?.src)
+            this._audio.play();
     }
     userClicked(status) {
         const customEventInit = {
@@ -60,17 +64,31 @@ let Slide = class Slide extends LitElement {
         };
         this.dispatchEvent(new CustomEvent("userActed", customEventInit));
     }
+    // Whenever the slide is updated, remove the old audio, add the new one and play it on render.
+    updated(_changedProperties) {
+        if (this._audio?.src) {
+            URL.revokeObjectURL(this._audio.src);
+        }
+        if (this._audio && this.slide?.sound) {
+            this._audio.src = URL.createObjectURL(this.slide.sound);
+            setTimeout(() => { this._audio?.play(); }, 200);
+        }
+    }
     render() {
         return html ` ${choose(this.slide?.type, [
             ["question", () => this.questionSlideTemplate()],
             ["intro", () => this.introSlideTemplate()]
         ])}
+        <audio></audio>
     `;
     }
 };
 __decorate([
     property({ type: Object })
 ], Slide.prototype, "slide", void 0);
+__decorate([
+    query("audio")
+], Slide.prototype, "_audio", void 0);
 Slide = __decorate([
     customElement("lesson-slide")
 ], Slide);

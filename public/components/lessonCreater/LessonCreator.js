@@ -6,14 +6,15 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 };
 import { css, html, LitElement } from "lit";
 import { customElement, property, query, state } from "lit/decorators.js";
+import { Task } from "@lit/task";
+import { map } from "lit/directives/map.js";
 import "./NameContainer.js";
 import "./GroupNameSelector.js";
 import "./SlideSelector.js";
 import "./SoundSelector.js";
 import "./SlideFieldSet.js";
-import { map } from "lit/directives/map.js";
-import { Task } from "@lit/task";
 import "../MessageDialog.js";
+import "../audio/AudioInput.js";
 const j = { slidetype: "intro", definition: "f", targetword: "f", slideorder: 1, soundurl: "f" };
 let LessonCreator = class LessonCreator extends LitElement {
     constructor() {
@@ -23,7 +24,7 @@ let LessonCreator = class LessonCreator extends LitElement {
         this.groupNameList = [];
         this.slides = [];
         this.slideCount = 0;
-        this.soundUrls = [];
+        this.audioFiles = [new File(["fefe"], "wow.com"), new File(["ddef"], "hot.webm")];
         this.sendLessonTask = new Task(this, {
             task: async () => {
                 const lesson = this.createLesson();
@@ -36,7 +37,11 @@ let LessonCreator = class LessonCreator extends LitElement {
                 });
                 if (!response.ok)
                     return;
-                this.messageDialog.open();
+                this.messageDialog.open({
+                    text: `${this.lessonId ? "Your lesson has successfully updated." : "The lesson was created."}`,
+                    link: "/lessons",
+                    buttonText: "Return to the dashboard"
+                });
             }
         });
         this.getLessonTask = new Task(this, {
@@ -49,6 +54,8 @@ let LessonCreator = class LessonCreator extends LitElement {
                 this.groupName = lesson.groupname;
                 this.slideCount = lesson.slides.length;
                 this.slides = [...lesson.slides];
+                // mock the retrieval of audio files
+                this.audioFiles = createMockAudioFiles(lesson.slides);
             },
             args: () => []
         });
@@ -217,7 +224,7 @@ let LessonCreator = class LessonCreator extends LitElement {
     render() {
         return html `
        <h1>Create Your Lesson</h1>
-        <form action="/lessons/createlesson" method="post" @stateChanged=${this.stateChangedHandler}>
+        <form action="/lessons/createlesson" method="post" @stateChanged=${this.stateChangedHandler} @message=${this.openMessageDialog}>
             <div class="top">
                 <div class="nameContainer">
 
@@ -227,24 +234,24 @@ let LessonCreator = class LessonCreator extends LitElement {
 
                 </div>
 
-                <!-- <audio-input></audio-input> -->
+                <audio-inputt .audioFiles=${this.audioFiles}></audio-inputt>
 
             </div>
 
             <div class="breakLine" style="width: 100%; border: 2px solid black;"></div>
 
             <!-- FieldSets -->
-
-            ${map(this.slides, (slide, index) => html `<slide-fieldset moveButtonState=${this.setMoveButtonState(index, this.slides.length)} .slide=${slide} .soundUrls=${this.soundUrls}></slide-fieldset>`)}
+            ${map(this.slides, (slide, index) => html `<slide-fieldset moveButtonState=${this.setMoveButtonState(index, this.slides.length)} .slide=${slide} .soundUrls=${this.audioFiles.map(audioFile => audioFile.name)}></slide-fieldset>`)}
 
             <slide-selector></slide-selector>
 
-            <button type="button" class="submit" @click=${this.sendLessonHandler}>${!this.lessonId ? "Create Lesson" : "Edit Lesson"}</button>
+            <button type="button" class="submit" @click=${this.sendLessonHandler}>${!this.lessonId ? "Create Lesson" : "Finish editing lesson"}</button>
 
+            <message-dialog .url=${"/lessons"} .message=${"The lesson was successfully created."} .linkText=${"Return to Dashboard"}></message-dialog>
         </form>
-
-        <message-dialog .url=${"/lessons"} .message=${"The lesson was successfully created."} .linkText=${"Return to Dashboard"}></message-dialog>
     `;
+    }
+    openMessageDialog(event) {
     }
     createLesson() {
         const intro = this.slides.filter(slide => slide.type === "intro");
@@ -343,6 +350,16 @@ let LessonCreator = class LessonCreator extends LitElement {
             .map((slide, index) => { return { ...slide, slideorder: index + 1 }; });
         this.slides = [...newSlides];
     }
+    audioFilesUpdatedHandler(state) {
+        const newAudioFile = state.audioFile;
+        this.audioFiles = [...this.audioFiles, newAudioFile];
+    }
+    async audioFileDeletedHandler(state) {
+        const deletedFileName = state.name;
+        const userResponse = await this.messageDialog.getUserResponse({ text: `Delete this recording: ${deletedFileName} ?`, link: undefined });
+        if (userResponse.response === "Yes")
+            this.audioFiles = this.audioFiles.filter(audioFile => audioFile.name !== deletedFileName);
+    }
     stateChangedHandler(e) {
         const newState = e.detail;
         switch (newState.action) {
@@ -360,6 +377,12 @@ let LessonCreator = class LessonCreator extends LitElement {
                 break;
             case "slideDeleted":
                 this.slideDeletedHandler(newState);
+                break;
+            case "audioFilesUpdated":
+                this.audioFilesUpdatedHandler(newState);
+                break;
+            case "audioFileDeleted":
+                this.audioFileDeletedHandler(newState);
                 break;
             default:
                 break;
@@ -386,7 +409,7 @@ __decorate([
 ], LessonCreator.prototype, "slideCount", void 0);
 __decorate([
     state()
-], LessonCreator.prototype, "soundUrls", void 0);
+], LessonCreator.prototype, "audioFiles", void 0);
 __decorate([
     query("message-dialog")
 ], LessonCreator.prototype, "messageDialog", void 0);
@@ -394,4 +417,11 @@ LessonCreator = __decorate([
     customElement("lesson-creator")
 ], LessonCreator);
 export { LessonCreator };
+const createMockAudioFiles = (slides) => {
+    const slidesWithAudio = slides.filter(slide => slide.soundurl);
+    if (!slidesWithAudio.length)
+        return [];
+    const soundUrls = slidesWithAudio.map(slide => slide.soundurl);
+    return soundUrls.map(soundUrl => new File(["blah blah"], soundUrl));
+};
 //# sourceMappingURL=LessonCreator.js.map

@@ -4,10 +4,15 @@ import type AudioInputTab from "./AudioInputTab.ts";
 import type AudioInputRecorder from "./AudioInputRecorder.ts";
 import "./AudioInputRecorder.ts";
 
+import { LitElement, html, css } from "lit";
+import { customElement, property, query, state } from "lit/decorators.js"
+import type { AudioInputRecorderr } from "./AudioInputRecorder.ts";
+import { removeExtention } from "../../util/util.ts";
+
 export default class AudioInput extends HTMLElement {
   private root;
   private inputFileButton: HTMLInputElement;
-  private recorderButton:HTMLButtonElement
+  private recorderButton: HTMLButtonElement
   private store;
 
   constructor() {
@@ -39,11 +44,11 @@ export default class AudioInput extends HTMLElement {
     this.store.subscribe("audioFilesChanged", this.handleAudioFilesChanged);
   }
 
-  connectedCallback() {}
+  connectedCallback() { }
 
-  disconnectedCallback() {}
+  disconnectedCallback() { }
 
-  attributeChangedCallback() {}
+  attributeChangedCallback() { }
 
   handleChangeInputFile = (event: Event) => {
     const files = (event.target as HTMLInputElement).files;
@@ -71,18 +76,18 @@ export default class AudioInput extends HTMLElement {
     soundFileNames.textContent = `There is ${audioFiles.length} files`;
 
     audioFiles.forEach((audioFile) => {
-     
+
       const audioInputTab = document.createElement(
         "audio-input-tab",
       ) as AudioInputTab;
-      
+
       audioInputTab.setAudioUrl(audioFile)
-      
+
       ul.appendChild(audioInputTab);
     });
   };
 
-  handleAudioRecorderButtonClicked = ()=>{
+  handleAudioRecorderButtonClicked = () => {
     const audioInputRecorder = this.root.querySelector("audio-input-recorder") as AudioInputRecorder
 
     audioInputRecorder.open()
@@ -91,3 +96,105 @@ export default class AudioInput extends HTMLElement {
 }
 
 customElements.define("audio-input", AudioInput);
+
+
+@customElement("audio-inputt")
+export class AudioInputt extends LitElement {
+  static styles = [
+    css`
+       * {
+            box-sizing: border-box;
+          }
+
+            :host {
+                border: black 1px solid;
+                padding: 10px;
+
+
+                .buttons {
+                    display: flex;
+                    gap: 20px;
+
+                    button {
+                        background-image: url("/stop-button.png");
+                        background-size: 90%;
+                        background-repeat: no-repeat;
+                        background-position: center;
+                        background-color: white;
+                    }
+
+                    label {
+                        background-image: url("/upload-big-arrow.png");
+                        background-size: 90%;
+                        background-repeat: no-repeat;
+                        background-position: center;
+                    }
+
+                    button,
+                    label {
+                        border-radius: 4px;
+                        height: 30px;
+                        width: 30px;
+                        padding: 0;
+                        margin: 0;
+                        appearance: none;
+                        border: black solid 1px;
+                        cursor: pointer;
+                    }
+
+                    input#audio_file_input {
+                        display: none;
+                    }
+                }
+
+                ul{
+                    /* margin: 0; */
+                    padding: 0;
+                }
+
+            }
+    `
+  ];
+
+  @property({ type: Array })
+  audioFiles: File[] = []
+
+  @query("audio-input-recorderr")
+  audioInputRecorder?: AudioInputRecorderr
+
+  render() {
+    return html`
+      <p>Add an audio file or record a new one.</p>
+        <div class="buttons">
+            <button id="audio_recorder_button" type="button" @click=${this.recorderClickedHandler}></button>
+            <label id="audio_file_input_button" for="audio_file_input">
+                <input type="file" name="audio" id="audio_file_input" accept="audio/*">
+            </label>
+        </div>
+
+        <p class="soundFileNames">No Files Added</p>
+
+        <ul>
+          ${this.audioFiles.map(audioFile => html`<audio-input-tabb .audioFile=${audioFile}></audio-input-tabb>`)}
+        </ul>
+
+        <audio-input-recorderr .audioFileNames=${this.createAudioFileNames()}></audio-input-recorderr>
+    `;
+  }
+
+  private createAudioFileNames() {
+    return this.audioFiles.map(audioFile => removeExtention(audioFile.name))
+  }
+
+  private recorderClickedHandler() {
+    if (this.audioInputRecorder) {
+      this.audioInputRecorder.open()
+    }
+  }
+}
+
+declare global {
+  interface HTMLElementTagNameMap {
+    "audio-inputt": AudioInputt;
+  }
+}

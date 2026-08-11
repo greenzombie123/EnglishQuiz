@@ -56,7 +56,7 @@ export class GroupNameSelector extends LitElement {
     render() {
         return html`
             <label for="newGroupName">Create a group to put your lesson in</label>
-            <input type="text" id="newGroupName" name="newgroupname" value=${ifDefined(this.groupName)} @input=${this.onGroupNameChanged}>
+            <input type="text" id="newGroupName" name="newgroupname" value=${this.groupName} @input=${this.onGroupNameChanged}>
             <label for="groupNames">Or choose a preexisting group</label>
             <select name="oldgroupname" id="groupNames" @input=${this.onGroupNameChanged}>
                 <option value="" selected>Choose a group name</option>

@@ -1,14 +1,15 @@
 import { css, html, LitElement, nothing } from "lit"
 import { customElement, property, query, state } from "lit/decorators.js"
+import { Task } from "@lit/task"
+import { map } from "lit/directives/map.js"
 import "./NameContainer.ts"
 import "./GroupNameSelector.ts"
 import "./SlideSelector.ts"
 import "./SoundSelector.ts"
 import "./SlideFieldSet.ts"
-import { map } from "lit/directives/map.js"
-import { LessonData, LessonDataChanged, SlideAdded, SlideChanged, SlideDeleted, SlideOrderChanged, StateChanged } from "./types.ts"
-import { Task } from "@lit/task"
 import "../MessageDialog.ts"
+import { AudioFileDeleted, AudioFilesUpdated, LessonData, LessonDataChanged, SlideAdded, SlideChanged, SlideDeleted, SlideOrderChanged, StateChanged } from "./types.ts"
+import "../audio/AudioInput.ts"
 
 import type { MessageDialog } from "../MessageDialog.ts"
 import { IntroSlideData, LessonRecord, QuestionSlideData, SlideData } from "../types.ts"
@@ -191,7 +192,7 @@ export class LessonCreator extends LitElement {
     private slideCount = 0
 
     @state()
-    private soundUrls: string[] = []
+    private audioFiles: File[] = [new File(["fefe"], "wow.com"), new File(["ddef"], "hot.webm")]
 
     @query("message-dialog")
     messageDialog!: MessageDialog
@@ -211,7 +212,11 @@ export class LessonCreator extends LitElement {
 
             if (!response.ok) return
 
-            this.messageDialog.open()
+            this.messageDialog.open({
+                text: `${this.lessonId ? "Your lesson has successfully updated." : "The lesson was created."}`,
+                link: "/lessons",
+                buttonText: "Return to the dashboard"
+            })
         }
     })
 
@@ -227,6 +232,9 @@ export class LessonCreator extends LitElement {
             this.groupName = lesson.groupname
             this.slideCount = lesson.slides.length
             this.slides = [...lesson.slides]
+
+            // mock the retrieval of audio files
+            this.audioFiles = createMockAudioFiles(lesson.slides)
         },
         args: () => []
     })
@@ -248,7 +256,7 @@ export class LessonCreator extends LitElement {
 
         return html`
        <h1>Create Your Lesson</h1>
-        <form action="/lessons/createlesson" method="post" @stateChanged=${this.stateChangedHandler}>
+        <form action="/lessons/createlesson" method="post" @stateChanged=${this.stateChangedHandler} @message=${this.openMessageDialog}>
             <div class="top">
                 <div class="nameContainer">
 
@@ -258,24 +266,26 @@ export class LessonCreator extends LitElement {
 
                 </div>
 
-                <!-- <audio-input></audio-input> -->
+                <audio-inputt .audioFiles=${this.audioFiles}></audio-inputt>
 
             </div>
 
             <div class="breakLine" style="width: 100%; border: 2px solid black;"></div>
 
             <!-- FieldSets -->
-
-            ${map(this.slides, (slide, index) => html`<slide-fieldset moveButtonState=${this.setMoveButtonState(index, this.slides.length)} .slide=${slide} .soundUrls=${this.soundUrls}></slide-fieldset>`)}
+            ${map(this.slides, (slide, index) => html`<slide-fieldset moveButtonState=${this.setMoveButtonState(index, this.slides.length)} .slide=${slide} .soundUrls=${this.audioFiles.map(audioFile => audioFile.name)}></slide-fieldset>`)}
 
             <slide-selector></slide-selector>
 
-            <button type="button" class="submit" @click=${this.sendLessonHandler}>${!this.lessonId ? "Create Lesson" : "Edit Lesson"}</button>
+            <button type="button" class="submit" @click=${this.sendLessonHandler}>${!this.lessonId ? "Create Lesson" : "Finish editing lesson"}</button>
 
+            <message-dialog .url=${"/lessons"} .message=${"The lesson was successfully created."} .linkText=${"Return to Dashboard"}></message-dialog>
         </form>
-
-        <message-dialog .url=${"/lessons"} .message=${"The lesson was successfully created."} .linkText=${"Return to Dashboard"}></message-dialog>
     `
+    }
+
+    private openMessageDialog(event: CustomEvent) {
+
     }
 
     private createLesson() {
@@ -397,6 +407,20 @@ export class LessonCreator extends LitElement {
         this.slides = [...newSlides]
     }
 
+    private audioFilesUpdatedHandler(state: AudioFilesUpdated) {
+        const newAudioFile = state.audioFile
+        this.audioFiles = [...this.audioFiles, newAudioFile]
+    }
+
+    private async audioFileDeletedHandler(state: AudioFileDeleted) {
+
+        const deletedFileName = state.name
+
+        const userResponse = await this.messageDialog.getUserResponse({ text: `Delete this recording: ${deletedFileName} ?`, link: undefined })
+
+        if (userResponse.response === "Yes") this.audioFiles = this.audioFiles.filter(audioFile => audioFile.name !== deletedFileName)
+    }
+
     private stateChangedHandler(e: CustomEvent<StateChanged>) {
 
         const newState = e.detail
@@ -417,8 +441,25 @@ export class LessonCreator extends LitElement {
             case "slideDeleted":
                 this.slideDeletedHandler(newState)
                 break;
+            case "audioFilesUpdated":
+                this.audioFilesUpdatedHandler(newState)
+                break;
+            case "audioFileDeleted":
+                this.audioFileDeletedHandler(newState)
+                break;
             default:
                 break;
         }
     }
+}
+
+const createMockAudioFiles = (slides: (QuestionSlideData | IntroSlideData)[]) => {
+
+    const slidesWithAudio = slides.filter(slide=>slide.soundurl)
+
+    if(!slidesWithAudio.length) return []
+
+    const soundUrls = slidesWithAudio.map(slide => slide.soundurl)
+
+    return soundUrls.map(soundUrl => new File(["blah blah"], soundUrl))
 }

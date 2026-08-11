@@ -9,7 +9,7 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 
 // Create url of the current directory of module
-const dirname = path.dirname(__filename);
+export const dirname = path.dirname(__filename);
 
 const views = path.join(dirname, "views") as string
 const errors = path.join(dirname, "errors") as string
