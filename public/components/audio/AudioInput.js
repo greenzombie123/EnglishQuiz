@@ -4,57 +4,12 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
-import { lesssonCreaterStore } from "../store/LessonCreaterStore.js";
 import "./AudioInputTab.js";
 import "./AudioInputRecorder.js";
 import { LitElement, html, css } from "lit";
 import { customElement, property, query } from "lit/decorators.js";
 import { removeExtention } from "../../util/util.js";
-export default class AudioInput extends HTMLElement {
-    constructor() {
-        super();
-        this.handleChangeInputFile = (event) => {
-            const files = event.target.files;
-            if (files && files[0]) {
-                const audioFiles = this.store.getState("audioFiles");
-                const newAudioFiles = [...audioFiles, files[0]];
-                this.store.setState("audioFiles", newAudioFiles);
-            }
-        };
-        this.handleAudioFilesChanged = () => {
-            const audioFiles = this.store.getState("audioFiles");
-            const ul = this.root.querySelector("ul");
-            ul.replaceChildren();
-            const soundFileNames = this.root.querySelector(".soundFileNames");
-            soundFileNames.textContent = `There is ${audioFiles.length} files`;
-            audioFiles.forEach((audioFile) => {
-                const audioInputTab = document.createElement("audio-input-tab");
-                audioInputTab.setAudioUrl(audioFile);
-                ul.appendChild(audioInputTab);
-            });
-        };
-        this.handleAudioRecorderButtonClicked = () => {
-            const audioInputRecorder = this.root.querySelector("audio-input-recorder");
-            audioInputRecorder.open();
-        };
-        this.root = this.attachShadow({ mode: "closed" });
-        const template = document.getElementById("audio-input");
-        this.root.appendChild(template.content.cloneNode(true));
-        this.inputFileButton = this.root.querySelector("#audio_file_input");
-        this.recorderButton = this.root.querySelector("#audio_recorder_button");
-        this.addEventListener("change", this.handleChangeInputFile);
-        this.inputFileButton.addEventListener("change", this.handleChangeInputFile);
-        this.recorderButton.addEventListener("click", this.handleAudioRecorderButtonClicked);
-        this.store = lesssonCreaterStore;
-        // Subscribe to store events
-        this.store.subscribe("audioFilesChanged", this.handleAudioFilesChanged);
-    }
-    connectedCallback() { }
-    disconnectedCallback() { }
-    attributeChangedCallback() { }
-}
-customElements.define("audio-input", AudioInput);
-let AudioInputt = class AudioInputt extends LitElement {
+let AudioInput = class AudioInput extends LitElement {
     constructor() {
         super(...arguments);
         this.audioFiles = [];
@@ -120,18 +75,30 @@ let AudioInputt = class AudioInputt extends LitElement {
         <div class="buttons">
             <button id="audio_recorder_button" type="button" @click=${this.recorderClickedHandler}></button>
             <label id="audio_file_input_button" for="audio_file_input">
-                <input type="file" name="audio" id="audio_file_input" accept="audio/*">
+                <input type="file" name="audio" id="audio_file_input" accept="audio/*" @change=${this.fileInputChanged}>
             </label>
         </div>
 
         <p class="soundFileNames">No Files Added</p>
 
         <ul>
-          ${this.audioFiles.map(audioFile => html `<audio-input-tabb .audioFile=${audioFile}></audio-input-tabb>`)}
+          ${this.audioFiles.map(audioFile => html `<audio-input-tab .audioFile=${audioFile}></audio-input-tab>`)}
         </ul>
 
-        <audio-input-recorderr .audioFileNames=${this.createAudioFileNames()}></audio-input-recorderr>
+        <audio-input-recorder .audioFileNames=${this.createAudioFileNames()}></audio-input-recorder>
     `;
+    }
+    // TODO Check if file name is similar to another file. Advise user to use a different file name. 
+    fileInputChanged(event) {
+        const target = event.target;
+        if (target.files && target.files[0]) {
+            const option = {
+                bubbles: true,
+                composed: true,
+                detail: { audioFile: target.files[0], action: "audioFilesUpdated" }
+            };
+            this.dispatchEvent(new CustomEvent("stateChanged", option));
+        }
     }
     createAudioFileNames() {
         return this.audioFiles.map(audioFile => removeExtention(audioFile.name));
@@ -144,12 +111,15 @@ let AudioInputt = class AudioInputt extends LitElement {
 };
 __decorate([
     property({ type: Array })
-], AudioInputt.prototype, "audioFiles", void 0);
+], AudioInput.prototype, "audioFiles", void 0);
 __decorate([
     query("audio-input-recorderr")
-], AudioInputt.prototype, "audioInputRecorder", void 0);
-AudioInputt = __decorate([
-    customElement("audio-inputt")
-], AudioInputt);
-export { AudioInputt };
+], AudioInput.prototype, "audioInputRecorder", void 0);
+__decorate([
+    query("input")
+], AudioInput.prototype, "_fileInput", void 0);
+AudioInput = __decorate([
+    customElement("audio-input")
+], AudioInput);
+export { AudioInput };
 //# sourceMappingURL=AudioInput.js.map

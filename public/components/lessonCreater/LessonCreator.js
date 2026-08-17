@@ -6,7 +6,6 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 };
 import { css, html, LitElement } from "lit";
 import { customElement, property, query, state } from "lit/decorators.js";
-import { Task } from "@lit/task";
 import { map } from "lit/directives/map.js";
 import "./NameContainer.js";
 import "./GroupNameSelector.js";
@@ -25,50 +24,6 @@ let LessonCreator = class LessonCreator extends LitElement {
         this.slides = [];
         this.slideCount = 0;
         this.audioFiles = [new File(["fefe"], "wow.com"), new File(["ddef"], "hot.webm")];
-        this.sendLessonTask = new Task(this, {
-            task: async () => {
-                const lesson = this.createLesson();
-                const response = await fetch("/lessons/createlesson", {
-                    method: "POST",
-                    body: JSON.stringify(lesson),
-                    headers: {
-                        "Content-Type": "application/json"
-                    }
-                });
-                if (!response.ok)
-                    return;
-                this.messageDialog.open({
-                    text: `${this.lessonId ? "Your lesson has successfully updated." : "The lesson was created."}`,
-                    link: "/lessons",
-                    buttonText: "Return to the dashboard"
-                });
-            }
-        });
-        this.getLessonTask = new Task(this, {
-            task: async () => {
-                const response = await fetch(`/lessons/get/${this.lessonId}`);
-                if (!response.ok)
-                    return;
-                const lesson = await response.json();
-                this.lessonName = lesson.name;
-                this.groupName = lesson.groupname;
-                this.slideCount = lesson.slides.length;
-                this.slides = [...lesson.slides];
-                // mock the retrieval of audio files
-                this.audioFiles = createMockAudioFiles(lesson.slides);
-            },
-            args: () => []
-        });
-        this.getGroupNames = new Task(this, {
-            task: async () => {
-                const response = await fetch(`/lessons/groupnames`);
-                if (!response.ok)
-                    return;
-                const groupnames = await response.json();
-                this.groupNameList = [...groupnames];
-            },
-            args: () => []
-        });
     }
     static { this.styles = css `
             h1 {
@@ -224,7 +179,7 @@ let LessonCreator = class LessonCreator extends LitElement {
     render() {
         return html `
        <h1>Create Your Lesson</h1>
-        <form action="/lessons/createlesson" method="post" @stateChanged=${this.stateChangedHandler} @message=${this.openMessageDialog}>
+        <form action="/lessons/createlesson" method="post" @stateChanged=${this.stateChangedHandler}>
             <div class="top">
                 <div class="nameContainer">
 
@@ -234,7 +189,7 @@ let LessonCreator = class LessonCreator extends LitElement {
 
                 </div>
 
-                <audio-inputt .audioFiles=${this.audioFiles}></audio-inputt>
+                <audio-input .audioFiles=${this.audioFiles}></audio-input>
 
             </div>
 
@@ -245,13 +200,86 @@ let LessonCreator = class LessonCreator extends LitElement {
 
             <slide-selector></slide-selector>
 
-            <button type="button" class="submit" @click=${this.sendLessonHandler}>${!this.lessonId ? "Create Lesson" : "Finish editing lesson"}</button>
+            <button type="button" class="submit" @click=${this.sendLesson}>${!this.lessonId ? "Create Lesson" : "Finish editing lesson"}</button>
 
             <message-dialog .url=${"/lessons"} .message=${"The lesson was successfully created."} .linkText=${"Return to Dashboard"}></message-dialog>
         </form>
     `;
     }
-    openMessageDialog(event) {
+    async connectedCallback() {
+        super.connectedCallback();
+        await this.getLesson();
+        await this.getGroupNames();
+    }
+    async getAudioFiles() {
+    }
+    async putAudioFiles() {
+    }
+    async createPresignedUrls(audioFiles) {
+        const fileNames = audioFiles.map(audioFile => audioFile.name);
+        console.log(fileNames);
+        const response = await fetch("/lessons/audiofiles/put", {
+            method: "POST",
+            body: JSON.stringify(fileNames),
+            headers: {
+                "Content-Type": "application/json"
+            }
+        });
+        const urls = await response.json();
+        const audioFilesWithUrls = [];
+        urls.forEach((url, index) => {
+            if (audioFiles[index]) {
+                audioFilesWithUrls.push({ audioFile: audioFiles[index], url });
+            }
+        });
+        return audioFilesWithUrls;
+    }
+    async getLesson() {
+        const response = await fetch(`/lessons/get/${this.lessonId}`);
+        if (!response.ok)
+            return;
+        const lesson = await response.json();
+        this.lessonName = lesson.name;
+        this.groupName = lesson.groupname;
+        this.slideCount = lesson.slides.length;
+        this.slides = [...lesson.slides];
+        // mock the retrieval of audio files
+        this.audioFiles = createMockAudioFiles(lesson.slides);
+    }
+    async sendLesson() {
+        //TODO Add feature that tells user that they must create at least one slide before creating lesson
+        if (this.slides.length === 0)
+            return;
+        //TODO Send files to the bucket
+        // Send file names and retrieve urls
+        const b = await this.createPresignedUrls(this.audioFiles);
+        console.log(b);
+        // Send audio files 
+        // If successful, post lesson
+        // If lesson is not posted successfully, delete files from bucket.
+        return;
+        const lesson = this.createLesson();
+        const response = await fetch("/lessons/createlesson", {
+            method: "POST",
+            body: JSON.stringify(lesson),
+            headers: {
+                "Content-Type": "application/json"
+            }
+        });
+        if (!response.ok)
+            return;
+        this.messageDialog.open({
+            text: `${this.lessonId ? "Your lesson has successfully updated." : "The lesson was created."}`,
+            link: "/lessons",
+            buttonText: "Return to the dashboard"
+        });
+    }
+    async getGroupNames() {
+        const response = await fetch(`/lessons/groupnames`);
+        if (!response.ok)
+            return;
+        const groupnames = await response.json();
+        this.groupNameList = [...groupnames];
     }
     createLesson() {
         const intro = this.slides.filter(slide => slide.type === "intro");
@@ -264,11 +292,6 @@ let LessonCreator = class LessonCreator extends LitElement {
             question
         };
         return lesson;
-    }
-    sendLessonHandler() {
-        if (this.slides.length > 0) {
-            this.sendLessonTask.run();
-        }
     }
     setMoveButtonState(slideIndex, maxSlides) {
         slideIndex++;

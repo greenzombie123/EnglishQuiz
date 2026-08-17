@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { deleteLesson, getAudioFiles, getCreateLessonPage, getDashBoard, getGroupNames, getLesson, getLessonPage, postLesson} from "./lessons.controller.ts"
+import { createPresignedUrls, deleteLesson, getAudioFiles, getCreateLessonPage, getDashBoard, getGroupNames, getLesson, getLessonPage, postLesson} from "./lessons.controller.ts"
 import multer from "multer"; // Handles multipart/form-data
 
 const upload = multer() // Do this to parse the formdata
@@ -25,6 +25,9 @@ lessonsRouter.get('/get/:lessonId', getLesson)
 
 //Send mock audiofiles
 lessonsRouter.get('/audiofiles', getAudioFiles)
+
+//Send presigned urls
+lessonsRouter.post('/audiofiles/put', createPresignedUrls)
 
 // Lesson Page
 lessonsRouter.get('/:lessonId', getLessonPage)

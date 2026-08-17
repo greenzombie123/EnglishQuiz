@@ -1,6 +1,5 @@
 import { css, html, LitElement, nothing } from "lit"
 import { customElement, property, query, state } from "lit/decorators.js"
-import { Task } from "@lit/task"
 import { map } from "lit/directives/map.js"
 import "./NameContainer.ts"
 import "./GroupNameSelector.ts"
@@ -197,66 +196,11 @@ export class LessonCreator extends LitElement {
     @query("message-dialog")
     messageDialog!: MessageDialog
 
-    private sendLessonTask = new Task(this, {
-        task: async () => {
-
-            const lesson = this.createLesson()
-
-            const response = await fetch("/lessons/createlesson", {
-                method: "POST",
-                body: JSON.stringify(lesson),
-                headers: {
-                    "Content-Type": "application/json"
-                }
-            })
-
-            if (!response.ok) return
-
-            this.messageDialog.open({
-                text: `${this.lessonId ? "Your lesson has successfully updated." : "The lesson was created."}`,
-                link: "/lessons",
-                buttonText: "Return to the dashboard"
-            })
-        }
-    })
-
-    private getLessonTask = new Task(this, {
-        task: async () => {
-            const response = await fetch(`/lessons/get/${this.lessonId}`)
-
-            if (!response.ok) return
-
-            const lesson = await response.json() as LessonRecord
-
-            this.lessonName = lesson.name
-            this.groupName = lesson.groupname
-            this.slideCount = lesson.slides.length
-            this.slides = [...lesson.slides]
-
-            // mock the retrieval of audio files
-            this.audioFiles = createMockAudioFiles(lesson.slides)
-        },
-        args: () => []
-    })
-
-    private getGroupNames = new Task(this, {
-        task: async () => {
-            const response = await fetch(`/lessons/groupnames`)
-
-            if (!response.ok) return
-
-            const groupnames = await response.json() as string[]
-
-            this.groupNameList = [...groupnames]
-        },
-        args: () => []
-    })
-
     protected render() {
 
         return html`
        <h1>Create Your Lesson</h1>
-        <form action="/lessons/createlesson" method="post" @stateChanged=${this.stateChangedHandler} @message=${this.openMessageDialog}>
+        <form action="/lessons/createlesson" method="post" @stateChanged=${this.stateChangedHandler}>
             <div class="top">
                 <div class="nameContainer">
 
@@ -266,7 +210,7 @@ export class LessonCreator extends LitElement {
 
                 </div>
 
-                <audio-inputt .audioFiles=${this.audioFiles}></audio-inputt>
+                <audio-input .audioFiles=${this.audioFiles}></audio-input>
 
             </div>
 
@@ -277,15 +221,115 @@ export class LessonCreator extends LitElement {
 
             <slide-selector></slide-selector>
 
-            <button type="button" class="submit" @click=${this.sendLessonHandler}>${!this.lessonId ? "Create Lesson" : "Finish editing lesson"}</button>
+            <button type="button" class="submit" @click=${this.sendLesson}>${!this.lessonId ? "Create Lesson" : "Finish editing lesson"}</button>
 
             <message-dialog .url=${"/lessons"} .message=${"The lesson was successfully created."} .linkText=${"Return to Dashboard"}></message-dialog>
         </form>
     `
     }
 
-    private openMessageDialog(event: CustomEvent) {
+    async connectedCallback() {
+        super.connectedCallback();
 
+        await this.getLesson()
+        await this.getGroupNames()
+    }
+
+    private async getAudioFiles() {
+
+    }
+
+
+    private async putAudioFiles() {
+
+    }
+
+    private async createPresignedUrls(audioFiles: File[]): Promise<{ audioFile: File, url: string }[]> {
+        const fileNames = audioFiles.map(audioFile => audioFile.name)
+
+        console.log(fileNames)
+
+        const response = await fetch("/lessons/audiofiles/put", {
+            method: "POST",
+            body: JSON.stringify(fileNames),
+            headers: {
+                "Content-Type": "application/json"
+            }
+        })
+
+        const urls: string[] = await response.json()
+
+        const audioFilesWithUrls: { audioFile: File, url: string }[] = []
+
+        urls.forEach((url, index) => {
+            if (audioFiles[index]) {
+                audioFilesWithUrls.push({ audioFile: audioFiles[index], url })
+            }
+        })
+
+        return audioFilesWithUrls
+    }
+
+    private async getLesson() {
+        const response = await fetch(`/lessons/get/${this.lessonId}`)
+
+        if (!response.ok) return
+
+        const lesson = await response.json() as LessonRecord
+
+        this.lessonName = lesson.name
+        this.groupName = lesson.groupname
+        this.slideCount = lesson.slides.length
+        this.slides = [...lesson.slides]
+
+        // mock the retrieval of audio files
+        this.audioFiles = createMockAudioFiles(lesson.slides)
+    }
+
+    private async sendLesson() {
+        //TODO Add feature that tells user that they must create at least one slide before creating lesson
+        if (this.slides.length === 0) return
+
+        //TODO Send files to the bucket
+
+        // Send file names and retrieve urls
+        const b = await this.createPresignedUrls(this.audioFiles)
+        console.log(b)
+
+        // Send audio files 
+        // If successful, post lesson
+
+        // If lesson is not posted successfully, delete files from bucket.
+
+        return
+
+        const lesson = this.createLesson()
+
+        const response = await fetch("/lessons/createlesson", {
+            method: "POST",
+            body: JSON.stringify(lesson),
+            headers: {
+                "Content-Type": "application/json"
+            }
+        })
+
+        if (!response.ok) return
+
+        this.messageDialog.open({
+            text: `${this.lessonId ? "Your lesson has successfully updated." : "The lesson was created."}`,
+            link: "/lessons",
+            buttonText: "Return to the dashboard"
+        })
+    }
+
+    private async getGroupNames() {
+        const response = await fetch(`/lessons/groupnames`)
+
+        if (!response.ok) return
+
+        const groupnames = await response.json() as string[]
+
+        this.groupNameList = [...groupnames]
     }
 
     private createLesson() {
@@ -302,12 +346,6 @@ export class LessonCreator extends LitElement {
         }
 
         return lesson
-    }
-
-    private sendLessonHandler() {
-        if (this.slides.length > 0) {
-            this.sendLessonTask.run()
-        }
     }
 
     private setMoveButtonState(slideIndex: number, maxSlides: number): MoveButtonState {
@@ -455,9 +493,9 @@ export class LessonCreator extends LitElement {
 
 const createMockAudioFiles = (slides: (QuestionSlideData | IntroSlideData)[]) => {
 
-    const slidesWithAudio = slides.filter(slide=>slide.soundurl)
+    const slidesWithAudio = slides.filter(slide => slide.soundurl)
 
-    if(!slidesWithAudio.length) return []
+    if (!slidesWithAudio.length) return []
 
     const soundUrls = slidesWithAudio.map(slide => slide.soundurl)
 

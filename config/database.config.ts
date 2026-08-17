@@ -9,3 +9,15 @@ export const pool = new Pool({
   password: process.env.PASSWORD,
   port: 5432,
 });
+
+declare global {
+  namespace NodeJS {
+    interface ProcessEnv {
+      KEY: string;
+      SECRETKEY:string;
+      REGION:string;
+      ENDPOINT:string;
+      BUCKET:string
+    }
+  }
+}

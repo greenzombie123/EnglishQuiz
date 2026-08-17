@@ -4,153 +4,9 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
-import { lesssonCreaterStore } from "../store/LessonCreaterStore.js";
 import { LitElement, html, css } from "lit";
 import { customElement, property, query, state } from "lit/decorators.js";
-export default class AudioInputRecorder extends HTMLElement {
-    constructor() {
-        super();
-        this.mimeType = "";
-        this.audioFile = null;
-        this.handleAudioFileCreated = () => { };
-        this.#handleStartRecording = () => {
-            if (this.mediaRecorder &&
-                this.mediaRecorder.state === "inactive" &&
-                this.audio.paused) {
-                if (this.audioFile) {
-                    URL.revokeObjectURL(this.audioFile.url);
-                    this.audioFile = null;
-                }
-                this.#changeIndicatorColor("recording");
-                this.mediaRecorder.start();
-            }
-        };
-        this.#handleStopRecording = () => {
-            if (this.mediaRecorder &&
-                this.mediaRecorder.state === "recording" &&
-                this.audio.paused) {
-                this.#changeIndicatorColor("inactive");
-                this.mediaRecorder.stop();
-            }
-        };
-        this.#handlePlayRecording = () => {
-            if (this.mediaRecorder &&
-                this.mediaRecorder.state === "inactive" &&
-                this.audioFile) {
-                this.audio.src = this.audioFile.url;
-                this.audio.play();
-                this.#changeIndicatorColor("playing");
-            }
-        };
-        this.#handleUpdateAudioFiles = () => {
-            if (!this.audioFile?.file)
-                return this.#giveWarning("No file has been recorded yet.");
-            if (!this.#hasName())
-                return this.#giveWarning("Write the name of the audio file");
-            if (!this.#hasNewName())
-                return this.#giveWarning("Another audio file has the same name.");
-            // Grab the audio files and add the newly recorded one to the array and set as new state
-            const audioFiles = this.store.getState("audioFiles");
-            const newAudioFile = new File([this.audioFile.file], this.name.value + '.webm', { type: this.audioFile.file.type });
-            this.store.setState("audioFiles", [...audioFiles, newAudioFile]);
-            this.#handleCloseDialog();
-        };
-        this.#handleCloseDialog = () => {
-            URL.revokeObjectURL(this.audioFile?.url || "");
-            this.audioFile = null;
-            this.audio.src = "";
-            this.name.value = "";
-            this.dialog.close();
-        };
-        this.#handleSetAudioUrl = (event) => {
-            this.audioFile = { url: URL.createObjectURL(event.data), file: event.data };
-        };
-        this.#changeIndicatorColor = (state) => {
-            switch (state) {
-                case "recording":
-                    this.indicator.style.backgroundColor = "red";
-                    break;
-                case "inactive":
-                    this.indicator.style.backgroundColor = "black";
-                    break;
-                case "playing":
-                    this.indicator.style.backgroundColor = "green";
-                    break;
-                default:
-                    break;
-            }
-        };
-        this.#hasName = () => this.name.value !== "";
-        this.#hasNewName = () => {
-            const audioFilesNames = this.store
-                .getState("audioFiles")
-                .map((audioFile) => audioFile.name);
-            if (!audioFilesNames.length)
-                return true;
-            return audioFilesNames.some((audioFilesName) => audioFilesName !== this.name.value);
-        };
-        this.#hasAudioFile = () => this.audioFile !== null;
-        this.#giveWarning = (message) => {
-            this.warning.textContent = message;
-        };
-        this.root = this.attachShadow({ mode: "closed" });
-        const template = document.getElementById("audio-input-recorder");
-        this.root.appendChild(template.content.cloneNode(true));
-        this.dialog = this.root.querySelector("dialog");
-        this.startButton = this.root.querySelector(".start");
-        this.stopButton = this.root.querySelector(".stop");
-        this.playButton = this.root.querySelector(".play");
-        this.name = this.root.querySelector("#name");
-        this.finishButton = this.root.querySelector(".finish");
-        this.cancelButton = this.root.querySelector(".cancel");
-        this.indicator = this.root.querySelector(".circle");
-        this.audio = this.root.querySelector("audio");
-        this.warning = this.root.querySelector(".warning");
-        // Add listeners to buttons and inputs
-        this.startButton.addEventListener("click", this.#handleStartRecording);
-        this.stopButton.addEventListener("click", this.#handleStopRecording);
-        this.playButton.addEventListener("click", this.#handlePlayRecording);
-        this.audio.addEventListener("ended", () => this.#changeIndicatorColor("inactive"));
-        this.cancelButton.addEventListener("click", this.#handleCloseDialog);
-        this.finishButton.addEventListener("click", this.#handleUpdateAudioFiles);
-        this.store = lesssonCreaterStore;
-        this.store.subscribe("audioFilesChanged", this.handleAudioFileCreated);
-    }
-    connectedCallback() { }
-    async getMedia() {
-        try {
-            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-            const mimeType = 'audio/webm;codecs=opus';
-            this.mediaRecorder = new MediaRecorder(stream, { mimeType });
-            // When the media recorder stops, get the blob from the captured media
-            this.mediaRecorder.ondataavailable = this.#handleSetAudioUrl;
-            return true;
-        }
-        catch (error) {
-            console.error(error);
-            return false;
-        }
-    }
-    async open() {
-        this.dialog.showModal();
-        const canUseMedia = await this.getMedia();
-        if (!canUseMedia)
-            this.dialog.close();
-    }
-    #handleStartRecording;
-    #handleStopRecording;
-    #handlePlayRecording;
-    #handleUpdateAudioFiles;
-    #handleCloseDialog;
-    #handleSetAudioUrl;
-    #changeIndicatorColor;
-    #hasName;
-    #hasNewName;
-    #hasAudioFile;
-    #giveWarning;
-}
-customElements.define("audio-input-recorder", AudioInputRecorder);
-let AudioInputRecorderr = class AudioInputRecorderr extends LitElement {
+let AudioInputRecorder = class AudioInputRecorder extends LitElement {
     constructor() {
         super(...arguments);
         this.audioFileNames = [];
@@ -210,15 +66,6 @@ let AudioInputRecorderr = class AudioInputRecorderr extends LitElement {
                             background-color: black;
                         }
                     }
-
-                    .recorder-buttons{
-
-                        
-                    }
-
-                    input{}
-
-                    bottom-buttons{}
                 }
             }
     `
@@ -354,30 +201,30 @@ let AudioInputRecorderr = class AudioInputRecorderr extends LitElement {
 };
 __decorate([
     property({ type: Array })
-], AudioInputRecorderr.prototype, "audioFileNames", void 0);
+], AudioInputRecorder.prototype, "audioFileNames", void 0);
 __decorate([
     state()
-], AudioInputRecorderr.prototype, "blob", void 0);
+], AudioInputRecorder.prototype, "blob", void 0);
 __decorate([
     query("dialog")
-], AudioInputRecorderr.prototype, "_dialog", void 0);
+], AudioInputRecorder.prototype, "_dialog", void 0);
 __decorate([
     query(".circle")
-], AudioInputRecorderr.prototype, "_indicator", void 0);
+], AudioInputRecorder.prototype, "_indicator", void 0);
 __decorate([
     query("audio")
-], AudioInputRecorderr.prototype, "_audio", void 0);
+], AudioInputRecorder.prototype, "_audio", void 0);
 __decorate([
     state()
-], AudioInputRecorderr.prototype, "name", void 0);
+], AudioInputRecorder.prototype, "name", void 0);
 __decorate([
     query(".message")
-], AudioInputRecorderr.prototype, "_message", void 0);
+], AudioInputRecorder.prototype, "_message", void 0);
 __decorate([
     query("input")
-], AudioInputRecorderr.prototype, "_input", void 0);
-AudioInputRecorderr = __decorate([
-    customElement("audio-input-recorderr")
-], AudioInputRecorderr);
-export { AudioInputRecorderr };
+], AudioInputRecorder.prototype, "_input", void 0);
+AudioInputRecorder = __decorate([
+    customElement("audio-input-recorder")
+], AudioInputRecorder);
+export { AudioInputRecorder };
 //# sourceMappingURL=AudioInputRecorder.js.map

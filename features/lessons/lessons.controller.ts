@@ -1,5 +1,4 @@
 import type { Request, Response, NextFunction } from "express";
-import { pool } from "../../pool.ts";
 import { format } from "node-pg-format";
 import { Lesson } from "./lessons.model.ts";
 import { createLessonStore, postLessonService } from "./lessons.service.ts";
@@ -7,6 +6,7 @@ import type {
   LessonIdParams,
 } from "../../shared.types.ts";
 import { dirname } from "../../dirNames.ts"
+import { pool } from "../../config/database.config.ts";
 
 export const getLesson = async (
   req: Request<LessonIdParams>,
@@ -123,3 +123,16 @@ export const getAudioFiles = (
 
   res.sendFile("/public/hello.mp3", { root: dirname })
 }
+
+export const createPresignedUrls = async (
+  req: Request<{}, {}, string[]>,
+  res: Response,
+  next: NextFunction) => {
+
+    const filesNames = req.body
+
+    console.log(filesNames)
+
+    // const urls = filesNames.map(filesName=>createSignedUrls(s3client, new putSoundAudio(s3)))
+
+} 

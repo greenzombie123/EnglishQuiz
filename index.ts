@@ -41,6 +41,7 @@ server.use("/components", express.static("components"));
 server.use("/lessons", express.static("public/components"));
 
 // For Lesson Creator Page
+server.use(express.static("public/components/lessonCreater"));
 server.use(express.static("public/components"));
 
 //TODO Only meant for testing. Remove when can!
