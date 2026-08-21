@@ -15,6 +15,7 @@ import "./SlideFieldSet.js";
 import "../MessageDialog.js";
 import "../audio/AudioInput.js";
 const j = { slidetype: "intro", definition: "f", targetword: "f", slideorder: 1, soundurl: "f" };
+const files = [new File(["fefe"], "wow.com"), new File(["ddef"], "hot.webm")];
 let LessonCreator = class LessonCreator extends LitElement {
     constructor() {
         super(...arguments);
@@ -23,7 +24,7 @@ let LessonCreator = class LessonCreator extends LitElement {
         this.groupNameList = [];
         this.slides = [];
         this.slideCount = 0;
-        this.audioFiles = [new File(["fefe"], "wow.com"), new File(["ddef"], "hot.webm")];
+        this.audioFiles = [];
     }
     static { this.styles = css `
             h1 {
@@ -206,36 +207,67 @@ let LessonCreator = class LessonCreator extends LitElement {
         </form>
     `;
     }
-    async connectedCallback() {
-        super.connectedCallback();
-        await this.getLesson();
+    async firstUpdated(_changedProperties) {
+        if (this.lessonId) {
+            await this.getLesson(this.lessonId);
+        }
         await this.getGroupNames();
     }
-    async getAudioFiles() {
+    async getAudioFiles(lessonId) {
+        const response = await fetch(`/lessons/audiofiles/${lessonId}`);
+        const audioItems = await response.json();
+        return await Promise.all(audioItems.map(async (audioItem) => {
+            const response = await fetch(audioItem.url);
+            const blob = await response.blob();
+            const file = new File([blob], audioItem.fileName);
+            return file;
+        }));
     }
-    async putAudioFiles() {
+    async sendAudioFiles(audioItems, audioFiles) {
+        if (!audioFiles.length)
+            return;
+        const audioItemMap = new Map();
+        audioItems.forEach(audioItem => {
+            audioItemMap.set(audioItem.fileName, audioItem.url);
+        });
+        const fileAndUrls = [];
+        audioFiles.forEach(audioFile => {
+            const url = audioItemMap.get(audioFile.name);
+            if (url) {
+                const file = audioFile;
+                const fileAndUrl = { url, file };
+                fileAndUrls.push(fileAndUrl);
+            }
+        });
+        await Promise.all(fileAndUrls.map(async (fileAndUrl) => {
+            await fetch(fileAndUrl.url, {
+                method: "PUT",
+                body: fileAndUrl.file
+            });
+        }));
     }
-    async createPresignedUrls(audioFiles) {
-        const fileNames = audioFiles.map(audioFile => audioFile.name);
-        console.log(fileNames);
-        const response = await fetch("/lessons/audiofiles/put", {
+    async createPresignedUrls(audioFiles, lessonId, slides) {
+        const soundUrls = new Set(slides.map(slide => slide.soundurl));
+        const soundUrlsToSend = [];
+        audioFiles.forEach(audioFile => {
+            if (soundUrls.has(audioFile.name))
+                soundUrlsToSend.push(audioFile.name);
+            console.log(audioFiles.map(g => g.name), slides.map(slide => slide.soundurl));
+        });
+        if (!soundUrlsToSend.length)
+            return [];
+        const response = await fetch("/lessons/audiofiles", {
             method: "POST",
-            body: JSON.stringify(fileNames),
+            body: JSON.stringify({ fileNames: soundUrlsToSend, lessonId }),
             headers: {
                 "Content-Type": "application/json"
             }
         });
-        const urls = await response.json();
-        const audioFilesWithUrls = [];
-        urls.forEach((url, index) => {
-            if (audioFiles[index]) {
-                audioFilesWithUrls.push({ audioFile: audioFiles[index], url });
-            }
-        });
-        return audioFilesWithUrls;
+        const audioItems = await response.json();
+        return audioItems;
     }
-    async getLesson() {
-        const response = await fetch(`/lessons/get/${this.lessonId}`);
+    async getLesson(lessonId) {
+        const response = await fetch(`/lessons/get/${lessonId}`);
         if (!response.ok)
             return;
         const lesson = await response.json();
@@ -243,22 +275,31 @@ let LessonCreator = class LessonCreator extends LitElement {
         this.groupName = lesson.groupname;
         this.slideCount = lesson.slides.length;
         this.slides = [...lesson.slides];
-        // mock the retrieval of audio files
-        this.audioFiles = createMockAudioFiles(lesson.slides);
+        const soundUrls = this.slides.map(slide => slide.soundurl);
+        if (soundUrls.length) {
+            this.audioFiles = await this.getAudioFiles(lessonId);
+        }
     }
     async sendLesson() {
         //TODO Add feature that tells user that they must create at least one slide before creating lesson
         if (this.slides.length === 0)
             return;
-        //TODO Send files to the bucket
-        // Send file names and retrieve urls
-        const b = await this.createPresignedUrls(this.audioFiles);
-        console.log(b);
-        // Send audio files 
-        // If successful, post lesson
-        // If lesson is not posted successfully, delete files from bucket.
-        return;
-        const lesson = this.createLesson();
+        //TODO Check if there lessonId. Also, flag if lesson is new
+        let lessonId;
+        let isLessonNew;
+        // lesson is not new if its a 0
+        if (this.lessonId) {
+            lessonId = this.lessonId;
+            isLessonNew = false;
+        }
+        else {
+            lessonId = await this.makeLesson(this.lessonName, this.groupName);
+            isLessonNew = true;
+        }
+        const audioItems = await this.createPresignedUrls(this.audioFiles, lessonId, this.slides);
+        if (audioItems.length)
+            await this.sendAudioFiles(audioItems, this.audioFiles);
+        const lesson = this.createLesson(lessonId, isLessonNew);
         const response = await fetch("/lessons/createlesson", {
             method: "POST",
             body: JSON.stringify(lesson),
@@ -266,6 +307,7 @@ let LessonCreator = class LessonCreator extends LitElement {
                 "Content-Type": "application/json"
             }
         });
+        console.log(response.statusText);
         if (!response.ok)
             return;
         this.messageDialog.open({
@@ -274,6 +316,17 @@ let LessonCreator = class LessonCreator extends LitElement {
             buttonText: "Return to the dashboard"
         });
     }
+    async makeLesson(name, groupname) {
+        const response = await fetch("/lessons/createjustlesson", {
+            method: "POST",
+            body: JSON.stringify({ name, groupname }),
+            headers: {
+                "Content-Type": "application/json"
+            }
+        });
+        const lessonId = await response.json();
+        return lessonId;
+    }
     async getGroupNames() {
         const response = await fetch(`/lessons/groupnames`);
         if (!response.ok)
@@ -281,15 +334,16 @@ let LessonCreator = class LessonCreator extends LitElement {
         const groupnames = await response.json();
         this.groupNameList = [...groupnames];
     }
-    createLesson() {
+    createLesson(lessonId, isLessonNew) {
         const intro = this.slides.filter(slide => slide.type === "intro");
         const question = this.slides.filter(slide => slide.type === "question");
         const lesson = {
-            id: this.lessonId,
+            id: lessonId,
             name: this.lessonName,
             groupname: this.groupName,
             intro,
-            question
+            question,
+            isLessonNew
         };
         return lesson;
     }

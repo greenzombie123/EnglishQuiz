@@ -1,6 +1,6 @@
-import { S3Client } from "@aws-sdk/client-s3";
-export { getSignedUrl as createSignedUrls } from "@aws-sdk/s3-request-presigner";
-import { GetObjectCommand, PutObjectCommand} from "@aws-sdk/client-s3";
+import { DeleteObjectsCommand, type DeleteObjectsCommandInput, GetObjectCommand, type GetObjectCommandInput, ListObjectsV2Command, type ListObjectsV2Request, S3Client } from "@aws-sdk/client-s3";
+import { PutObjectCommand } from "@aws-sdk/client-s3";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
 import "dotenv/config";
 
@@ -13,6 +13,47 @@ export const s3client = new S3Client({
     endpoint: process.env.ENDPOINT
 })
 
-// export const putAudioFiles = (fileName:string)=>{
-//     return new PutObjectCommand(process.env.BUCKET, )
-// } 
+export const createPresignedUrls = async (fileName: string, lessonId: number) => {
+    const command = new PutObjectCommand({ Bucket: process.env.BUCKET, Key: lessonId + '/' + fileName })
+    return await getSignedUrl(s3client, command)
+}
+
+export const getAudioFileNamesFromStorage = async (lessonId: number) => {
+    const req: ListObjectsV2Request = {
+        Bucket: process.env.BUCKET,
+        Prefix: `${lessonId}/`
+    }
+
+    const listcommand = new ListObjectsV2Command(req)
+
+    const response = await s3client.send(listcommand)
+
+    if (!response.Contents) return new Set<string | undefined>()
+
+    const listofKeys = response.Contents?.map(item => item.Key)
+
+    const set = new Set(listofKeys)
+
+    return set
+}
+
+export const getAudioFileFromStorage = async (lessonId: number, soundUrl: string) => {
+    const input: GetObjectCommandInput = { Bucket: process.env.BUCKET, Key: `${lessonId}/${soundUrl}` }
+    const command = new GetObjectCommand(input)
+
+    return await getSignedUrl(s3client, command)
+}
+
+export const deleteAudioFilesFromStorage = async (lessonId: number, soundUrls: string[]) => {
+
+    const toBeDeleted: DeleteObjectsCommandInput = {
+        Bucket: process.env.BUCKET,
+        Delete: {
+            Objects: soundUrls.map(soundUrl => ({ Key: `${lessonId}/${soundUrl}` }))
+        }
+    }
+
+    const command = new DeleteObjectsCommand(toBeDeleted)
+
+    return await s3client.send(command)
+}

@@ -39,6 +39,17 @@ export class IntroSlide extends Slide {
         const queryString = format(`DELETE FROM introslides WHERE id in (%L)`, slideIds);
         return (await p.query(queryString)).rows;
     }; }
+    static { this.getSoundUrls = async (lessonId) => {
+        const { rows } = await pool.query(`
+            SELECT 
+            soundurl
+            FROM introslides
+            INNER JOIN lessons_introslides 
+            ON lessons_introslides.introslideid = introslides.id
+            WHERE lessons_introslides.lessonid = $1
+            `, [lessonId]);
+        return rows.map(row => row.soundurl);
+    }; }
 }
 export class QuestionSlide extends Slide {
     constructor(sliderorder, question, correctanswer, wronganswer1, wronganswer2, wronganswer3, soundurl) {
@@ -83,6 +94,17 @@ export class QuestionSlide extends Slide {
         let p = client ? client : pool;
         const queryString = format(`DELETE FROM introslides WHERE id in (%L)`, slideIds);
         return (await p.query(queryString)).rows;
+    }; }
+    static { this.getSoundUrls = async (lessonId) => {
+        const { rows } = await pool.query(`
+            SELECT 
+            soundurl
+            FROM questionslides
+            INNER JOIN lessons_questionslides
+            ON lessons_questionslides.questionslideid = questionslides.id
+            WHERE lessons_questionslides.lessonid = $1
+            `, [lessonId]);
+        return rows.map(row => row.soundurl);
     }; }
 }
 export class Lesson {
@@ -153,7 +175,16 @@ export class Lesson {
         const queryString = format(`UPDATE lessons SET (name, groupname) = (%L, %L) WHERE id = %L`, name, groupname, lessonId);
         await p.query(queryString);
     }; }
-    static { this.delete = async (lessonId, client) => {
+    static { this.getSoundUrls = async (lessonId) => {
+        const introSlideSoundUrls = await IntroSlide.getSoundUrls(lessonId);
+        const questionSlideSoundUrls = await QuestionSlide.getSoundUrls(lessonId);
+        const soundurls = [...introSlideSoundUrls, ...questionSlideSoundUrls].filter(soundUrl => soundUrl);
+        // Remove duplicates
+        return [...new Set(soundurls)];
+    }; }
+    static { this.delete = async (lessonId) => {
+        const queryString = format("DELETE FROM lessons WHERE id = %L", lessonId);
+        await pool.query(queryString);
     }; }
 }
 export class LessonSlideData {

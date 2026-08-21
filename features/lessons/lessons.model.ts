@@ -67,6 +67,19 @@ export class IntroSlide extends Slide {
 
         return (await p.query<IntroSlideData>(queryString)).rows
     }
+
+    static getSoundUrls = async (lessonId: number) => {
+        const { rows } = await pool.query<IntroSlideData>(`
+            SELECT 
+            soundurl
+            FROM introslides
+            INNER JOIN lessons_introslides 
+            ON lessons_introslides.introslideid = introslides.id
+            WHERE lessons_introslides.lessonid = $1
+            `, [lessonId]);
+
+        return rows.map(row => row.soundurl)
+    }
 }
 
 export type QuestionSlideData = InstanceType<typeof QuestionSlide>
@@ -136,6 +149,19 @@ export class QuestionSlide extends Slide {
         const queryString = format(`DELETE FROM introslides WHERE id in (%L)`, slideIds)
 
         return (await p.query<QuestionSlideData>(queryString)).rows
+    }
+
+    static getSoundUrls = async (lessonId: number) => {
+        const { rows } = await pool.query<QuestionSlideData>(`
+            SELECT 
+            soundurl
+            FROM questionslides
+            INNER JOIN lessons_questionslides
+            ON lessons_questionslides.questionslideid = questionslides.id
+            WHERE lessons_questionslides.lessonid = $1
+            `, [lessonId]);
+
+        return rows.map(row => row.soundurl)
     }
 }
 
@@ -243,8 +269,19 @@ export class Lesson {
         await p.query(queryString)
     }
 
-    static delete = async (lessonId: number, client?: PoolClient) => {
+    static getSoundUrls = async (lessonId: number) => {
+        const introSlideSoundUrls = await IntroSlide.getSoundUrls(lessonId)
+        const questionSlideSoundUrls = await QuestionSlide.getSoundUrls(lessonId)
 
+        const soundurls = [...introSlideSoundUrls, ...questionSlideSoundUrls].filter(soundUrl => soundUrl)
+
+        // Remove duplicates
+        return [...new Set(soundurls)]
+    }
+
+    static delete = async (lessonId: number|string) => {
+        const queryString = format("DELETE FROM lessons WHERE id = %L", lessonId);
+        await pool.query(queryString);
     }
 }
 

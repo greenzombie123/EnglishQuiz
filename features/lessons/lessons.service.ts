@@ -1,4 +1,5 @@
 import { pool } from "../../config/database.config.ts"
+import { deleteAudioFilesFromStorage, getAudioFileFromStorage, getAudioFileNamesFromStorage } from "../../config/s3client.config.ts";
 import { User } from "../users/Users.model.ts";
 import { IntroSlide, Lesson, LessonSlideData, QuestionSlide, type LessonData } from "./lessons.model.ts";
 import type { LessonStore, PostLessonArg, PostLessonFunc, PostLessonResult } from "./lessons.types.ts";
@@ -22,7 +23,7 @@ export const createLessonStore = (lessons: LessonData[]) => {
 }
 
 // Insert lesson, lessonslidedata, and slides into database
-export const postLessonService = async (teacherUsername: string, postLessonArg: PostLessonArg): Promise<PostLessonResult> => {
+export const postLessonService = async (isLessonNew: boolean, postLessonArg: PostLessonArg): Promise<PostLessonResult> => {
   const client = await pool.connect()
 
   let postLessonResult: PostLessonResult
@@ -30,51 +31,26 @@ export const postLessonService = async (teacherUsername: string, postLessonArg: 
   try {
     await client.query("BEGIN");
 
-    const teacher = await User.findByUserName(teacherUsername, "teacher", client)
+    const { lessonId, name, groupname, introSlides, questionSlides } = postLessonArg
 
-    if (!teacher) throw new Error("Can't find teacher")
+    if (!isLessonNew) {
 
-    let lessonId: number | "" | undefined = postLessonArg.lessonId
-
-    // If new lesson, post the new lesson
-    if (!lessonId) {
-      lessonId = await Lesson.post(postLessonArg.name, postLessonArg.groupname, teacher.id, client)
-      if (!lessonId) throw new Error("Couldn't post new lesson")
-
-      if (postLessonArg.introSlides && postLessonArg.introSlides.length) {
-        const IntroSlideIds = await IntroSlide.post(postLessonArg.introSlides, client)
-        await LessonSlideData.post(lessonId, IntroSlideIds, "intro", client)
-      }
-
-      if (postLessonArg.questionSlides && postLessonArg.questionSlides.length) {
-        const questionSlideIds = await QuestionSlide.post(postLessonArg.questionSlides, client)
-        await LessonSlideData.post(lessonId, questionSlideIds, "question", client)
-      }
-    }
-
-    // If not a new lesson, update the old one
-    else {
-
-      await Lesson.update(lessonId, postLessonArg.name, postLessonArg.groupname, client)
+      await Lesson.update(lessonId, name, groupname, client)
 
       await IntroSlide.delete(lessonId, client)
 
-      if (postLessonArg.introSlides.length) {
-        const IntroSlideIds = await IntroSlide.post(postLessonArg.introSlides, client)
-        await LessonSlideData.post(lessonId, IntroSlideIds, "intro", client)
-      }
-
-
       await QuestionSlide.delete(lessonId, client)
-      
-      if (postLessonArg.questionSlides.length) {
-        const questionSlideIds = await QuestionSlide.post(postLessonArg.questionSlides, client)
-        await LessonSlideData.post(lessonId, questionSlideIds, "question", client)
-      }
-
     }
 
+    if (introSlides.length) {
+      const IntroSlideIds = await IntroSlide.post(introSlides, client)
+      await LessonSlideData.post(lessonId, IntroSlideIds, "intro", client)
+    }
 
+    if (questionSlides.length) {
+      const questionSlideIds = await QuestionSlide.post(questionSlides, client)
+      await LessonSlideData.post(lessonId, questionSlideIds, "question", client)
+    }
 
     await client.query("COMMIT");
 
@@ -91,4 +67,29 @@ export const postLessonService = async (teacherUsername: string, postLessonArg: 
     client.release()
   }
   return postLessonResult
+}
+
+export const areAudioFilesStored = async (soundUrls: string[], lessonId: number): Promise<boolean> => {
+
+  const keyList = await getAudioFileNamesFromStorage(lessonId)
+
+  const clientSoundUrls = soundUrls.map(soundUrl => `${lessonId}/${soundUrl}`)
+
+  return clientSoundUrls.some(soundUrl => keyList.has(soundUrl))
+}
+
+export const getAudioUrlsService = async (lessonId: number, fileNames: string[]): Promise<{ fileName: string, url: string }[]> => {
+  const audioItems = fileNames.map(async (fileName) => {
+    const url = await getAudioFileFromStorage(lessonId, fileName)
+
+    return { fileName, url }
+  })
+
+  return Promise.all(audioItems)
+}
+
+export const deleteLessonAndAudio = async (lessonId:number)=>{
+  await Lesson.delete(lessonId)
+  const soundUrls = await Lesson.getSoundUrls(lessonId)
+  await deleteAudioFilesFromStorage(lessonId, soundUrls)
 }

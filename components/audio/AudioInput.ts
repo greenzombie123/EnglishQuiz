@@ -1,4 +1,3 @@
-import { lesssonCreaterStore } from "../store/LessonCreaterStore.ts";
 import "./AudioInputTab.ts";
 import "./AudioInputRecorder.ts";
 
@@ -69,7 +68,7 @@ export class AudioInput extends LitElement {
   @property({ type: Array })
   audioFiles: File[] = []
 
-  @query("audio-input-recorderr")
+  @query("audio-input-recorder")
   audioInputRecorder?: AudioInputRecorder
 
   @query("input")

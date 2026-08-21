@@ -113,7 +113,7 @@ __decorate([
     property({ type: Array })
 ], AudioInput.prototype, "audioFiles", void 0);
 __decorate([
-    query("audio-input-recorderr")
+    query("audio-input-recorder")
 ], AudioInput.prototype, "audioInputRecorder", void 0);
 __decorate([
     query("input")

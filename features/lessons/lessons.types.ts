@@ -25,7 +25,7 @@ export interface PostLessonFunc {
 export interface PostLessonArg {
   name: string
   groupname: string
-  lessonId: number | "",
+  lessonId: number,
   introSlides: IntroSlide[]
   questionSlides: QuestionSlide[]
 }
