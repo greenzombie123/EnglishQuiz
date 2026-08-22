@@ -4,7 +4,6 @@ import { choose } from "lit/directives/choose.js";
 import {SlideChanged, SlideDeleted, SlideOrderChanged } from "./types.ts";
 import { ifDefined } from "lit/directives/if-defined.js";
 import { MoveButtonState } from "./LessonCreator.ts";
-import { live } from "lit/directives/live.js";
 import { IntroSlideData, QuestionSlideData, SlideData } from "../types.ts";
 
 @customElement("slide-fieldset")

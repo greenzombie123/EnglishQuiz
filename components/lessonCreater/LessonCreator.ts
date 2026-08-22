@@ -338,7 +338,7 @@ export class LessonCreator extends LitElement {
         if (this.slides.length === 0) return
 
         //TODO Check if there lessonId. Also, flag if lesson is new
-        let lessonId:number
+        let lessonId: number
         let isLessonNew: boolean
 
         // lesson is not new if its a 0
@@ -524,7 +524,13 @@ export class LessonCreator extends LitElement {
 
         const userResponse = await this.messageDialog.getUserResponse({ text: `Delete this recording: ${deletedFileName} ?`, link: undefined })
 
-        if (userResponse.response === "Yes") this.audioFiles = this.audioFiles.filter(audioFile => audioFile.name !== deletedFileName)
+        if (userResponse.response === "Yes") {
+            this.audioFiles = this.audioFiles.filter(audioFile => audioFile.name !== deletedFileName)
+            this.slides = this.slides.map(slide => {
+                if (slide.soundurl === deletedFileName) return { ...slide, soundurl: "" }
+                return { ...slide }
+            })
+        }
     }
 
     private stateChangedHandler(e: CustomEvent<StateChanged>) {

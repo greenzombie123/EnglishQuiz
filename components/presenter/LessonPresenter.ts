@@ -1,8 +1,7 @@
 import { LitElement, html, css } from "lit";
 import { customElement, property, state } from "lit/decorators.js"
-import { cache } from 'lit/directives/cache.js'
 import "./Slide.ts"
-import type { Lesson, SlideData } from "../types.ts";
+import type { Lesson } from "../types.ts";
 import type { LessonSlide, UserActed } from "./types.ts"
 
 type LessonState = "loading" | "error" | "finished" | "lessonLoaded" | "start"
@@ -58,7 +57,6 @@ export class LessonPresenter extends LitElement {
         const slides = await this.getSlidesWithAudio(lesson)
         this.lesson = lesson
         this.slides = slides
-        console.log(this.slides)
         this.status = "lessonLoaded"
     }
 
@@ -111,27 +109,29 @@ export class LessonPresenter extends LitElement {
     //TODO Implement S3 functionalality later
     private async getSlidesWithAudio(lesson: Lesson) {
 
-        const { slides } = lesson
+        const { slides, id } = lesson
 
-        const slidesWithAudio = await Promise.all<LessonSlide>(slides.map<Promise<LessonSlide>>(async slide => {
-            const res = await fetch("/lessons/audiofiles")
-            const sound = await res.blob()
+        let lessonSlides
 
-            if (slide.type === "intro") {
-                const { targetword, definition, slideorder, type } = slide
+        const response = await fetch(`/lessons/audiofiles/${id}`)
 
-                return { targetword, definition, slideorder, type, sound }
+        const audioItems: { fileName: string, url: string }[] = await response.json()
+
+        const audioItemsMap = new Map<string, string>()
+
+        audioItems.forEach(audioItem => audioItemsMap.set(audioItem.fileName, audioItem.url))
+
+        lessonSlides = slides.map<Promise<LessonSlide>>(async (slide) => {
+            const url = audioItemsMap.get(slide.soundurl)
+            if (url) {
+                const response = await fetch(url)
+                const blob = await response.blob()
+                return { ...slide, sound: blob }
             }
+            else return { ...slide, sound: null }
+        })
 
-            // if slideType is "question"
-            else {
-                const { question, correctanswer, wronganswer1, wronganswer2, wronganswer3, slideorder, type } = slide
-
-                return { question, correctanswer, wronganswer1, wronganswer2, wronganswer3, slideorder, type, sound }
-            }
-        }))
-
-        return slidesWithAudio
+        return await Promise.all(lessonSlides)
     }
 
     private userCorrectHandler = () => {

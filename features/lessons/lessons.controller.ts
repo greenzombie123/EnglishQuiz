@@ -166,8 +166,6 @@ export const getAudioFileUrls = async (
 
   const fileNames = await Lesson.getSoundUrls(id)
 
-  console.log(fileNames)
-
   const audioItems = await getAudioUrlsService(id, fileNames)
 
   res.send(audioItems)

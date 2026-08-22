@@ -61,7 +61,6 @@ let LessonPresenter = class LessonPresenter extends LitElement {
         const slides = await this.getSlidesWithAudio(lesson);
         this.lesson = lesson;
         this.slides = slides;
-        console.log(this.slides);
         this.status = "lessonLoaded";
     }
     errorTemplate() {
@@ -102,21 +101,23 @@ let LessonPresenter = class LessonPresenter extends LitElement {
     }
     //TODO Implement S3 functionalality later
     async getSlidesWithAudio(lesson) {
-        const { slides } = lesson;
-        const slidesWithAudio = await Promise.all(slides.map(async (slide) => {
-            const res = await fetch("/lessons/audiofiles");
-            const sound = await res.blob();
-            if (slide.type === "intro") {
-                const { targetword, definition, slideorder, type } = slide;
-                return { targetword, definition, slideorder, type, sound };
+        const { slides, id } = lesson;
+        let lessonSlides;
+        const response = await fetch(`/lessons/audiofiles/${id}`);
+        const audioItems = await response.json();
+        const audioItemsMap = new Map();
+        audioItems.forEach(audioItem => audioItemsMap.set(audioItem.fileName, audioItem.url));
+        lessonSlides = slides.map(async (slide) => {
+            const url = audioItemsMap.get(slide.soundurl);
+            if (url) {
+                const response = await fetch(url);
+                const blob = await response.blob();
+                return { ...slide, sound: blob };
             }
-            // if slideType is "question"
-            else {
-                const { question, correctanswer, wronganswer1, wronganswer2, wronganswer3, slideorder, type } = slide;
-                return { question, correctanswer, wronganswer1, wronganswer2, wronganswer3, slideorder, type, sound };
-            }
-        }));
-        return slidesWithAudio;
+            else
+                return { ...slide, sound: null };
+        });
+        return await Promise.all(lessonSlides);
     }
     userWrongHandler() {
         // if the question slide is the first slide, force an update to reshuffle the questions

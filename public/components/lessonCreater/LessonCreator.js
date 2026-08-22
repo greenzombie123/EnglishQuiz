@@ -434,8 +434,14 @@ let LessonCreator = class LessonCreator extends LitElement {
     async audioFileDeletedHandler(state) {
         const deletedFileName = state.name;
         const userResponse = await this.messageDialog.getUserResponse({ text: `Delete this recording: ${deletedFileName} ?`, link: undefined });
-        if (userResponse.response === "Yes")
+        if (userResponse.response === "Yes") {
             this.audioFiles = this.audioFiles.filter(audioFile => audioFile.name !== deletedFileName);
+            this.slides = this.slides.map(slide => {
+                if (slide.soundurl === deletedFileName)
+                    return { ...slide, soundurl: "" };
+                return { ...slide };
+            });
+        }
     }
     stateChangedHandler(e) {
         const newState = e.detail;

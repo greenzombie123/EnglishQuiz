@@ -38,10 +38,11 @@ let AudioInputTab = class AudioInputTab extends LitElement {
         if (!this.audioFile)
             throw new Error("Expected an audio file but was not found");
         this.blobUrl = URL.createObjectURL(this.audioFile);
-        this.fileName = removeExtention(this.audioFile.name);
+        this.fileName = this.audioFile.name;
+        const fileName = removeExtention(this.audioFile.name);
         return html `
        <div class="audio_input_tab">
-            <span>${this.fileName}</span>
+            <span>${fileName}</span>
             <!-- Add images later -->
             <button type="button" class="play" @click=${this.handlePlayAudio}>P</button>
             <button type="button" class="delete" @click=${this.handleDeleteAudio}>D</button>
