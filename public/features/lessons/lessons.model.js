@@ -1,9 +1,9 @@
 import { pool } from "../../config/database.config.js";
-import { Slide } from "./lessons.types.js";
+import { BaseSlide } from "./lessons.types.js";
 import { format } from "node-pg-format";
-export class IntroSlide extends Slide {
-    constructor(sliderorder, targetword, definition, soundurl) {
-        super(sliderorder, "intro", soundurl);
+export class IntroSlide extends BaseSlide {
+    constructor(sliderorder, targetword, definition, lessonid, id, action) {
+        super(sliderorder, lessonid, id, action);
         this.type = "intro";
         this.targetword = targetword;
         this.definition = definition;
@@ -15,45 +15,66 @@ export class IntroSlide extends Slide {
             definition,
             slideorder,
             type,
-            soundurl
+            lessonid,
+            id
             FROM introslides
-            INNER JOIN lessons_introslides 
-            ON lessons_introslides.introslideid = introslides.id
-            WHERE lessons_introslides.lessonid = $1
+            WHERE lessonid = $1
             `, [lessonId]);
-        return rows.length ? rows : [];
+        if (!rows.length)
+            return [];
+        const action = "update";
+        const slides = rows.map(async (row) => {
+            const introslideid = row.id;
+            const { rows } = await pool.query(`SELECT recordingid FROM introslide_recordings WHERE introslideid = $1`, [introslideid]);
+            const recordings = rows.map(row => row.recordingid);
+            return { ...row, lessonid: Number(row.lessonid), action, recordings };
+        });
+        return await Promise.all(slides);
     }; }
-    static { this.post = async (introSlides, client) => {
+    static { this.post = async (introSlide, lessonId, client) => {
         let p = client ? client : pool;
-        const queryString = createIntroSlideQueryString(introSlides);
-        const { rows: ids } = await p.query(queryString);
-        return ids.map(id => id.id);
+        await p.query(`
+            INSERT INTO introslides 
+            (targetword, definition, slideorder, lessonid, id)
+            VALUES($1, $2, $3, $4, $5)
+        `, [introSlide.targetword, introSlide.definition, introSlide.slideorder, lessonId, introSlide.id]);
+        if (introSlide.recordings.length) {
+            const slideRecordings = introSlide.recordings.map(recording => [introSlide.id, recording]);
+            const queryString = format(`INSERT INTO introslide_recordings (introslideid, recordingid) VALUES %L`, slideRecordings);
+            await p.query(queryString);
+        }
     }; }
-    static { this.delete = async (lessonId, client = pool) => {
+    static { this.update = async (introSlide, client) => {
         let p = client ? client : pool;
-        const queryString = format(`DELETE FROM introslides WHERE id in (SELECT introslideid FROM lessons_introslides WHERE lessonid = %L)`, lessonId);
+        await p.query(`
+            UPDATE introslides 
+                SET 
+                    targetword = $1,
+                    definition = $2,
+                    slideorder = $3
+                WHERE id = $4
+        `, [introSlide.targetword, introSlide.definition, introSlide.slideorder, introSlide.id]);
+        await p.query(`DELETE FROM introslide_recordings WHERE introslideid = $1`, [introSlide.id]);
+        if (introSlide.recordings.length) {
+            const slideRecordings = introSlide.recordings.map(recording => [introSlide.id, recording]);
+            const queryString = format(`INSERT INTO introslide_recordings (introslideid, recordingid) VALUES %L`, slideRecordings);
+            await p.query(queryString);
+        }
+    }; }
+    static { this.deleteAll = async (lessonId, client) => {
+        let p = client ? client : pool;
+        const queryString = format(`DELETE FROM introslides WHERE lessonid = %L`, lessonId);
         await p.query(queryString);
     }; }
-    static { this.deleteById = async (slideIds, client) => {
+    static { this.deleteById = async (id, client) => {
         let p = client ? client : pool;
-        const queryString = format(`DELETE FROM introslides WHERE id in (%L)`, slideIds);
-        return (await p.query(queryString)).rows;
-    }; }
-    static { this.getSoundUrls = async (lessonId) => {
-        const { rows } = await pool.query(`
-            SELECT 
-            soundurl
-            FROM introslides
-            INNER JOIN lessons_introslides 
-            ON lessons_introslides.introslideid = introslides.id
-            WHERE lessons_introslides.lessonid = $1
-            `, [lessonId]);
-        return rows.map(row => row.soundurl);
+        const queryString = format(`DELETE FROM introslides WHERE id = %L`, id);
+        await p.query(queryString);
     }; }
 }
-export class QuestionSlide extends Slide {
-    constructor(sliderorder, question, correctanswer, wronganswer1, wronganswer2, wronganswer3, soundurl) {
-        super(sliderorder, "question", soundurl);
+export class QuestionSlide extends BaseSlide {
+    constructor(sliderorder, question, correctanswer, wronganswer1, wronganswer2, wronganswer3, lessonid, id, action) {
+        super(sliderorder, lessonid, id, action);
         this.type = "question";
         this.question = question;
         this.correctanswer = correctanswer;
@@ -71,43 +92,91 @@ export class QuestionSlide extends Slide {
             wronganswer3,
             slideorder,
             type,
-            soundurl
+            lessonid,
+            id
             FROM questionslides
-            INNER JOIN lessons_questionslides
-            ON lessons_questionslides.questionslideid = questionslides.id
-            WHERE lessons_questionslides.lessonid = $1
+            WHERE lessonid = $1
             `, [lessonId]);
-        return rows.length ? rows : [];
+        if (!rows.length)
+            return [];
+        const action = "update";
+        const slides = rows.map(async (row) => {
+            const questionslideid = row.id;
+            const { rows } = await pool.query(`SELECT recordingid FROM questionslide_recordings WHERE questionslideid = $1`, [questionslideid]);
+            const recordings = rows.map(row => row.recordingid);
+            return { ...row, lessonid: Number(row.lessonid), action, recordings };
+        });
+        return await Promise.all(slides);
     }; }
-    static { this.post = async (questionSlides, client) => {
+    // static post = async (questionSlides: QuestionSlide[], client?: PoolClient): Promise<number[]> => {
+    //     let p = client ? client : pool
+    //     const queryString = createQuestionSlideQueryString(questionSlides)
+    //     const { rows: ids } = await p.query<{ id: number }>(queryString)
+    //     return ids.map(id => id.id)
+    // }
+    static { this.post = async (questionSlide, lessonId, client) => {
         let p = client ? client : pool;
-        const queryString = createQuestionSlideQueryString(questionSlides);
-        const { rows: ids } = await p.query(queryString);
-        return ids.map(id => id.id);
+        await p.query(`
+            INSERT INTO questionslides 
+            (question, correctanswer, wronganswer1, wronganswer2, wronganswer3, slideorder, lessonid, id)
+            VALUES($1, $2, $3, $4, $5, $6, $7, $8)
+        `, [
+            questionSlide.question,
+            questionSlide.correctanswer,
+            questionSlide.wronganswer1,
+            questionSlide.wronganswer2,
+            questionSlide.wronganswer3,
+            questionSlide.slideorder,
+            lessonId,
+            questionSlide.id
+        ]);
+        if (questionSlide.recordings.length) {
+            const slideRecordings = questionSlide.recordings.map(recording => [questionSlide.id, recording]);
+            const queryString = format(`INSERT INTO questionslide_recordings (questionslideid, recordingid) VALUES %L`, slideRecordings);
+            await p.query(queryString);
+        }
     }; }
-    static { this.delete = async (lessonId, client = pool) => {
+    static { this.update = async (questionSlide, client) => {
         let p = client ? client : pool;
-        const queryString = format(`DELETE FROM questionslides WHERE id in (SELECT questionslideid FROM lessons_questionslides WHERE lessonid = %L)`, lessonId);
+        await p.query(`
+            UPDATE questionslides 
+                SET 
+                    question = $1,
+                    correctanswer = $2,
+                    wronganswer1 = $3,
+                    wronganswer2 = $4,
+                    wronganswer3 = $5,
+                    slideorder = $6
+                WHERE id = $7
+        `, [
+            questionSlide.question,
+            questionSlide.correctanswer,
+            questionSlide.wronganswer1,
+            questionSlide.wronganswer2,
+            questionSlide.wronganswer3,
+            questionSlide.slideorder,
+            questionSlide.id
+        ]);
+        await p.query(`DELETE FROM questionslide_recordings WHERE questionslideid = $1`, [questionSlide.id]);
+        if (questionSlide.recordings.length) {
+            const slideRecordings = questionSlide.recordings.map(recording => [questionSlide.id, recording]);
+            const queryString = format(`INSERT INTO questionslide_recordings (questionslideid, recordingid) VALUES %L`, slideRecordings);
+            await p.query(queryString);
+        }
+    }; }
+    static { this.deleteAll = async (lessonId, client) => {
+        let p = client ? client : pool;
+        const queryString = format(`DELETE FROM questionslides WHERE lessonid = %L`, lessonId);
         await p.query(queryString);
     }; }
-    static { this.deleteById = async (slideIds, client) => {
+    static { this.deleteById = async (id, client) => {
         let p = client ? client : pool;
-        const queryString = format(`DELETE FROM introslides WHERE id in (%L)`, slideIds);
-        return (await p.query(queryString)).rows;
-    }; }
-    static { this.getSoundUrls = async (lessonId) => {
-        const { rows } = await pool.query(`
-            SELECT 
-            soundurl
-            FROM questionslides
-            INNER JOIN lessons_questionslides
-            ON lessons_questionslides.questionslideid = questionslides.id
-            WHERE lessons_questionslides.lessonid = $1
-            `, [lessonId]);
-        return rows.map(row => row.soundurl);
+        const queryString = format(`DELETE FROM questionslides WHERE id = %L`, id);
+        await p.query(queryString);
     }; }
 }
 export class Lesson {
+    // classid:number
     constructor(name, groupname, id) {
         this.id = undefined;
         this.slides = [];
@@ -119,10 +188,15 @@ export class Lesson {
         const { rows } = await pool.query("SELECT name, groupname FROM lessons WHERE id=$1", [lessonId]);
         return rows[0] ? true : false;
     }; }
-    static { this.getLessonsDataByTeacher = async (teacherId) => {
-        const { rows } = await pool.query("SELECT name, groupname FROM lessons WHERE teacherid=$1", [teacherId]);
-        return rows;
-    }; }
+    //TODO change to getLessonsDataByClass
+    // static getLessonsDataByTeacher = async (teacherId: string) => {
+    //     const { rows } = await pool.query<LessonData>(
+    //         "SELECT name, groupname FROM lessons WHERE teacherid=$1",
+    //         [teacherId],
+    //     )
+    //     return rows
+    // }
+    //TODO Change students later
     static { this.getAllLessonDataByUserName = async (username, userType) => {
         let queryString;
         if (userType === "student") {
@@ -135,19 +209,21 @@ export class Lesson {
         }
         else
             queryString = `SELECT lessons.name, lessons.id, lessons.groupname FROM lessons
+                    INNER JOIN classes
+                    ON lessons.classid = classes.id 
                     INNER JOIN teachers
-                    ON lessons.teacherid = teachers.id
-                    WHERE teachers.username = $1`;
+                    on teachers.id = classes.teacherid
+                    WHERE teachers.username = $1
+                    `;
         const { rows } = await pool.query(queryString, [username]);
         return rows;
     }; }
     static { this.getLessonById = async (id) => {
         const { rows: lessonData } = await pool.query("SELECT name, groupname, id FROM lessons WHERE id=$1", [id]);
         let lesson;
-        if (lessonData[0])
-            lesson = lessonData[0];
-        else
+        if (!lessonData[0])
             return undefined;
+        lesson = lessonData[0];
         const questionSlides = await QuestionSlide.get(id);
         const introSlides = await IntroSlide.get(id);
         const sortedSlides = sortSlides([...questionSlides, ...introSlides]);
@@ -155,50 +231,51 @@ export class Lesson {
             name: lesson.name,
             groupname: lesson.groupname,
             id: id,
-            slides: sortedSlides
+            slides: sortedSlides,
         };
     }; }
     static { this.getAllGroupNamesByTeacher = async (username) => {
         const { rows } = await pool.query(`select distinct groupname from lessons where groupname <> '' 
-                and teacherid = (select id from teachers where username = $1);
+                and classid = (select classes.id from classes 
+                    join teachers
+                    on teachers.id = classes.teacherid
+                    where teachers.username = $1);
             `, [username]);
         if (!rows.length)
             return [];
         return rows.map(row => row.groupname);
     }; }
-    static { this.post = async (name, groupname, teacherId, client) => {
-        const { rows } = await pool.query(`INSERT INTO lessons (name, teacherid, groupname) VALUES('${name}', '${teacherId}', '${groupname}') RETURNING id`);
-        return rows[0] ? rows[0].id : undefined;
+    static { this.post = async (name, groupname, classId, client) => {
+        let p = client ? client : pool;
+        const { rows } = await p.query(`INSERT INTO lessons (name, classid, groupname) VALUES('${name}', '${classId}', '${groupname}') RETURNING id`);
+        if (!rows[0])
+            throw new Error(`Couldn't create lesson because ${rows}`);
+        return rows[0].id;
     }; }
     static { this.update = async (lessonId, name, groupname, client) => {
         let p = client ? client : pool;
         const queryString = format(`UPDATE lessons SET (name, groupname) = (%L, %L) WHERE id = %L`, name, groupname, lessonId);
         await p.query(queryString);
     }; }
-    static { this.getSoundUrls = async (lessonId) => {
-        const introSlideSoundUrls = await IntroSlide.getSoundUrls(lessonId);
-        const questionSlideSoundUrls = await QuestionSlide.getSoundUrls(lessonId);
-        const soundurls = [...introSlideSoundUrls, ...questionSlideSoundUrls].filter(soundUrl => soundUrl);
-        // Remove duplicates
-        return [...new Set(soundurls)];
-    }; }
+    // static getSoundUrls = async (lessonId: number) => {
+    //     const introSlideSoundUrls = await IntroSlide.getSoundUrls(lessonId)
+    //     const questionSlideSoundUrls = await QuestionSlide.getSoundUrls(lessonId)
+    //     const soundurls = [...introSlideSoundUrls, ...questionSlideSoundUrls].filter(soundUrl => soundUrl)
+    //     // Remove duplicates
+    //     return [...new Set(soundurls)]
+    // }
     static { this.delete = async (lessonId) => {
         const queryString = format("DELETE FROM lessons WHERE id = %L", lessonId);
         await pool.query(queryString);
     }; }
-}
-export class LessonSlideData {
-    constructor(lessonId, slideId) {
-        this.lessonId = lessonId;
-        this.slideId = slideId;
-    }
-    static { this.post = async (lessonid, slideIds, slideType, client) => {
+    static { this.getSlideIdsByLessonId = async (lessonId, client) => {
         let p = client ? client : pool;
-        const slideTableType = slideType === "intro" ? "lessons_introslides" : "lessons_questionslides";
-        const slideIdColumnType = slideType === "intro" ? "introslideid" : "questionslideid";
-        const lessonSlideDataArray = slideIds.map(id => [lessonid, id]);
-        const queryString = format(`INSERT INTO ${slideTableType} (lessonid, ${slideIdColumnType}) VALUES %L`, lessonSlideDataArray);
-        await p.query(queryString);
+        const { rows: introRows } = await pool.query(`SELECT id, type FROM introslides WHERE lessonid = $1`, [lessonId]);
+        const { rows: questionRows } = await pool.query(`SELECT id, type FROM questionslides WHERE lessonid = $1`, [lessonId]);
+        const rows = [...introRows, ...questionRows];
+        let ids;
+        ids = rows.map(row => [row.id, row.type]);
+        return ids;
     }; }
 }
 // Spread all slide arrays into one and then sorts them by slideorder
@@ -207,14 +284,14 @@ const sortSlides = (slides) => {
 };
 // Create a query string to insert introslides
 export const createIntroSlideQueryString = (slides) => {
-    const introColumns = ["targetword", "definition", "slideorder", "soundurl"];
+    const introColumns = ["targetword", "definition", "slideorder", "lessonid"];
     const introSlides = slides.map((slide) => [
         slide.targetword,
         slide.definition,
         slide.slideorder,
-        slide.soundurl
+        slide.lessonid
     ]);
-    return format("INSERT INTO introslides (%I) VALUES %L RETURNING id", introColumns, introSlides);
+    return format("INSERT INTO introslides (%I) VALUES %L", introColumns, introSlides);
 };
 // Create a query string to insert questionslides
 export const createQuestionSlideQueryString = (slides) => {
@@ -225,7 +302,7 @@ export const createQuestionSlideQueryString = (slides) => {
         slide.wronganswer2,
         slide.wronganswer3,
         slide.slideorder,
-        slide.soundurl
+        slide.lessonid
     ]);
     const questionColumns = [
         "question",
@@ -234,9 +311,8 @@ export const createQuestionSlideQueryString = (slides) => {
         "wronganswer2",
         "wronganswer3",
         "slideorder",
-        "soundurl"
+        "lessonid"
     ];
-    return format("INSERT INTO questionslides (%I) VALUES %L RETURNING id", questionColumns, questionslides);
+    return format("INSERT INTO questionslides (%I) VALUES %L", questionColumns, questionslides);
 };
-const g = { slides: [], name: "efe", groupname: "fefe", id: 1 };
 //# sourceMappingURL=lessons.model.js.map

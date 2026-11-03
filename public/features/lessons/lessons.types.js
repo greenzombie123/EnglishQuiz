@@ -1,7 +1,10 @@
-export class Slide {
-    constructor(slideorder, type, soundurl) {
+export class BaseSlide {
+    constructor(slideorder, lessonid, id, action) {
+        this.recordings = [];
         this.slideorder = slideorder;
-        this.soundurl = soundurl;
+        this.lessonid = lessonid;
+        this.id = id;
+        this.action = action;
     }
 }
 //# sourceMappingURL=lessons.types.js.map

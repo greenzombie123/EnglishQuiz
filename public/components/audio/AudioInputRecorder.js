@@ -6,10 +6,11 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 };
 import { LitElement, html, css } from "lit";
 import { customElement, property, query, state } from "lit/decorators.js";
+import { v7 as createId } from "uuid";
 let AudioInputRecorder = class AudioInputRecorder extends LitElement {
     constructor() {
         super(...arguments);
-        this.audioFileNames = [];
+        this.fileNames = [];
         this.name = "";
         this.handleSetAudioFile = (event) => {
             if (!this._audio)
@@ -96,7 +97,7 @@ let AudioInputRecorder = class AudioInputRecorder extends LitElement {
     `;
     }
     isNameNew() {
-        const isNameUsed = this.audioFileNames.some(audioFileName => audioFileName === this.name);
+        const isNameUsed = this.fileNames.some(fileName => fileName === this.name);
         return isNameUsed ? false : true;
     }
     resetRecorderState() {
@@ -121,7 +122,7 @@ let AudioInputRecorder = class AudioInputRecorder extends LitElement {
         const option = {
             bubbles: true,
             composed: true,
-            detail: { audioFile: new File([this.blob], this.name + '.webm', { type: this.blob.type }), action: "audioFilesUpdated" }
+            detail: { recording: { id: createId(), name: this.name, key: createId({}), file: new File([this.blob], this.name, { type: "webm" }), url: "", isNew: true }, action: "audioFilesUpdated" }
         };
         this.dispatchEvent(new CustomEvent("stateChanged", option));
         this.handleCloseRecorder();
@@ -201,7 +202,7 @@ let AudioInputRecorder = class AudioInputRecorder extends LitElement {
 };
 __decorate([
     property({ type: Array })
-], AudioInputRecorder.prototype, "audioFileNames", void 0);
+], AudioInputRecorder.prototype, "fileNames", void 0);
 __decorate([
     state()
 ], AudioInputRecorder.prototype, "blob", void 0);

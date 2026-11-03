@@ -1,5 +1,5 @@
 import { pool } from "../../config/database.config.ts";
-import { v4 as createId } from "uuid";
+import { v7 as createId } from "uuid";
 import { Student, Teacher } from "./auth.model.ts";
 import { User } from "../users/Users.model.ts";
 import type { Role } from "../users/Users.types.ts";

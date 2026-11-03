@@ -13,9 +13,26 @@ export const s3client = new S3Client({
     endpoint: process.env.ENDPOINT
 })
 
-export const createPresignedUrls = async (fileName: string, lessonId: number) => {
-    const command = new PutObjectCommand({ Bucket: process.env.BUCKET, Key: lessonId + '/' + fileName })
+export const createPostPresignedUrl = async (key:string) => {
+    const command = new PutObjectCommand({ Bucket: process.env.BUCKET, Key: key})
     return await getSignedUrl(s3client, command)
+}
+
+export const createGetPresignedUrl = async (key:string) => {
+    const input: GetObjectCommandInput = { Bucket: process.env.BUCKET, Key:key }
+    const command = new GetObjectCommand(input)
+
+    return await getSignedUrl(s3client, command)
+}
+
+export const deleteRecordings = async (keys:string[]) => {
+
+    const Keys = keys.map(key=>({Key:key}))
+
+    const input: DeleteObjectsCommandInput = { Bucket: process.env.BUCKET, Delete:{Objects:[...Keys]} }
+    const command = new DeleteObjectsCommand(input)
+
+    await s3client.send(command)
 }
 
 export const getAudioFileNamesFromStorage = async (lessonId: number) => {

@@ -1,4 +1,4 @@
-import { S3Client, ListObjectsCommand, PutObjectCommand, PutBucketCorsCommand, type ListObjectsV2Request, ListObjectsV2Command, GetObjectCommand } from "@aws-sdk/client-s3";
+import { S3Client, ListObjectsCommand, PutObjectCommand, PutBucketCorsCommand, type ListObjectsV2Request, ListObjectsV2Command, GetObjectCommand, type PutBucketCorsCommandInput } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import "dotenv/config";
 import { readFile, writeFile } from "fs/promises";
@@ -15,18 +15,19 @@ async function mainModule() {
         endpoint:process.env.ENDPOINT
     })
 
-    const listobjects = new ListObjectsCommand({Bucket:process.env.BUCKET, Prefix:"2"})
+    // const listobjects = new ListObjectsCommand({Bucket:process.env.BUCKET, Prefix:"2"})
 
-    const get = new GetObjectCommand({
-        Bucket: process.env.BUCKET,
-        Key: "0/wow.com"
-    })
+    // const put = new GetObjectCommand({
+    //     Bucket: process.env.BUCKET,
+    //     Key: "ice.txt"
+    // })
 
     // const n = await readFile("./public/hello.mp3")
 
     // const put = new PutObjectCommand({
     //     Bucket: process.env.BUCKET,
-    //     Key: "icce.txt"
+    //     Key: "BOP.txt",
+    //     Body:"WHY!?!?!?"
     // })
 
     // return getSignedUrl(s3Client, get)
@@ -46,17 +47,27 @@ async function mainModule() {
 
     // const listcommand = new ListObjectsV2Command(listobjects)
 
-    const response = await s3Client.send(listobjects)
+    const option:PutBucketCorsCommandInput = {
+        Bucket:process.env.BUCKET,
+        CORSConfiguration:{
+            CORSRules:[
+                {
+                    AllowedMethods:["PUT", "DELETE", "POST", "GET"],
+                    AllowedHeaders:["*"],
+                    AllowedOrigins:["*"],
+                    MaxAgeSeconds:5000
+                }
+            ]
+        }
+    }
 
-    return response
+    const putBucketCorsCommand = new PutBucketCorsCommand(option)
+
+    const response = await s3Client.send(putBucketCorsCommand)
+
+    console.log(response)
+
+    return
 }
 
-const b = await mainModule()
-
-// const n = await fetch(b)
-
-console.log(b)
-
-
-
-
+await mainModule()

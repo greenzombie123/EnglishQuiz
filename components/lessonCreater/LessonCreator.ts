@@ -7,15 +7,20 @@ import "./SlideSelector.ts"
 import "./SoundSelector.ts"
 import "./SlideFieldSet.ts"
 import "../MessageDialog.ts"
-import { AudioFileDeleted, AudioFilesUpdated, LessonData, LessonDataChanged, SlideAdded, SlideChanged, SlideDeleted, SlideOrderChanged, StateChanged } from "./types.ts"
 import "../audio/AudioInput.ts"
+import { AudioFileDeleted, AudioFilesUpdated, LessonData, LessonDataChanged, SlideAdded, SlideChanged, SlideDeleted, SlideOrderChanged, StateChanged } from "./types.ts"
+
+import { RecordingController } from "./RecordingController.ts"
 
 import type { MessageDialog } from "../MessageDialog.ts"
-import { IntroSlideData, LessonRecord, QuestionSlideData, SlideData } from "../types.ts"
+import { DatabaseAction, IntroSlide, Lesson, LessonSlide, QuestionSlide, Recording } from "../types.ts"
+
+import { v7 as createId } from "uuid"
 
 export type MoveButtonState = "none" | "up" | "down" | "both"
 
-const j = { slidetype: "intro", definition: "f", targetword: "f", slideorder: 1, soundurl: "f" }
+const j: IntroSlide = { type: "intro", definition: "f", targetword: "f", slideorder: 1, id: createId(), lessonid: undefined, action: "add", recordings: [] }
+const pog: QuestionSlide = { type: "question", question: "g", correctanswer: "x", wronganswer1: "b", wronganswer2: "", wronganswer3: "", id: createId(), lessonid: undefined, action: "add", slideorder: 2, recordings: [] }
 const files = [new File(["fefe"], "wow.com"), new File(["ddef"], "hot.webm")]
 
 @customElement("lesson-creator")
@@ -173,12 +178,15 @@ export class LessonCreator extends LitElement {
             }
 `
 
+    private recordingController = new RecordingController(this)
 
     @property({ type: Number })
     lessonId?: number
 
+    tempLessonId = 0
+
     @state()
-    private lessonName = ""
+    private lessonName = "LOL"//""
 
     @state()
     private groupName = ""
@@ -187,13 +195,14 @@ export class LessonCreator extends LitElement {
     private groupNameList: string[] = []
 
     @state()
-    private slides: SlideData[] = []
+    private slides: LessonSlide[] = [j, pog]
+
+    private deleteSlideIds: { id: string, slideType: string }[] = []
 
     @state()
     private slideCount = 0
 
-    @state()
-    private audioFiles: File[] = []
+    classId?: number = undefined
 
     @query("message-dialog")
     messageDialog!: MessageDialog
@@ -212,14 +221,14 @@ export class LessonCreator extends LitElement {
 
                 </div>
 
-                <audio-input .audioFiles=${this.audioFiles}></audio-input>
+                <audio-input .recordings=${this.recordingController.recordings}></audio-input>
 
             </div>
 
             <div class="breakLine" style="width: 100%; border: 2px solid black;"></div>
 
             <!-- FieldSets -->
-            ${map(this.slides, (slide, index) => html`<slide-fieldset moveButtonState=${this.setMoveButtonState(index, this.slides.length)} .slide=${slide} .soundUrls=${this.audioFiles.map(audioFile => audioFile.name)}></slide-fieldset>`)}
+            ${map(this.slides, (slide, index) => html`<slide-fieldset moveButtonState=${this.setMoveButtonState(index, this.slides.length)} .slide=${slide} .recordings=${this.recordingController.recordings}></slide-fieldset>`)}
 
             <slide-selector></slide-selector>
 
@@ -233,84 +242,10 @@ export class LessonCreator extends LitElement {
     protected async firstUpdated(_changedProperties: PropertyValues) {
         if (this.lessonId) {
             await this.getLesson(this.lessonId)
+            //
         }
+        else this.lessonId = undefined
         await this.getGroupNames()
-    }
-
-    private async getAudioFiles(lessonId: number): Promise<File[]> {
-        const response = await fetch(`/lessons/audiofiles/${lessonId}`)
-
-        const audioItems: { fileName: string, url: string }[] = await response.json()
-
-        return await Promise.all(audioItems.map(async (audioItem) => {
-            const response = await fetch(audioItem.url)
-            const blob = await response.blob()
-            const file = new File([blob], audioItem.fileName)
-            return file
-        }))
-    }
-
-
-    private async sendAudioFiles(audioItems: { fileName: string, url: string }[], audioFiles: File[]) {
-
-        if (!audioFiles.length) return
-
-        const audioItemMap = new Map<string, string>()
-
-        audioItems.forEach(audioItem => {
-            audioItemMap.set(audioItem.fileName, audioItem.url)
-        })
-
-        const fileAndUrls: { url: string, file: File }[] = []
-
-        audioFiles.forEach(audioFile => {
-
-            const url = audioItemMap.get(audioFile.name)
-
-            if (url) {
-
-                const file = audioFile
-
-                const fileAndUrl: { url: string, file: File } = { url, file }
-
-                fileAndUrls.push(fileAndUrl)
-            }
-
-        })
-
-        await Promise.all(fileAndUrls.map(async (fileAndUrl) => {
-            await fetch(fileAndUrl.url, {
-                method: "PUT",
-                body: fileAndUrl.file
-            })
-        }))
-    }
-
-    private async createPresignedUrls(audioFiles: File[], lessonId: number, slides: SlideData[]) {
-
-        const soundUrls = new Set(slides.map(slide => slide.soundurl))
-
-        const soundUrlsToSend: string[] = []
-
-        audioFiles.forEach(audioFile => {
-            if (soundUrls.has(audioFile.name)) soundUrlsToSend.push(audioFile.name)
-
-            console.log(audioFiles.map(g => g.name), slides.map(slide => slide.soundurl))
-        })
-
-        if (!soundUrlsToSend.length) return []
-
-        const response = await fetch("/lessons/audiofiles", {
-            method: "POST",
-            body: JSON.stringify({ fileNames: soundUrlsToSend, lessonId }),
-            headers: {
-                "Content-Type": "application/json"
-            }
-        })
-
-        const audioItems: { fileName: string, url: string }[] = await response.json()
-
-        return audioItems
     }
 
     private async getLesson(lessonId: number) {
@@ -319,52 +254,37 @@ export class LessonCreator extends LitElement {
 
         if (!response.ok) return
 
-        const lesson = await response.json() as LessonRecord
+        const lesson = await response.json() as Lesson
 
         this.lessonName = lesson.name
         this.groupName = lesson.groupname
         this.slideCount = lesson.slides.length
         this.slides = [...lesson.slides]
 
-        const soundUrls: string[] = this.slides.map(slide => slide.soundurl)
-
-        if (soundUrls.length) {
-            this.audioFiles = await this.getAudioFiles(lessonId)
-        }
+        this.recordingController.retrieveRecordings(this.slides)
     }
 
     private async sendLesson() {
         //TODO Add feature that tells user that they must create at least one slide before creating lesson
         if (this.slides.length === 0) return
 
-        //TODO Check if there lessonId. Also, flag if lesson is new
-        let lessonId: number
-        let isLessonNew: boolean
+        const recordings = await this.recordingController.prepareRecordings(this.slides)
 
-        // lesson is not new if its a 0
-        if (this.lessonId) {
-            lessonId = this.lessonId
-            isLessonNew = false
-        } else {
-            lessonId = await this.makeLesson(this.lessonName, this.groupName)
-            isLessonNew = true
-        }
+        const lesson = this.createLesson(this.lessonId)
 
-        const audioItems: { fileName: string, url: string }[] = await this.createPresignedUrls(this.audioFiles, lessonId, this.slides)
+        await this.recordingController.processUnattachedRecordingsForDeletion(this.slides)
+        await this.recordingController.deleteRecordingFromStorage()
+        await this.recordingController.deleteRecordingsFromDatabase()
 
-        if (audioItems.length) await this.sendAudioFiles(audioItems, this.audioFiles)
+        await this.recordingController.sendRecordingsToStorage(recordings)
+        await this.recordingController.sendRecordingsToDatabase(recordings)
 
-        const lesson = this.createLesson(lessonId, isLessonNew)
-
+        // Add or update lesson in database
         const response = await fetch("/lessons/createlesson", {
             method: "POST",
             body: JSON.stringify(lesson),
-            headers: {
-                "Content-Type": "application/json"
-            }
+            headers: { "Content-Type": "application/json" }
         })
-
-        console.log(response.statusText)
 
         if (!response.ok) return
 
@@ -373,20 +293,6 @@ export class LessonCreator extends LitElement {
             link: "/lessons",
             buttonText: "Return to the dashboard"
         })
-    }
-
-    private async makeLesson(name: string, groupname: string): Promise<number> {
-        const response = await fetch("/lessons/createjustlesson", {
-            method: "POST",
-            body: JSON.stringify({ name, groupname }),
-            headers: {
-                "Content-Type": "application/json"
-            }
-        })
-
-        const lessonId: number = await response.json()
-
-        return lessonId
     }
 
     private async getGroupNames() {
@@ -399,10 +305,10 @@ export class LessonCreator extends LitElement {
         this.groupNameList = [...groupnames]
     }
 
-    private createLesson(lessonId: number, isLessonNew: boolean) {
+    private createLesson(lessonId: number | undefined) {
 
-        const intro: IntroSlideData[] = this.slides.filter(slide => slide.type === "intro")
-        const question: QuestionSlideData[] = this.slides.filter(slide => slide.type === "question")
+        let intro: IntroSlide[] = this.slides.filter(slide => slide.type === "intro")
+        let question: QuestionSlide[] = this.slides.filter(slide => slide.type === "question")
 
         const lesson: LessonData = {
             id: lessonId,
@@ -410,7 +316,7 @@ export class LessonCreator extends LitElement {
             groupname: this.groupName,
             intro,
             question,
-            isLessonNew
+            deleteSlideIds: this.deleteSlideIds
         }
 
         return lesson
@@ -458,20 +364,26 @@ export class LessonCreator extends LitElement {
 
         this.slideCount = this.slideCount + 1
 
+        const id: string = createId()
+        const action: DatabaseAction = "add"
+
         if (slideType === "intro") {
-            const slide: SlideData = {
+            const slide: IntroSlide = {
                 type: "intro",
                 slideorder: this.slideCount,
                 targetword: "",
                 definition: "",
-                soundurl: ""
+                lessonid: this.lessonId,
+                id,
+                action,
+                recordings: []
             }
 
             this.slides = [...this.slides, slide]
         }
 
         else if (slideType === "question") {
-            const slide: SlideData = {
+            const slide: QuestionSlide = {
                 type: "question",
                 slideorder: this.slideCount,
                 question: "",
@@ -479,7 +391,10 @@ export class LessonCreator extends LitElement {
                 wronganswer1: "",
                 wronganswer2: "",
                 wronganswer3: "",
-                soundurl: ""
+                lessonid: this.lessonId || this.tempLessonId,
+                id,
+                action,
+                recordings: []
             }
 
             this.slides = [...this.slides, slide]
@@ -503,7 +418,11 @@ export class LessonCreator extends LitElement {
 
     private slideDeletedHandler(state: SlideDeleted) {
 
-        const { slideorder } = state
+        const { slideorder, id, slideType, databaseAction } = state
+
+        if (databaseAction === "update") {
+            this.deleteSlideIds.push({ id, slideType })
+        }
 
         const newSlides = this.slides
             .filter(slide => slide.slideorder !== slideorder)
@@ -514,22 +433,18 @@ export class LessonCreator extends LitElement {
     }
 
     private audioFilesUpdatedHandler(state: AudioFilesUpdated) {
-        const newAudioFile = state.audioFile
-        this.audioFiles = [...this.audioFiles, newAudioFile]
+        this.recordingController.setRecording(state.recording)
     }
 
     private async audioFileDeletedHandler(state: AudioFileDeleted) {
 
-        const deletedFileName = state.name
+        const { name, id } = state
 
-        const userResponse = await this.messageDialog.getUserResponse({ text: `Delete this recording: ${deletedFileName} ?`, link: undefined })
+        const userResponse = await this.messageDialog.getUserResponse({ text: `Delete this recording: ${name} ?`, link: undefined })
 
         if (userResponse.response === "Yes") {
-            this.audioFiles = this.audioFiles.filter(audioFile => audioFile.name !== deletedFileName)
-            this.slides = this.slides.map(slide => {
-                if (slide.soundurl === deletedFileName) return { ...slide, soundurl: "" }
-                return { ...slide }
-            })
+            this.recordingController.removeRecording(id)
+            this.slides = this.recordingController.removeRecordingFromSlides(this.slides, id)
         }
     }
 
@@ -563,15 +478,4 @@ export class LessonCreator extends LitElement {
                 break;
         }
     }
-}
-
-const createMockAudioFiles = (slides: (QuestionSlideData | IntroSlideData)[]) => {
-
-    const slidesWithAudio = slides.filter(slide => slide.soundurl)
-
-    if (!slidesWithAudio.length) return []
-
-    const soundUrls = slidesWithAudio.map(slide => slide.soundurl)
-
-    return soundUrls.map(soundUrl => new File(["blah blah"], soundUrl))
 }

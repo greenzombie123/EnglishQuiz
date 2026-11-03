@@ -7,12 +7,11 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 import { LitElement, html, css } from "lit";
 import { customElement, property, query } from "lit/decorators.js";
 import { map } from "lit/directives/map.js";
-import { removeExtention } from "../../util/util.js";
 let SoundSelector = class SoundSelector extends LitElement {
     constructor() {
         super(...arguments);
-        this.selectedSoundurl = "";
-        this.soundUrls = [];
+        this.recordings = [];
+        this.slideRecordings = [];
     }
     static { this.styles = [
         css `
@@ -35,26 +34,26 @@ let SoundSelector = class SoundSelector extends LitElement {
             }
         `
     ]; }
-    optionTemplate(soundUrl) {
-        const isSelected = soundUrl === this.selectedSoundurl;
-        const fileNameWithOutExtension = removeExtention(soundUrl);
-        return html `<option ?selected=${isSelected} value=${soundUrl}>${fileNameWithOutExtension}</option>`;
+    optionTemplate(recording) {
+        const isSelected = this.slideRecordings.includes(recording.id);
+        return html `<option ?selected=${isSelected} value=${recording.id}>${recording.name}</option>`;
     }
     render() {
+        const noSelectedRecording = this.slideRecordings.length === 0;
         return html `
-        <select class="sound_select" name="soundurl" @input=${this.onSoundUrlChanged} >
-            <option value="" ?selected=${!this.selectedSoundurl} > --- No Sound File Chosen </option>
-            ${map(this.soundUrls, (soundUrl) => this.optionTemplate(soundUrl))}
+        <select class="sound_select" name="soundurl" @input=${this.onSlideRecordingChanged} >
+            <option value="" ?selected=${noSelectedRecording} > --- No Sound File Chosen </option>
+            ${map(this.recordings, (recording) => this.optionTemplate(recording))}
         </select>
     `;
     }
-    onSoundUrlChanged(e) {
+    onSlideRecordingChanged(e) {
         if (this.slideOrder === undefined)
             return;
-        const { value } = e.target;
-        const field = "soundurl";
+        let { value } = e.target;
+        const field = "recordings";
         const options = {
-            detail: { action: "slideChanged", field, value, slideOrder: this.slideOrder },
+            detail: { action: "slideChanged", field, value: value ? [value] : [], slideOrder: this.slideOrder },
             bubbles: true,
             composed: true
         };
@@ -62,11 +61,11 @@ let SoundSelector = class SoundSelector extends LitElement {
     }
 };
 __decorate([
-    property()
-], SoundSelector.prototype, "selectedSoundurl", void 0);
+    property({ type: Array })
+], SoundSelector.prototype, "recordings", void 0);
 __decorate([
     property({ type: Array })
-], SoundSelector.prototype, "soundUrls", void 0);
+], SoundSelector.prototype, "slideRecordings", void 0);
 __decorate([
     property({ type: Number })
 ], SoundSelector.prototype, "slideOrder", void 0);

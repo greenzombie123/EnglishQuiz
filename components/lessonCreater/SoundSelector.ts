@@ -3,6 +3,7 @@ import { customElement, property, query, state } from "lit/decorators.js"
 import { map } from "lit/directives/map.js";
 import { SlideAdded, SlideChanged } from "./types.ts";
 import { removeExtention } from "../../util/util.ts";
+import { Recording } from "../types.ts";
 
 @customElement("sound-selector")
 export class SoundSelector extends LitElement {
@@ -28,11 +29,11 @@ export class SoundSelector extends LitElement {
         `
     ];
 
-    @property()
-    selectedSoundurl = ""
+    @property({ type: Array })
+    recordings: Recording[] = []
 
     @property({ type: Array })
-    soundUrls: string[] = []
+    slideRecordings: string[] = []
 
     @property({ type: Number })
     slideOrder?: number
@@ -40,32 +41,33 @@ export class SoundSelector extends LitElement {
     @query("select")
     _select?: HTMLSelectElement
 
-    optionTemplate(soundUrl: string) {
-        const isSelected = soundUrl === this.selectedSoundurl
-        const fileNameWithOutExtension = removeExtention(soundUrl)
-        return html`<option ?selected=${isSelected} value=${soundUrl}>${fileNameWithOutExtension}</option>`
+    optionTemplate(recording: Recording) {
+        const isSelected = this.slideRecordings.includes(recording.id)
+        return html`<option ?selected=${isSelected} value=${recording.id}>${recording.name}</option>`
     }
 
 
     render() {
 
+        const noSelectedRecording = this.slideRecordings.length === 0
+
         return html`
-        <select class="sound_select" name="soundurl" @input=${this.onSoundUrlChanged} >
-            <option value="" ?selected=${!this.selectedSoundurl} > --- No Sound File Chosen </option>
-            ${map(this.soundUrls, (soundUrl) => this.optionTemplate(soundUrl))}
+        <select class="sound_select" name="soundurl" @input=${this.onSlideRecordingChanged} >
+            <option value="" ?selected=${noSelectedRecording} > --- No Sound File Chosen </option>
+            ${map(this.recordings, (recording) => this.optionTemplate(recording))}
         </select>
     `;
     }
 
-    onSoundUrlChanged(e: Event) {
+    onSlideRecordingChanged(e: Event) {
         if (this.slideOrder === undefined) return;
 
-        const { value } = e.target as HTMLSelectElement
+        let { value } = e.target as HTMLSelectElement
 
-        const field = "soundurl"
+        const field = "recordings"
 
         const options: CustomEventInit<SlideChanged> = {
-            detail: { action: "slideChanged", field, value, slideOrder: this.slideOrder },
+            detail: { action: "slideChanged", field, value: value ? [value] : [], slideOrder: this.slideOrder },
             bubbles: true,
             composed: true
         }

@@ -8,6 +8,9 @@ import indexRouter from "./features/home/home.route.ts"
 import lessonsRouter from "./features/lessons/lessons.route.ts";
 import findTeacherRouter from "./features/findTeacher/findTeacher.route.ts";
 import {signupRouter, logInRouter} from "./features/auth/auth.route.ts"
+import { classRouter } from "./features/class/class.route.ts";
+import { audioRouter } from "./features/audio/audio.routes.ts";
+
 
 // Create a server
 const server = express();
@@ -73,6 +76,8 @@ server.use("/findTeacher", findTeacherRouter);
 server.use("/lessons", lessonsRouter);
 server.use("/login", logInRouter);
 server.use("/signup", signupRouter);
+server.use("/class", classRouter)
+server.use("/audio", audioRouter)
 server.use("/", indexRouter);
 
 export default server

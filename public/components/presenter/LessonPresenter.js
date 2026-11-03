@@ -54,10 +54,7 @@ let LessonPresenter = class LessonPresenter extends LitElement {
     ]; }
     async connectedCallback() {
         super.connectedCallback();
-        const res = await fetch(`./get/${this.lessonId}`);
-        if (!res.ok)
-            return this.status = "error";
-        const lesson = await res.json();
+        const lesson = await this.getLesson(this.lessonId);
         const slides = await this.getSlidesWithAudio(lesson);
         this.lesson = lesson;
         this.slides = slides;
@@ -95,27 +92,40 @@ let LessonPresenter = class LessonPresenter extends LitElement {
                         : this.loadingTemplate();
         return html `${template}`;
     }
+    async getLesson(lessonId) {
+        if (!lessonId)
+            throw new Error("Couldn't get lesson");
+        const res = await fetch(`./get/${lessonId}`);
+        if (!res.ok)
+            throw new Error('Something happened');
+        const lesson = await res.json();
+        return lesson;
+    }
+    async getRecording(key) {
+        try {
+            const res1 = await fetch(`/audio/${key}`);
+            const recording = await res1.json();
+            const res2 = await fetch(recording.url);
+            return await res2.blob();
+        }
+        catch (error) {
+            console.error(error);
+            throw new Error("Something went wrong");
+        }
+    }
     // In order to allow autoplay for audio recordings, user must click after page load
     handleStartLesson() {
         this.status = "start";
     }
     //TODO Implement S3 functionalality later
     async getSlidesWithAudio(lesson) {
-        const { slides, id } = lesson;
         let lessonSlides;
-        const response = await fetch(`/lessons/audiofiles/${id}`);
-        const audioItems = await response.json();
-        const audioItemsMap = new Map();
-        audioItems.forEach(audioItem => audioItemsMap.set(audioItem.fileName, audioItem.url));
-        lessonSlides = slides.map(async (slide) => {
-            const url = audioItemsMap.get(slide.soundurl);
-            if (url) {
-                const response = await fetch(url);
-                const blob = await response.blob();
-                return { ...slide, sound: blob };
-            }
-            else
-                return { ...slide, sound: null };
+        //TODO Change for sentence slides later
+        const slidesWithRecordings = lesson.slides.filter(slide => slide.recordings[0]);
+        lessonSlides = slidesWithRecordings.map(async (slide) => {
+            const recordingId = slide.recordings[0];
+            const recording = await this.getRecording(recordingId);
+            return { ...slide, recording };
         });
         return await Promise.all(lessonSlides);
     }

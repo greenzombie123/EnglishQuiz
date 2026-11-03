@@ -1,14 +1,22 @@
+import { Recording } from "../audio/audio.model.ts"
 import type { IntroSlide, LessonData, QuestionSlide } from "./lessons.model.ts"
 
 export type SlideType = "intro" | "question"
 
-export class Slide {
-  slideorder: number
-  soundurl: string
+export type DatabaseAction = "add" | "update"
 
-  constructor(slideorder: number, type: SlideType, soundurl: string) {
+export class BaseSlide {
+  slideorder: number
+  lessonid: number | undefined
+  id: string
+  action: DatabaseAction
+  recordings: string[] = []
+
+  constructor(slideorder: number, lessonid: number | undefined, id: string, action: DatabaseAction) {
     this.slideorder = slideorder
-    this.soundurl = soundurl
+    this.lessonid = lessonid
+    this.id = id
+    this.action = action
   }
 }
 
@@ -25,9 +33,11 @@ export interface PostLessonFunc {
 export interface PostLessonArg {
   name: string
   groupname: string
-  lessonId: number,
+  lessonId: number | undefined,
   introSlides: IntroSlide[]
-  questionSlides: QuestionSlide[]
+  questionSlides: QuestionSlide[],
+  teacherName: string,
+  deleteSlideIds: { id: string, slideType: string }[]
 }
 
 // type for post lesson form

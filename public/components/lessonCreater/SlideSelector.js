@@ -32,7 +32,7 @@ let SlideSelector = class SlideSelector extends LitElement {
                         font-size: var(--fontSize)
                     }
 
-                    button {}
+                    /* button {} */
             }
 
             

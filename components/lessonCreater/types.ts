@@ -1,13 +1,15 @@
-import { IntroSlideData, Lesson, QuestionSlideData } from "../types.ts";
+import { DatabaseAction, IntroSlide, Lesson, QuestionSlide, Recording } from "../types.ts";
 
-export type LessonData = Omit<InstanceType<typeof Lesson>, "slides"> & { intro: IntroSlideData[], question: QuestionSlideData[], isLessonNew:boolean }
-
-// export type SlideData = IntroSlideData | QuestionSlideData
+export type LessonData = Omit<InstanceType<typeof Lesson>, "slides"> & {
+    intro: IntroSlide[],
+    question: QuestionSlide[],
+    deleteSlideIds: { id: string, slideType: string }[]
+}
 
 export type SlideChanged = {
     action: "slideChanged",
     slideOrder: number,
-    field: keyof IntroSlideData | keyof QuestionSlideData
+    field: keyof IntroSlide | keyof QuestionSlide
     value: unknown
 }
 
@@ -31,17 +33,28 @@ export type SlideOrderChanged = {
 
 export type SlideDeleted = {
     action: "slideDeleted",
-    slideorder: number
+    slideorder: number,
+    id: string,
+    slideType: string,
+    databaseAction: DatabaseAction
 }
 
 export type AudioFilesUpdated = {
     action: "audioFilesUpdated",
-    audioFile: File
+    recording: Recording
 }
 
 export type AudioFileDeleted = {
     action: "audioFileDeleted",
+    id: string
     name: string
+}
+
+export type SlideRecordingsChanged = {
+    action: "SlideRecordingsChanged",
+    slideOrder: number,
+    field: keyof IntroSlide | keyof QuestionSlide
+    value: string[]
 }
 
 export type StateChanged = SlideChanged | LessonDataChanged | SlideAdded | SlideOrderChanged | SlideDeleted | AudioFilesUpdated | AudioFileDeleted

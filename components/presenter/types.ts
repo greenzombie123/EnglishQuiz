@@ -1,4 +1,5 @@
-import { IntroSlideData, QuestionSlideData } from "../types.ts"
+import { IntroSlide, Lesson, QuestionSlide } from "../types.ts"
+import { LessonPresenter } from "./LessonPresenter.ts"
 
 export type UserWrong = {
     action: "wrong"
@@ -27,14 +28,18 @@ export type UserActedKeyValue =
     NextSlide[keyof NextSlide] |
     PreviousSlide[keyof PreviousSlide]
 
-export type LessonSlide = Intro | Question
-
-export type Intro = Omit<IntroSlideData, "soundurl"> & {
-    sound: Blob | null
+export type Intro = IntroSlide & {
+    recording: Blob
 }
 
-export type Question = Omit<QuestionSlideData, "soundurl"> & {
-    sound: Blob | null
+export type Question = QuestionSlide & {
+    recording: Blob
+}
+
+export type LessonPresenterSlide = Intro | Question
+
+export type CurrentLesson = Omit<Lesson, "slides"> & {
+    slides: (Question | Intro)[]
 }
 
 

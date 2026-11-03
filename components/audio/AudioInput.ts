@@ -1,11 +1,13 @@
 import "./AudioInputTab.ts";
 import "./AudioInputRecorder.ts";
 
-import { LitElement, html, css, PropertyValues } from "lit";
+import { LitElement, html, css, PropertyValues, nothing } from "lit";
 import { customElement, property, query, state } from "lit/decorators.js"
 import type { AudioInputRecorder } from "./AudioInputRecorder.ts";
 import { removeExtention } from "../../util/util.ts";
 import { AudioFilesUpdated } from "../lessonCreater/types.ts";
+import { Recording } from "../types.ts";
+import { v7 as createId } from "uuid";
 
 @customElement("audio-input")
 export class AudioInput extends LitElement {
@@ -65,8 +67,8 @@ export class AudioInput extends LitElement {
     `
   ];
 
-  @property({ type: Array })
-  audioFiles: File[] = []
+  @property({type:Array})
+  recordings: Recording[] = []
 
   @query("audio-input-recorder")
   audioInputRecorder?: AudioInputRecorder
@@ -75,6 +77,7 @@ export class AudioInput extends LitElement {
   _fileInput?: HTMLInputElement
 
   render() {
+
     return html`
       <p>Add an audio file or record a new one.</p>
         <div class="buttons">
@@ -84,10 +87,10 @@ export class AudioInput extends LitElement {
             </label>
         </div>
 
-        <p class="soundFileNames">No Files Added</p>
+        ${!this.recordings.length ? html`<p class="soundFileNames">No Files Added</p>` : html`<p class="soundFileNames">${this.recordings.length} files added</p>`}
 
         <ul>
-          ${this.audioFiles.map(audioFile => html`<audio-input-tab .audioFile=${audioFile}></audio-input-tab>`)}
+          ${this.recordings.map(recording => html`<audio-input-tab .recording=${recording}></audio-input-tab>`)}
         </ul>
 
         <audio-input-recorder .audioFileNames=${this.createAudioFileNames()}></audio-input-recorder>
@@ -98,21 +101,23 @@ export class AudioInput extends LitElement {
   private fileInputChanged(event: InputEvent) {
 
     const target = event.target as HTMLInputElement
-    
+
     if (target.files && target.files[0]) {
+
+      const file = target.files[0]
 
       const option: CustomEventInit<AudioFilesUpdated> = {
         bubbles: true,
         composed: true,
-        detail: { audioFile: target.files[0], action: "audioFilesUpdated" }
+        detail: { recording: { id: createId(), key: createId(), name: removeExtention(file.name), file, url:"", isNew:true }, action: "audioFilesUpdated" }
       }
-
+    
       this.dispatchEvent(new CustomEvent("stateChanged", option))
     }
   }
 
   private createAudioFileNames() {
-    return this.audioFiles.map(audioFile => removeExtention(audioFile.name))
+    return this.recordings.map(recording => removeExtention(recording.name))
   }
 
   private recorderClickedHandler() {

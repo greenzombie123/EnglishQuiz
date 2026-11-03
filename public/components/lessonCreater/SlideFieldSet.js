@@ -11,7 +11,8 @@ import { ifDefined } from "lit/directives/if-defined.js";
 let SlideFieldSet = class SlideFieldSet extends LitElement {
     constructor() {
         super(...arguments);
-        this.soundUrls = [];
+        this.slide = {};
+        this.recordings = [];
         this.moveButtonState = "none";
     }
     static { this.styles = [
@@ -159,8 +160,8 @@ let SlideFieldSet = class SlideFieldSet extends LitElement {
         ])}
                     <input type="hidden" name="slideorder" id="slideOrderInput" value=${ifDefined(this.slide?.slideorder)} />
                     
-                    <sound-selector slideOrder=${ifDefined(this.slide?.slideorder)} selectedSoundurl=${ifDefined(this.slide?.soundurl)} .soundUrls=${this.soundUrls} ></sound-selector>
-                
+                    <sound-selector slideOrder=${ifDefined(this.slide?.slideorder)} .slideRecordings=${this.slide.recordings} .recordings=${this.recordings} ></sound-selector>
+
                 </fieldset>
                 <div class="fieldSetButtons">
 
@@ -200,8 +201,11 @@ let SlideFieldSet = class SlideFieldSet extends LitElement {
         if (!this.slide)
             return;
         const { slideorder } = this.slide;
+        const id = this.slide.id;
+        const slideType = this.slide.type;
+        const databaseAction = this.slide.action;
         const options = {
-            detail: { action: "slideDeleted", slideorder },
+            detail: { action: "slideDeleted", slideorder, id, slideType, databaseAction },
             bubbles: true,
             composed: true
         };
@@ -213,7 +217,7 @@ __decorate([
 ], SlideFieldSet.prototype, "slide", void 0);
 __decorate([
     property({ type: Array })
-], SlideFieldSet.prototype, "soundUrls", void 0);
+], SlideFieldSet.prototype, "recordings", void 0);
 __decorate([
     property()
 ], SlideFieldSet.prototype, "moveButtonState", void 0);

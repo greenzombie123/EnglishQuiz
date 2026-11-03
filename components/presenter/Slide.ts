@@ -1,10 +1,9 @@
 import { LitElement, html, css, nothing, TemplateResult, PropertyValues } from "lit";
-import { customElement, property, query, state } from "lit/decorators.js";
+import { customElement, property, query } from "lit/decorators.js";
 import { classMap } from "lit/directives/class-map.js";
 import { introSlideStyle, questionSlideStyle, slideStyle } from "./styles.ts";
-import { IntroSlideData, QuestionSlideData, SlideData } from "../types.ts";
 import { choose } from "lit/directives/choose.js";
-import { Intro, LessonSlide, Question, UserActed, UserActedKeyValue } from "./types.ts";
+import { Intro, LessonPresenterSlide, Question, UserActed, UserActedKeyValue } from "./types.ts";
 
 @customElement("lesson-slide")
 export class Slide extends LitElement {
@@ -15,7 +14,7 @@ export class Slide extends LitElement {
     ];
 
     @property({ type: Object })
-    slide?: LessonSlide
+    slide?: LessonPresenterSlide
 
     @query("audio")
     _audio?: HTMLAudioElement
@@ -89,9 +88,9 @@ export class Slide extends LitElement {
         }
 
 
-        if (this._audio && this.slide?.sound) {
+        if (this._audio && this.slide?.recording) {
 
-            this._audio.src = URL.createObjectURL(this.slide.sound)
+            this._audio.src = URL.createObjectURL(this.slide.recording)
 
             setTimeout(() => { this._audio?.play() }, 200)
         }

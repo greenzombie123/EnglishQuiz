@@ -1,0 +1,22 @@
+<form action="/registerClass" method="post" class="findClass">
+    <label for="username">Choose a class to register for</label>
+    <select>
+        
+    </select>
+    <% if (username) { %>
+        <p>Couldn't find <%= username %>.</p>
+        <%}%>
+            <button>Find Teacher</button>
+</form>
+<% } else { %>
+    <form action="/findTeacher/finished" method="post" class="findTeacher">
+        <h3>Is this your teacher?</h3>
+        <p>
+            <%= username %>
+        </p>
+        <input type="hidden" name="teacher" value=<%=username %>>
+        <div>
+            <button>Yes</button>
+            <button formaction="/findTeacher" formmethod="get">No</button>
+        </div>
+    </form>

@@ -69,8 +69,8 @@ let Slide = class Slide extends LitElement {
         if (this._audio?.src) {
             URL.revokeObjectURL(this._audio.src);
         }
-        if (this._audio && this.slide?.sound) {
-            this._audio.src = URL.createObjectURL(this.slide.sound);
+        if (this._audio && this.slide?.recording) {
+            this._audio.src = URL.createObjectURL(this.slide.recording);
             setTimeout(() => { this._audio?.play(); }, 200);
         }
     }

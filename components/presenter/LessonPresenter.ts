@@ -1,8 +1,8 @@
 import { LitElement, html, css } from "lit";
 import { customElement, property, state } from "lit/decorators.js"
 import "./Slide.ts"
-import type { Lesson } from "../types.ts";
-import type { LessonSlide, UserActed } from "./types.ts"
+import type { Lesson, Recording } from "../types.ts";
+import type { CurrentLesson, Intro, LessonPresenterSlide, Question, UserActed } from "./types.ts"
 
 type LessonState = "loading" | "error" | "finished" | "lessonLoaded" | "start"
 
@@ -38,9 +38,9 @@ export class LessonPresenter extends LitElement {
     @property({ type: Number })
     lessonId?: number
 
-    lesson?: Lesson
+    lesson?: CurrentLesson
 
-    slides: LessonSlide[] = []
+    slides: (Intro | Question)[] = []
 
     @state()
     status: LessonState = "loading"
@@ -51,9 +51,7 @@ export class LessonPresenter extends LitElement {
     async connectedCallback() {
         super.connectedCallback()
 
-        const res = await fetch(`./get/${this.lessonId}`)
-        if (!res.ok) return this.status = "error"
-        const lesson = await res.json()
+        const lesson = await this.getLesson(this.lessonId)
         const slides = await this.getSlidesWithAudio(lesson)
         this.lesson = lesson
         this.slides = slides
@@ -101,34 +99,43 @@ export class LessonPresenter extends LitElement {
         return html`${template}`;
     }
 
+    private async getLesson(lessonId: number | undefined) {
+        if (!lessonId) throw new Error("Couldn't get lesson")
+        const res = await fetch(`./get/${lessonId}`)
+        if(!res.ok) throw new Error('Something happened')
+        const lesson: CurrentLesson = await res.json()
+        return lesson
+    }
+
+    private async getRecording(key:string){
+        try {
+            const res1 = await fetch(`/audio/${key}`)
+            const recording:Recording = await res1.json()
+            const res2 = await fetch(recording.url)
+            return await res2.blob()
+        } catch (error) {
+            console.error(error)
+            throw new Error("Something went wrong")
+        }
+    }
+
     // In order to allow autoplay for audio recordings, user must click after page load
     private handleStartLesson() {
         this.status = "start"
     }
 
     //TODO Implement S3 functionalality later
-    private async getSlidesWithAudio(lesson: Lesson) {
+    private async getSlidesWithAudio(lesson: CurrentLesson) {
 
-        const { slides, id } = lesson
+        let lessonSlides: Promise<LessonPresenterSlide>[]
 
-        let lessonSlides
+        //TODO Change for sentence slides later
+        const slidesWithRecordings = lesson.slides.filter(slide=> slide.recordings[0])
 
-        const response = await fetch(`/lessons/audiofiles/${id}`)
-
-        const audioItems: { fileName: string, url: string }[] = await response.json()
-
-        const audioItemsMap = new Map<string, string>()
-
-        audioItems.forEach(audioItem => audioItemsMap.set(audioItem.fileName, audioItem.url))
-
-        lessonSlides = slides.map<Promise<LessonSlide>>(async (slide) => {
-            const url = audioItemsMap.get(slide.soundurl)
-            if (url) {
-                const response = await fetch(url)
-                const blob = await response.blob()
-                return { ...slide, sound: blob }
-            }
-            else return { ...slide, sound: null }
+        lessonSlides = slidesWithRecordings.map(async (slide)=>{
+            const recordingId = slide.recordings[0]
+            const recording = await this.getRecording(recordingId) 
+            return {...slide, recording}
         })
 
         return await Promise.all(lessonSlides)

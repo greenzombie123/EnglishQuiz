@@ -14,17 +14,23 @@ import "./SoundSelector.js";
 import "./SlideFieldSet.js";
 import "../MessageDialog.js";
 import "../audio/AudioInput.js";
-const j = { slidetype: "intro", definition: "f", targetword: "f", slideorder: 1, soundurl: "f" };
+import { RecordingController } from "./RecordingController.js";
+import { v7 as createId } from "uuid";
+const j = { type: "intro", definition: "f", targetword: "f", slideorder: 1, id: createId(), lessonid: undefined, action: "add", recordings: [] };
+const pog = { type: "question", question: "g", correctanswer: "x", wronganswer1: "b", wronganswer2: "", wronganswer3: "", id: createId(), lessonid: undefined, action: "add", slideorder: 2, recordings: [] };
 const files = [new File(["fefe"], "wow.com"), new File(["ddef"], "hot.webm")];
 let LessonCreator = class LessonCreator extends LitElement {
     constructor() {
         super(...arguments);
-        this.lessonName = "";
+        this.recordingController = new RecordingController(this);
+        this.tempLessonId = 0;
+        this.lessonName = "LOL"; //""
         this.groupName = "";
         this.groupNameList = [];
-        this.slides = [];
+        this.slides = [j, pog];
+        this.deleteSlideIds = [];
         this.slideCount = 0;
-        this.audioFiles = [];
+        this.classId = undefined;
     }
     static { this.styles = css `
             h1 {
@@ -190,14 +196,14 @@ let LessonCreator = class LessonCreator extends LitElement {
 
                 </div>
 
-                <audio-input .audioFiles=${this.audioFiles}></audio-input>
+                <audio-input .recordings=${this.recordingController.recordings}></audio-input>
 
             </div>
 
             <div class="breakLine" style="width: 100%; border: 2px solid black;"></div>
 
             <!-- FieldSets -->
-            ${map(this.slides, (slide, index) => html `<slide-fieldset moveButtonState=${this.setMoveButtonState(index, this.slides.length)} .slide=${slide} .soundUrls=${this.audioFiles.map(audioFile => audioFile.name)}></slide-fieldset>`)}
+            ${map(this.slides, (slide, index) => html `<slide-fieldset moveButtonState=${this.setMoveButtonState(index, this.slides.length)} .slide=${slide} .recordings=${this.recordingController.recordings}></slide-fieldset>`)}
 
             <slide-selector></slide-selector>
 
@@ -210,61 +216,11 @@ let LessonCreator = class LessonCreator extends LitElement {
     async firstUpdated(_changedProperties) {
         if (this.lessonId) {
             await this.getLesson(this.lessonId);
+            //
         }
+        else
+            this.lessonId = undefined;
         await this.getGroupNames();
-    }
-    async getAudioFiles(lessonId) {
-        const response = await fetch(`/lessons/audiofiles/${lessonId}`);
-        const audioItems = await response.json();
-        return await Promise.all(audioItems.map(async (audioItem) => {
-            const response = await fetch(audioItem.url);
-            const blob = await response.blob();
-            const file = new File([blob], audioItem.fileName);
-            return file;
-        }));
-    }
-    async sendAudioFiles(audioItems, audioFiles) {
-        if (!audioFiles.length)
-            return;
-        const audioItemMap = new Map();
-        audioItems.forEach(audioItem => {
-            audioItemMap.set(audioItem.fileName, audioItem.url);
-        });
-        const fileAndUrls = [];
-        audioFiles.forEach(audioFile => {
-            const url = audioItemMap.get(audioFile.name);
-            if (url) {
-                const file = audioFile;
-                const fileAndUrl = { url, file };
-                fileAndUrls.push(fileAndUrl);
-            }
-        });
-        await Promise.all(fileAndUrls.map(async (fileAndUrl) => {
-            await fetch(fileAndUrl.url, {
-                method: "PUT",
-                body: fileAndUrl.file
-            });
-        }));
-    }
-    async createPresignedUrls(audioFiles, lessonId, slides) {
-        const soundUrls = new Set(slides.map(slide => slide.soundurl));
-        const soundUrlsToSend = [];
-        audioFiles.forEach(audioFile => {
-            if (soundUrls.has(audioFile.name))
-                soundUrlsToSend.push(audioFile.name);
-            console.log(audioFiles.map(g => g.name), slides.map(slide => slide.soundurl));
-        });
-        if (!soundUrlsToSend.length)
-            return [];
-        const response = await fetch("/lessons/audiofiles", {
-            method: "POST",
-            body: JSON.stringify({ fileNames: soundUrlsToSend, lessonId }),
-            headers: {
-                "Content-Type": "application/json"
-            }
-        });
-        const audioItems = await response.json();
-        return audioItems;
     }
     async getLesson(lessonId) {
         const response = await fetch(`/lessons/get/${lessonId}`);
@@ -275,39 +231,25 @@ let LessonCreator = class LessonCreator extends LitElement {
         this.groupName = lesson.groupname;
         this.slideCount = lesson.slides.length;
         this.slides = [...lesson.slides];
-        const soundUrls = this.slides.map(slide => slide.soundurl);
-        if (soundUrls.length) {
-            this.audioFiles = await this.getAudioFiles(lessonId);
-        }
+        this.recordingController.retrieveRecordings(this.slides);
     }
     async sendLesson() {
         //TODO Add feature that tells user that they must create at least one slide before creating lesson
         if (this.slides.length === 0)
             return;
-        //TODO Check if there lessonId. Also, flag if lesson is new
-        let lessonId;
-        let isLessonNew;
-        // lesson is not new if its a 0
-        if (this.lessonId) {
-            lessonId = this.lessonId;
-            isLessonNew = false;
-        }
-        else {
-            lessonId = await this.makeLesson(this.lessonName, this.groupName);
-            isLessonNew = true;
-        }
-        const audioItems = await this.createPresignedUrls(this.audioFiles, lessonId, this.slides);
-        if (audioItems.length)
-            await this.sendAudioFiles(audioItems, this.audioFiles);
-        const lesson = this.createLesson(lessonId, isLessonNew);
+        const recordings = await this.recordingController.prepareRecordings(this.slides);
+        const lesson = this.createLesson(this.lessonId);
+        await this.recordingController.processUnattachedRecordingsForDeletion(this.slides);
+        await this.recordingController.deleteRecordingFromStorage();
+        await this.recordingController.deleteRecordingsFromDatabase();
+        await this.recordingController.sendRecordingsToStorage(recordings);
+        await this.recordingController.sendRecordingsToDatabase(recordings);
+        // Add or update lesson in database
         const response = await fetch("/lessons/createlesson", {
             method: "POST",
             body: JSON.stringify(lesson),
-            headers: {
-                "Content-Type": "application/json"
-            }
+            headers: { "Content-Type": "application/json" }
         });
-        console.log(response.statusText);
         if (!response.ok)
             return;
         this.messageDialog.open({
@@ -316,17 +258,6 @@ let LessonCreator = class LessonCreator extends LitElement {
             buttonText: "Return to the dashboard"
         });
     }
-    async makeLesson(name, groupname) {
-        const response = await fetch("/lessons/createjustlesson", {
-            method: "POST",
-            body: JSON.stringify({ name, groupname }),
-            headers: {
-                "Content-Type": "application/json"
-            }
-        });
-        const lessonId = await response.json();
-        return lessonId;
-    }
     async getGroupNames() {
         const response = await fetch(`/lessons/groupnames`);
         if (!response.ok)
@@ -334,16 +265,16 @@ let LessonCreator = class LessonCreator extends LitElement {
         const groupnames = await response.json();
         this.groupNameList = [...groupnames];
     }
-    createLesson(lessonId, isLessonNew) {
-        const intro = this.slides.filter(slide => slide.type === "intro");
-        const question = this.slides.filter(slide => slide.type === "question");
+    createLesson(lessonId) {
+        let intro = this.slides.filter(slide => slide.type === "intro");
+        let question = this.slides.filter(slide => slide.type === "question");
         const lesson = {
             id: lessonId,
             name: this.lessonName,
             groupname: this.groupName,
             intro,
             question,
-            isLessonNew
+            deleteSlideIds: this.deleteSlideIds
         };
         return lesson;
     }
@@ -383,13 +314,18 @@ let LessonCreator = class LessonCreator extends LitElement {
     slideAddedHandler(state) {
         const slideType = state.value;
         this.slideCount = this.slideCount + 1;
+        const id = createId();
+        const action = "add";
         if (slideType === "intro") {
             const slide = {
                 type: "intro",
                 slideorder: this.slideCount,
                 targetword: "",
                 definition: "",
-                soundurl: ""
+                lessonid: this.lessonId,
+                id,
+                action,
+                recordings: []
             };
             this.slides = [...this.slides, slide];
         }
@@ -402,7 +338,10 @@ let LessonCreator = class LessonCreator extends LitElement {
                 wronganswer1: "",
                 wronganswer2: "",
                 wronganswer3: "",
-                soundurl: ""
+                lessonid: this.lessonId || this.tempLessonId,
+                id,
+                action,
+                recordings: []
             };
             this.slides = [...this.slides, slide];
         }
@@ -421,26 +360,24 @@ let LessonCreator = class LessonCreator extends LitElement {
         this.slides = [...newSlides];
     }
     slideDeletedHandler(state) {
-        const { slideorder } = state;
+        const { slideorder, id, slideType, databaseAction } = state;
+        if (databaseAction === "update") {
+            this.deleteSlideIds.push({ id, slideType });
+        }
         const newSlides = this.slides
             .filter(slide => slide.slideorder !== slideorder)
             .map((slide, index) => { return { ...slide, slideorder: index + 1 }; });
         this.slides = [...newSlides];
     }
     audioFilesUpdatedHandler(state) {
-        const newAudioFile = state.audioFile;
-        this.audioFiles = [...this.audioFiles, newAudioFile];
+        this.recordingController.setRecording(state.recording);
     }
     async audioFileDeletedHandler(state) {
-        const deletedFileName = state.name;
-        const userResponse = await this.messageDialog.getUserResponse({ text: `Delete this recording: ${deletedFileName} ?`, link: undefined });
+        const { name, id } = state;
+        const userResponse = await this.messageDialog.getUserResponse({ text: `Delete this recording: ${name} ?`, link: undefined });
         if (userResponse.response === "Yes") {
-            this.audioFiles = this.audioFiles.filter(audioFile => audioFile.name !== deletedFileName);
-            this.slides = this.slides.map(slide => {
-                if (slide.soundurl === deletedFileName)
-                    return { ...slide, soundurl: "" };
-                return { ...slide };
-            });
+            this.recordingController.removeRecording(id);
+            this.slides = this.recordingController.removeRecordingFromSlides(this.slides, id);
         }
     }
     stateChangedHandler(e) {
@@ -491,20 +428,10 @@ __decorate([
     state()
 ], LessonCreator.prototype, "slideCount", void 0);
 __decorate([
-    state()
-], LessonCreator.prototype, "audioFiles", void 0);
-__decorate([
     query("message-dialog")
 ], LessonCreator.prototype, "messageDialog", void 0);
 LessonCreator = __decorate([
     customElement("lesson-creator")
 ], LessonCreator);
 export { LessonCreator };
-const createMockAudioFiles = (slides) => {
-    const slidesWithAudio = slides.filter(slide => slide.soundurl);
-    if (!slidesWithAudio.length)
-        return [];
-    const soundUrls = slidesWithAudio.map(slide => slide.soundurl);
-    return soundUrls.map(soundUrl => new File(["blah blah"], soundUrl));
-};
 //# sourceMappingURL=LessonCreator.js.map

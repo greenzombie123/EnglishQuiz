@@ -1,7 +1,6 @@
 import { removeExtention } from "../../util/util.ts";
 import { AudioFileDeleted } from "../lessonCreater/types.ts";
-import { lesssonCreaterStore } from "../store/LessonCreaterStore.ts";
-import type { PopUpModal } from "../utility/PopUpModal.ts";
+import { Recording } from "../types.ts";
 import "../utility/PopUpModal.ts";
 
 import { LitElement, html, css, nothing } from "lit";
@@ -36,7 +35,7 @@ export class AudioInputTab extends LitElement {
   ];
 
   @property({ type: Object })
-  audioFile?: File
+  recording!: Recording
 
   @query("audio")
   _audio?: HTMLAudioElement
@@ -47,14 +46,13 @@ export class AudioInputTab extends LitElement {
 
   private tabTemplate() {
 
-    if (!this.audioFile) throw new Error("Expected an audio file but was not found")
-    this.blobUrl = URL.createObjectURL(this.audioFile)
-    this.fileName = this.audioFile.name
-    const fileName = removeExtention(this.audioFile.name)
+    if (!this.recording.file) throw new Error("Expected an audio file but was not found")
+    this.blobUrl = URL.createObjectURL(this.recording.file)
+    this.fileName = this.recording.name
 
     return html`
        <div class="audio_input_tab">
-            <span>${fileName}</span>
+            <span>${this.fileName}</span>
             <!-- Add images later -->
             <button type="button" class="play" @click=${this.handlePlayAudio}>P</button>
             <button type="button" class="delete" @click=${this.handleDeleteAudio}>D</button>
@@ -81,7 +79,7 @@ export class AudioInputTab extends LitElement {
     const init: CustomEventInit<AudioFileDeleted> = {
       bubbles: true,
       composed: true,
-      detail: { action: "audioFileDeleted", name: this.fileName! }
+      detail: { action: "audioFileDeleted", id: this.recording.id, name: this.recording.name }
     }
 
     this.dispatchEvent(new CustomEvent("stateChanged", init))

@@ -1,10 +1,10 @@
 import { LitElement, html, css, nothing } from "lit";
 import { customElement, property, state } from "lit/decorators.js"
 import { choose } from "lit/directives/choose.js";
-import {SlideChanged, SlideDeleted, SlideOrderChanged } from "./types.ts";
+import { SlideChanged, SlideDeleted, SlideOrderChanged } from "./types.ts";
 import { ifDefined } from "lit/directives/if-defined.js";
 import { MoveButtonState } from "./LessonCreator.ts";
-import { IntroSlideData, QuestionSlideData, SlideData } from "../types.ts";
+import { IntroSlide, LessonSlide, QuestionSlide, Recording } from "../types.ts";
 
 @customElement("slide-fieldset")
 export class SlideFieldSet extends LitElement {
@@ -89,16 +89,16 @@ export class SlideFieldSet extends LitElement {
     ];
 
     @property({ type: Object })
-    public slide?: SlideData
+    slide: LessonSlide = {} as LessonSlide
 
     @property({ type: Array })
-    public soundUrls: string[] = []
+    recordings: Recording[] = []
 
     @property()
-    public moveButtonState: MoveButtonState = "none"
+    moveButtonState: MoveButtonState = "none"
 
     introSlideTemplate() {
-        const { targetword, definition } = this.slide as IntroSlideData
+        const { targetword, definition } = this.slide as IntroSlide
 
         return html`
             <legend>Introduction</legend>
@@ -112,7 +112,7 @@ export class SlideFieldSet extends LitElement {
     }
 
     questionSlideTemplate() {
-        const { question, correctanswer, wronganswer1, wronganswer2, wronganswer3 } = this.slide as QuestionSlideData
+        const { question, correctanswer, wronganswer1, wronganswer2, wronganswer3 } = this.slide as QuestionSlide
 
         return html`
             <legend>Question</legend>
@@ -168,8 +168,8 @@ export class SlideFieldSet extends LitElement {
         ])}
                     <input type="hidden" name="slideorder" id="slideOrderInput" value=${ifDefined(this.slide?.slideorder)} />
                     
-                    <sound-selector slideOrder=${ifDefined(this.slide?.slideorder)} selectedSoundurl=${ifDefined(this.slide?.soundurl)} .soundUrls=${this.soundUrls} ></sound-selector>
-                
+                    <sound-selector slideOrder=${ifDefined(this.slide?.slideorder)} .slideRecordings=${this.slide.recordings} .recordings=${this.recordings} ></sound-selector>
+
                 </fieldset>
                 <div class="fieldSetButtons">
 
@@ -184,7 +184,7 @@ export class SlideFieldSet extends LitElement {
 
     //TODO Maybe change this later!!!!!
     onSlideChanged(e: Event) {
-        const field = (e.target as HTMLInputElement).name as keyof IntroSlideData | keyof QuestionSlideData
+        const field = (e.target as HTMLInputElement).name as keyof IntroSlide | keyof QuestionSlide
         const { value } = (e.target as HTMLInputElement)
         const slideOrder = this.slide?.slideorder as number
 
@@ -216,9 +216,12 @@ export class SlideFieldSet extends LitElement {
         if (!this.slide) return
 
         const { slideorder } = this.slide
+        const id = this.slide.id
+        const slideType = this.slide.type
+        const databaseAction = this.slide.action
 
         const options: CustomEventInit<SlideDeleted> = {
-            detail: { action: "slideDeleted", slideorder },
+            detail: { action: "slideDeleted", slideorder, id, slideType, databaseAction },
             bubbles: true,
             composed: true
         }

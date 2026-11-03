@@ -4,7 +4,6 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
-import { removeExtention } from "../../util/util.js";
 import "../utility/PopUpModal.js";
 import { LitElement, html, css } from "lit";
 import { customElement, property, query } from "lit/decorators.js";
@@ -35,14 +34,13 @@ let AudioInputTab = class AudioInputTab extends LitElement {
     `
     ]; }
     tabTemplate() {
-        if (!this.audioFile)
+        if (!this.recording.file)
             throw new Error("Expected an audio file but was not found");
-        this.blobUrl = URL.createObjectURL(this.audioFile);
-        this.fileName = this.audioFile.name;
-        const fileName = removeExtention(this.audioFile.name);
+        this.blobUrl = URL.createObjectURL(this.recording.file);
+        this.fileName = this.recording.name;
         return html `
        <div class="audio_input_tab">
-            <span>${fileName}</span>
+            <span>${this.fileName}</span>
             <!-- Add images later -->
             <button type="button" class="play" @click=${this.handlePlayAudio}>P</button>
             <button type="button" class="delete" @click=${this.handleDeleteAudio}>D</button>
@@ -66,14 +64,14 @@ let AudioInputTab = class AudioInputTab extends LitElement {
         const init = {
             bubbles: true,
             composed: true,
-            detail: { action: "audioFileDeleted", name: this.fileName }
+            detail: { action: "audioFileDeleted", id: this.recording.id, name: this.recording.name }
         };
         this.dispatchEvent(new CustomEvent("stateChanged", init));
     }
 };
 __decorate([
     property({ type: Object })
-], AudioInputTab.prototype, "audioFile", void 0);
+], AudioInputTab.prototype, "recording", void 0);
 __decorate([
     query("audio")
 ], AudioInputTab.prototype, "_audio", void 0);

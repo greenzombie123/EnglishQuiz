@@ -1,12 +1,10 @@
 import type { Request, Response, NextFunction } from "express";
-import { format } from "node-pg-format";
 import { IntroSlide, Lesson, QuestionSlide } from "./lessons.model.ts";
-import { areAudioFilesStored, createLessonStore, deleteLessonAndAudio, getAudioUrlsService, postLessonService } from "./lessons.service.ts";
+import { createLessonStore, postLessonService } from "./lessons.service.ts";
 import type {
   LessonIdParams,
 } from "../../shared.types.ts";
-import { User } from "../users/Users.model.ts";
-import { createPresignedUrls, deleteAudioFilesFromStorage, getAudioFileFromStorage } from "../../config/s3client.config.ts";
+import { Recording } from "../audio/audio.model.ts";
 
 export const getLesson = async (
   req: Request<LessonIdParams>,
@@ -20,8 +18,6 @@ export const getLesson = async (
     const lesson = await Lesson.getLessonById(Number(lessonId))
 
     if (!lesson) throw Error("Lesson doesn't exist")
-
-
 
     res.send(lesson);
 
@@ -67,8 +63,8 @@ export const deleteLesson = async (
 
   // Delete audio from storage
 
-  const soundUrls = await Lesson.getSoundUrls(id)
-  await deleteAudioFilesFromStorage(id, soundUrls)
+  // const soundUrls = await Lesson.getSoundUrls(id)
+  // await deleteAudioFilesFromStorage(id, soundUrls)
 
   // PostgreSQL deletes slides as well because of trigger function and trigger event
   await Lesson.delete(lessonId)
@@ -77,53 +73,21 @@ export const deleteLesson = async (
 };
 
 export const postLesson = async (
-  req: Request<{}, {}, { name: string, groupname: string, id: number, isLessonNew: boolean, question: QuestionSlide[], intro: IntroSlide[] }>,
+  req: Request<{}, {}, { name: string, groupname: string, id: number | undefined, question: QuestionSlide[], intro: IntroSlide[], deleteSlideIds: { id: string, slideType: string }[] }>,
   res: Response,
   next: NextFunction
 ) => {
   if (!req.user || req.user.userType === "student") return res.redirect("/");
 
-  const { question, intro, name, groupname, id: lessonId, isLessonNew } = req.body;
+  const { question, intro, name, groupname, id: lessonId, deleteSlideIds} = req.body;
 
-  const soundUrls: string[] = [...intro, ...question].map(slide => slide.soundurl)
-
-  // check if at least on soundurl is a string or not
-  const wereFilesSent = soundUrls.reduce((prev, cur) => prev + cur)
-
-  // If there any soundurl strings for audio files, check if the audio files were properly stored in storage
-  if (wereFilesSent) {
-
-    try {
-
-
-      const areFilesThere = await areAudioFilesStored(soundUrls, lessonId)
-
-      //TODO Create abort function to delete files and lesson
-      if (!areFilesThere) {
-        if (isLessonNew) {
-          await Lesson.delete(lessonId)
-          await deleteLessonAndAudio(lessonId)
-          // throw new Error("Audio files were not successfully deleted")
-        }
-        else {
-          await deleteLessonAndAudio(lessonId)
-          // throw new Error("Audio files were not successfully deleted")
-        }
-      }
-
-    } catch (error) {
-      console.error(error)
-    }
-
-  }
-
-  const postLessonResult = await postLessonService(isLessonNew, { name, groupname, lessonId, questionSlides: question, introSlides: intro })
+  const postLessonResult = await postLessonService({ name, groupname, lessonId, questionSlides: question, introSlides: intro, teacherName: req.user.username, deleteSlideIds })
 
   if (postLessonResult.isError) {
     throw postLessonResult.message
   }
 
-  return res.end()
+  res.end()
 }
 
 export const getGroupNames = async (
@@ -155,83 +119,83 @@ export const getCreateLessonPage = (
   res.render("createLesson");
 };
 
-export const getAudioFileUrls = async (
-  req: Request<{ lessonId: string }>,
-  res: Response,
-  next: NextFunction) => {
+// export const getAudioFileUrls = async (
+//   req: Request<{ lessonId: string }>,
+//   res: Response,
+//   next: NextFunction) => {
 
-  const { lessonId } = req.params
+//   const { lessonId } = req.params
 
-  const id = Number(lessonId)
+//   const id = Number(lessonId)
 
-  const fileNames = await Lesson.getSoundUrls(id)
+//   const fileNames = await Lesson.getSoundUrls(id)
 
-  const audioItems = await getAudioUrlsService(id, fileNames)
+//   const audioItems = await getAudioUrlsService(id, fileNames)
 
-  res.send(audioItems)
-}
+//   res.send(audioItems)
+// }
 
-export const processSoundUrls = async (
-  req: Request<{}, {}, { fileNames: string[], lessonId: number }>,
-  res: Response,
-  next: NextFunction) => {
+// export const processSoundUrls = async (
+//   req: Request<{}, {}, { fileNames: string[], lessonId: number }>,
+//   res: Response,
+//   next: NextFunction) => {
 
-  const { fileNames, lessonId } = req.body
+//   const { fileNames, lessonId } = req.body
 
-  const newSoundUrls = new Set(fileNames)
+//   const newSoundUrls = new Set(fileNames)
 
-  const oldSoundUrls = await Lesson.getSoundUrls(lessonId)
+//   const oldSoundUrls = await Lesson.getSoundUrls(lessonId)
 
-  const toBeDeleted: string[] = []
-
-
-  //TODO Turn to map later
-  await Promise.all(oldSoundUrls.map(async (oldSoundUrl) => {
-    //* Audio is already stored so there is no need to add it again
-    if (newSoundUrls.has(oldSoundUrl)) newSoundUrls.delete(oldSoundUrl)
-    //* If there is no new souldUrl that matches old one, it means user wants to delete the old one.
-    else toBeDeleted.push(oldSoundUrl)
-    //* If there is a new soundurl but no old one, it means user is adding a new audio
-  }))
-
-  // Send a request to delete all unused audio with one request. A later request will delete soundurl from database
-  await deleteAudioFilesFromStorage(lessonId, toBeDeleted)
+//   const toBeDeleted: string[] = []
 
 
-  const soundUrls = Array.from(newSoundUrls)
+//   //TODO Turn to map later
+//   await Promise.all(oldSoundUrls.map(async (oldSoundUrl) => {
+//     //* Audio is already stored so there is no need to add it again
+//     if (newSoundUrls.has(oldSoundUrl)) newSoundUrls.delete(oldSoundUrl)
+//     //* If there is no new souldUrl that matches old one, it means user wants to delete the old one.
+//     else toBeDeleted.push(oldSoundUrl)
+//     //* If there is a new soundurl but no old one, it means user is adding a new audio
+//   }))
 
-  const putAudioItems: { fileName: string, url: string }[] = await Promise.all(
+//   // Send a request to delete all unused audio with one request. A later request will delete soundurl from database
+//   await deleteAudioFilesFromStorage(lessonId, toBeDeleted)
 
-    soundUrls.map(async (newSoundUrl) => {
 
-      const presignedUrl = await createPresignedUrls(newSoundUrl, lessonId)
+//   const soundUrls = Array.from(newSoundUrls)
 
-      return { fileName: newSoundUrl, url: presignedUrl }
-    })
-  )
+//   const putAudioItems: { fileName: string, url: string }[] = await Promise.all(
 
-  res.send(putAudioItems)
-}
+//     soundUrls.map(async (newSoundUrl) => {
 
-export const createLesson = async (
-  req: Request<{}, {}, { name: string, groupname: string }>,
-  res: Response,
-  next: NextFunction) => {
+//       const presignedUrl = await createPresignedUrls(newSoundUrl, lessonId)
 
-  if (!req.user || req.user.userType === "student") return res.redirect("/");
+//       return { fileName: newSoundUrl, url: presignedUrl }
+//     })
+//   )
 
-  const { name, groupname } = req.body
+//   res.send(putAudioItems)
+// }
 
-  const { username: teacherUsername } = req.user
+// export const createLesson = async (
+//   req: Request<{}, {}, { name: string, groupname: string }>,
+//   res: Response,
+//   next: NextFunction) => {
 
-  const teacher = await User.findByUserName(teacherUsername, "teacher")
+//   if (!req.user || req.user.userType === "student") return res.redirect("/");
 
-  if (!teacher) throw new Error("Can't find teacher")
+//   const { name, groupname } = req.body
 
-  const lessonId = await Lesson.post(name, groupname, teacher.id)
-  if (!lessonId) throw new Error("Couldn't post new lesson")
+//   const { username: teacherUsername } = req.user
 
-  res.send(lessonId)
+//   const teacher = await User.findByUserName(teacherUsername, "teacher")
 
-  // res.send(0)
-}
+//   if (!teacher) throw new Error("Can't find teacher")
+
+//   const lessonId = await Lesson.post(name, groupname, teacher.id)
+//   if (!lessonId) throw new Error("Couldn't post new lesson")
+
+//   res.send(lessonId)
+
+//   // res.send(0)
+// }

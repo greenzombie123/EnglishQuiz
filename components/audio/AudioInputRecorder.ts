@@ -1,6 +1,7 @@
 import { LitElement, html, css } from "lit";
 import { customElement, property, query, state } from "lit/decorators.js"
 import { AudioFilesUpdated } from "../lessonCreater/types.ts";
+import { v7 as createId } from "uuid";
 
 @customElement("audio-input-recorder")
 export class AudioInputRecorder extends LitElement {
@@ -41,7 +42,7 @@ export class AudioInputRecorder extends LitElement {
   ];
 
   @property({ type: Array })
-  audioFileNames: string[] = []
+  fileNames: string[] = []
 
   @state()
   blob?: Blob | undefined
@@ -97,7 +98,7 @@ export class AudioInputRecorder extends LitElement {
   }
 
   private isNameNew() {
-    const isNameUsed = this.audioFileNames.some(audioFileName => audioFileName === this.name)
+    const isNameUsed = this.fileNames.some(fileName => fileName === this.name)
     return isNameUsed ? false : true
   }
 
@@ -123,7 +124,7 @@ export class AudioInputRecorder extends LitElement {
     const option: CustomEventInit<AudioFilesUpdated> = {
       bubbles: true,
       composed: true,
-      detail: { audioFile: new File([this.blob], this.name + '.webm', { type: this.blob.type }), action: "audioFilesUpdated" }
+      detail: { recording: { id: createId(), name: this.name, key: createId({}), file: new File([this.blob], this.name, { type: "webm" }), url:"", isNew:true }, action: "audioFilesUpdated" }
     }
 
     this.dispatchEvent(new CustomEvent("stateChanged", option))

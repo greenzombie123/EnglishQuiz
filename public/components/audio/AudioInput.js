@@ -9,10 +9,11 @@ import "./AudioInputRecorder.js";
 import { LitElement, html, css } from "lit";
 import { customElement, property, query } from "lit/decorators.js";
 import { removeExtention } from "../../util/util.js";
+import { v7 as createId } from "uuid";
 let AudioInput = class AudioInput extends LitElement {
     constructor() {
         super(...arguments);
-        this.audioFiles = [];
+        this.recordings = [];
     }
     static { this.styles = [
         css `
@@ -79,10 +80,10 @@ let AudioInput = class AudioInput extends LitElement {
             </label>
         </div>
 
-        <p class="soundFileNames">No Files Added</p>
+        ${!this.recordings.length ? html `<p class="soundFileNames">No Files Added</p>` : html `<p class="soundFileNames">${this.recordings.length} files added</p>`}
 
         <ul>
-          ${this.audioFiles.map(audioFile => html `<audio-input-tab .audioFile=${audioFile}></audio-input-tab>`)}
+          ${this.recordings.map(recording => html `<audio-input-tab .recording=${recording}></audio-input-tab>`)}
         </ul>
 
         <audio-input-recorder .audioFileNames=${this.createAudioFileNames()}></audio-input-recorder>
@@ -92,16 +93,17 @@ let AudioInput = class AudioInput extends LitElement {
     fileInputChanged(event) {
         const target = event.target;
         if (target.files && target.files[0]) {
+            const file = target.files[0];
             const option = {
                 bubbles: true,
                 composed: true,
-                detail: { audioFile: target.files[0], action: "audioFilesUpdated" }
+                detail: { recording: { id: createId(), key: createId(), name: removeExtention(file.name), file, url: "", isNew: true }, action: "audioFilesUpdated" }
             };
             this.dispatchEvent(new CustomEvent("stateChanged", option));
         }
     }
     createAudioFileNames() {
-        return this.audioFiles.map(audioFile => removeExtention(audioFile.name));
+        return this.recordings.map(recording => removeExtention(recording.name));
     }
     recorderClickedHandler() {
         if (this.audioInputRecorder) {
@@ -111,7 +113,7 @@ let AudioInput = class AudioInput extends LitElement {
 };
 __decorate([
     property({ type: Array })
-], AudioInput.prototype, "audioFiles", void 0);
+], AudioInput.prototype, "recordings", void 0);
 __decorate([
     query("audio-input-recorder")
 ], AudioInput.prototype, "audioInputRecorder", void 0);

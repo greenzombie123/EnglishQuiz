@@ -73,7 +73,8 @@ export const handleAddUser = async (
     const user = { username, userType };
     req.logIn(user, (err) => {
       if (err) return next(err);
-      return res.redirect("/signup/completed");
+      return res.redirect("/class");
+      // return res.redirect("/signup/completed");
     });
   } else {
     await handleAddNewStudent(username, password);
@@ -85,5 +86,4 @@ export const handleAddUser = async (
   }
 
 };
-
 

@@ -1,8 +1,11 @@
+import type { PoolClient } from "pg";
 import { pool } from "../../config/database.config.ts"
 import { deleteAudioFilesFromStorage, getAudioFileFromStorage, getAudioFileNamesFromStorage } from "../../config/s3client.config.ts";
 import { User } from "../users/Users.model.ts";
-import { IntroSlide, Lesson, LessonSlideData, QuestionSlide, type LessonData } from "./lessons.model.ts";
-import type { LessonStore, PostLessonArg, PostLessonFunc, PostLessonResult } from "./lessons.types.ts";
+import { IntroSlide, Lesson, QuestionSlide, type LessonData, type LessonSlide, } from "./lessons.model.ts";
+import type { LessonStore, PostLessonArg, PostLessonResult } from "./lessons.types.ts";
+import { body } from "express-validator";
+import { Recording } from "../audio/audio.model.ts";
 
 // Create lesson store the dashboard use to display available lessons
 export const createLessonStore = (lessons: LessonData[]) => {
@@ -23,7 +26,7 @@ export const createLessonStore = (lessons: LessonData[]) => {
 }
 
 // Insert lesson, lessonslidedata, and slides into database
-export const postLessonService = async (isLessonNew: boolean, postLessonArg: PostLessonArg): Promise<PostLessonResult> => {
+export const postLessonService = async (postLessonArg: PostLessonArg): Promise<PostLessonResult> => {
   const client = await pool.connect()
 
   let postLessonResult: PostLessonResult
@@ -31,32 +34,36 @@ export const postLessonService = async (isLessonNew: boolean, postLessonArg: Pos
   try {
     await client.query("BEGIN");
 
-    const { lessonId, name, groupname, introSlides, questionSlides } = postLessonArg
+    const { lessonId: currentLessonId, name, groupname, introSlides, questionSlides, teacherName, deleteSlideIds } = postLessonArg
+    let newLessonId: number
 
-    if (!isLessonNew) {
-
-      await Lesson.update(lessonId, name, groupname, client)
-
-      await IntroSlide.delete(lessonId, client)
-
-      await QuestionSlide.delete(lessonId, client)
+    if (!currentLessonId) {
+      const teacherData = await User.findByUserName(teacherName, "teacher", client)
+      newLessonId = await Lesson.post(name, groupname, teacherData.currentclass, client)
+    }
+    else {
+      newLessonId = currentLessonId
+      await Lesson.update(newLessonId, name, groupname, client)
     }
 
-    if (introSlides.length) {
-      const IntroSlideIds = await IntroSlide.post(introSlides, client)
-      await LessonSlideData.post(lessonId, IntroSlideIds, "intro", client)
-    }
+    const lessonId: number = newLessonId
 
-    if (questionSlides.length) {
-      const questionSlideIds = await QuestionSlide.post(questionSlides, client)
-      await LessonSlideData.post(lessonId, questionSlideIds, "question", client)
-    }
+    //TODO turn this into a service
+
+    if (deleteSlideIds.length) await deleteSlides(deleteSlideIds, client)
+
+    if (introSlides.length) await processIntroSlides(introSlides, lessonId, client)
+
+    if (questionSlides.length) await processQuestionSlides(questionSlides, lessonId, client)
+
+    // await client.query("ROLLBACK");
 
     await client.query("COMMIT");
 
     postLessonResult = { isError: false }
 
   } catch (error) {
+    console.log(error)
     await client.query("ROLLBACK");
     postLessonResult = {
       isError: true,
@@ -88,8 +95,44 @@ export const getAudioUrlsService = async (lessonId: number, fileNames: string[])
   return Promise.all(audioItems)
 }
 
-export const deleteLessonAndAudio = async (lessonId:number)=>{
-  await Lesson.delete(lessonId)
-  const soundUrls = await Lesson.getSoundUrls(lessonId)
-  await deleteAudioFilesFromStorage(lessonId, soundUrls)
+export const deleteLessonAndAudio = async (lessonId: number) => {
+  // await Lesson.delete(lessonId)
+  // const soundUrls = await Lesson.getSoundUrls(lessonId)
+  // await deleteAudioFilesFromStorage(lessonId, soundUrls)
 }
+
+const deleteSlides = async (slides: { id: string, slideType: string }[], client: PoolClient) => {
+  await Promise.all(
+    slides.map(async slide => {
+      if (slide.slideType === "question") {
+        return await QuestionSlide.deleteById(slide.id, client)
+      }
+      else {
+        return await IntroSlide.deleteById(slide.id, client)
+      }
+    })
+  )
+}
+
+const processIntroSlides = async (slides: IntroSlide[], lessonId: number, client: PoolClient) => {
+  const processedSlides = slides.map(async slide => {
+    if (slide.action === "add") return await IntroSlide.post(slide, lessonId, client)
+    else return await IntroSlide.update(slide, client)
+  })
+
+  await Promise.all(processedSlides)
+}
+
+const processQuestionSlides = async (slides: QuestionSlide[], lessonId: number, client: PoolClient) => {
+  const processedSlides = slides.map(async slide => {
+    if (slide.action === "add") return await QuestionSlide.post(slide, lessonId, client)
+    else return await QuestionSlide.update(slide, client)
+  })
+
+  await Promise.all(processedSlides)
+}
+
+
+
+const g = QuestionSlide
+const b = IntroSlide
